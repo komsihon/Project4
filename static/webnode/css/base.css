@@ -1,0 +1,70 @@
+/*
+    Created on : Jun 18, 2017, 12:25:49 PM
+    Author     : roddy Mbogning
+*/
+
+#feature .feature-wrap, #services .feature-wrap  {background-color: #FFF;}
+#feature .feature-wrap img, #services .feature-wrap img  {margin: auto; width: 100%;}
+#feature .feature-wrap h3, #services .feature-wrap h3   {height: 150px; overflow: hidden}
+.tpl {display: none}
+.subtle-shade {box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .15); -moz-box-shadow: 0 1px 2px 0 -moz-rgba(0, 0, 0, .15); -webkit-box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .15)}
+.widget h3 {margin-bottom: 0}
+.single_comments:first-child {margin-bottom: 30px}
+.single_comments:first-child {margin-bottom: 0}
+.single_comments a:first-child {margin-top: 0}
+.single_comments a:last-child {margin-top: 25px}
+.blog-item {text-align: justify}
+#feature .feature-wrap, #services .feature-wrap {height: 440px}
+.features .feature-wrap {height: 400px}
+#blog .features .feature-wrap {height: 150px}
+#blog .features .feature-wrap a {height: 130px; padding-left: 0}
+#blog .features .feature-wrap a img  {max-height: 100%; height: inherit;}
+
+.feature-wrap img {height: 38%}
+.feature-wrap h2 {height: 10%}
+.feature-wrap h3 {height: 44%; overflow: hidden}
+.recent-work-wrap img {height: 232px;width: 600px;}
+
+.post_reply ul li a i {border: none}
+.single_comments.item_details div.details div {float: left}
+
+@media (max-width: 767px) {
+    .navbar-brand img {width: 55%}
+    body > section {padding: 20px 0}
+    .features.home .item:nth-child(n+2) {display: none}
+    #blog .wow:nth-child(n+2) {display: none}
+    #recent-works.h-section div.work:nth-child(n+2) {display: none}
+    .features.blog h2 {font-size: 16px}
+    .features.blog h3 {height: 50px; overflow: hidden}
+    .center {padding-bottom: 5px;}
+    .center h2 {font-size: 22px;}
+    #main-slider .carousel h1 {font-size: 17px;}
+    #main-slider .carousel .carousel-content {margin-top: 100px;}
+    #main-slider .carousel .item {height: 175px;}
+    #main-slider .carousel .slide-margin {margin-top: -78px;}
+    #main-slider .carousel .btn-slide {margin-top: 0; padding: 3px 10px;}
+    #bottom .widget {margin-top: 25px}
+    .blog .blog-item .blog-content h2 {font-size: 20px;}
+    .feature-wrap h3  {margin-top: 0}
+    .feature-wrap h2 {height: 7%}
+    .widget.categories .row {padding: 15px;}
+    aside {margin-top: 40px}
+    .partners ul li {width: 33%;}
+    .recent-work-wrap img {height: 100%}
+}
+@media (max-width: 992px) {
+    .features.home .item:nth-child(n+4) {display: none}
+}
+@media (min-width: 992px) {
+    .features.home .item:nth-child(n+5) {display: none}
+    /*#blog .features .feature-wrap {height: 250px}*/
+    .features.blog h2 {font-size: 16px}
+    .features.blog h3 {height: 50px; overflow: hidden}
+}
+
+@media (min-width: 1200px) {
+    .features.home .item:nth-child(n+5) {display: none}
+    /*#blog .features .feature-wrap {height: 250px}*/
+    .features.blog h2 {font-size: 15px}
+    .features.blog h3 {height: 50px; overflow: hidden}
+}

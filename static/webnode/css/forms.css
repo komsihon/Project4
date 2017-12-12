@@ -1,0 +1,64 @@
+/* 
+    Document   : forms
+    Created on : jan 07, 2014, 12:18:12 AM
+    Author     : Roddy Mbogning
+    Description:
+        General display rules for forms
+*/
+form.confirm {padding: 14px}
+form>div {border: 1px solid transparent; float: left; padding-top: 9px}
+form>div:first-child {padding-top: 0}
+form label {color: #F15A24; float: left; font-weight: bold; font-family: arial, sans-serif; padding: 5px 0; width: 150px}
+input[type=text], input[type=password], input[type=number], input[type=email] {background: #fff; border: 1px solid #E2700B; border-radius: 2px; box-shadow: inset 0 1px 3px rgba(0, 0, 0, .15);
+    color: #55372D; height: 27px; padding-left: 5px; width: 216px}
+input:disabled, select:disabled {background: #FCE5DD; color: #B88A7B;}
+input[type=checkbox] {margin: 0}
+select {background: #fff; border: 1px solid #F15A24; box-shadow: inset -2px 2px 3px rgba(0, 0, 0, .24); color: #55372D; height: 26px; width: 218px}
+select:disabled {background: #FCE5DD; color: #B88A7B}
+button, .button, .qq-upload-button {border-radius: 2px; box-shadow: 0 1px 1px rgba(0, 0, 0, .1); color: #FFF; cursor: default; font-family: Arial, sans-serif; font-weight: bold; height: 20px; padding: 6px 15px 1px; text-align: center; text-shadow: 1px 2px 2px rgba(0, 0, 0, .15)}
+.button, .qq-upload-button {float: left}
+button {border: none; font-size: 13px; height: 30px; margin: 0; padding: 3px 15px 4px}
+button:hover, .button:hover, .qq-upload-button:hover {box-shadow: 1px 1px 6px 3px rgba(0, 0, 0, .1); text-shadow: 0 0 4px rgba(255, 255, 255, .3)}
+button:disabled, .disabled, .disabled:hover, .qq-upload-button.disabled, .qq-upload-button.disabled:hover {background: #FCE5DD; border: 1px solid #FFDCD0; border-bottom: 2px solid #EBA890; color: #B88A7B; cursor: default; font-weight: bold; text-align: center; text-shadow: none; box-shadow: none; -moz-box-shadow: none; -webkit-box-shadow: none}
+.ui-dialog-buttonset button, button.confirm, .button.confirm, .qq-upload-button {
+    background: #FD9A2E; border: 1px solid #FA8200; border-bottom: 2px solid #DD3E00; color: #631900
+}
+button.confirm:hover, .button.confirm:hover, .qq-upload-button-hover {background: #FFA440}
+button.default, .button.default {
+    background: #feffe8;
+    border: 1px solid #FCD2AE; border-bottom: 2px solid #E2700B; color: #B95200;
+}
+button.default:hover, .button.default:hover {background: #FBFFF8}
+button.warning, .button.warning {background: #D52226; border: 1px solid #B40005; border-bottom: 2px solid #910104; color: #FFF}
+button.warning:hover, .button.warning:hover {background: #DB2327}
+button.default:active, .button.default:active, button.confirm:active, .button.confirm:active, button.warning:active, .button.warning:active {box-shadow: inset 0 1px 2px rgba(0, 0, 0, .15); outline: none}
+button.label {background: none; border: none; color: #999; font-weight: normal; height: auto; text-align: left; box-shadow: none; -moz-box-shadow: none; -webkit-box-shadow: none; text-shadow: none}
+button.label:hover {cursor: pointer; box-shadow: none; -moz-box-shadow: none; -webkit-box-shadow: none; text-shadow: none}
+.submit-result {float: left; clear: both; height: 16px; padding: 5px}
+.working {cursor: wait}
+.success {background: #B6F1B6; border: 1px solid; color: #039B03}
+.failure {background: #FFB6C1; border: 1px solid; color:  #F00}
+
+.fancy-combo-box {float: left; padding: 0}
+.fancy-combo-box input {float: left; width: 275px}
+.fancy-combo-box span.arrow, #more-categories span.arrow {
+    background: #FBB03B;
+    background: -moz-linear-gradient(top,  #FBB03B 0%, #F15A24 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FBB03B), color-stop(100%,#F15A24));
+    background: -webkit-linear-gradient(top,  #FBB03B 0%,#F15A24 100%);
+    background: -o-linear-gradient(top,  #FBB03B 0%,#F15A24 100%);
+    background: -ms-linear-gradient(top,  #FBB03B 0%,#F15A24 100%);
+    background: linear-gradient(to bottom,  #FBB03B 0%,#F15A24 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FBB03B', endColorstr='#F15A24',GradientType=0 );
+    border-bottom: 1px solid #F15A24; border-right: 1px solid #F15A24; border-top: 1px solid #F15A24;
+    border-bottom-right-radius: 3px; border-top-right-radius: 3px;
+    float: right; height: 29px; margin-left: -6px; width: 30px
+}
+.fancy-combo-box span.arrow span {background: url("http://static.cinemax.club/media/images/sprite-cinemax-club-3.png") no-repeat -66px -44px;
+    background-size: auto 84px; float: left; height: 21px; margin: 6px; width: 21px}
+.fancy-combo-box .entries-overlay {margin: -1px 0 0 -9px; max-height: 240px; overflow: hidden; padding: 10px; position: absolute; width: 150px}
+.fancy-combo-box .entries, #more-categories .entries {background: #fff; border: 1px solid #FCE5DD; float: left; max-height: 240px; overflow: auto; width: 100%}
+.fancy-combo-box .entry {cursor: default; padding: 7px 5px}
+.fancy-combo-box .entry:hover {background: #FCE5DD}
+.icon {background-repeat: no-repeat; background-size: 360px auto; float: left; height: 24px; width: 24px}
+.icon + span {float: left; margin-top: 2px}

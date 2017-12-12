@@ -1,0 +1,22 @@
+/*--
+Author: ikwen
+Author URL: http://www.ikwen.com/webNode
+
+Blue Theme for Kakocase Origin Template
+--*/
+
+h1,h2,h3,h4,h5,h6{color: #0e0623}
+.top-bar {background: #1b0061; border-bottom:1px solid #1c1b61}
+.navbar {background: #1e0069}
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus, .navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus{background-color:#ff6a00}
+#main-slider .prev, #main-slider .next{background-color:#ff6a00}
+#main-slider .carousel-indicators .active:after {background-color:#ff6a00;border: 1px solid #ff6a00;}
+a {color:#ff6a00}
+.recent-work-wrap .overlay {background: #28067e}
+#bottom {border-bottom: 5px solid #ff6a00}
+#footer {background: #1b0061;}
+#publish_date {background: #ff6a00}
+.badge {background-color: #ff6a00;}
+.btn-primary:hover, .btn-primary:focus , .btn-primary{background: #ff6a00;}
+.badge:before {border-color: transparent transparent transparent #ff6a00}
+.navbar-inverse .navbar-nav > li > a:hover {background-color: #ff6a00;}
