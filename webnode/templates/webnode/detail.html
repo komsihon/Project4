@@ -1,0 +1,33 @@
+{% extends 'webnode/details_base.html' %}
+{% load i18n staticfiles auth_tokens %}
+{% block meta %}
+    <meta name="abstract" content="{{ product.name }} "/>
+    <meta property="og:title" content="{{ product.name }} {% trans "sur" %} "/>
+    <meta property="og:description" content="{{ product.description }}"/>
+    <meta property="og:image" content="{{ product.get_photos_url_list.0 }}"/>
+
+{% endblock %}
+{% block page_title %} <title>{{ product.name }}</title> {% endblock %}
+
+{% block blog_content %}
+    {% include 'snippets/fb_sdk.html' %}
+    <div class="blog-item">
+        {% if  product.image %}
+        <img class="img-responsive img-blog" src="{{ product.get_photos_url_list.0.small }}" width="100%" alt="" />
+        {% endif %}
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 blog-content">
+                <h2>{{ product.name  }}</h2>
+                <div>{{ product.description | safe }}</div>
+            </div>
+        </div>
+    </div><!--/.blog-item-->
+
+    <div class="pull-left post_reply text-center">
+        <ul>
+            <li><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"><i class="fa fa-facebook"></i></a></li>
+            <li><a target="_blank" href="https://twitter.com/share?url={{ request.build_absolute_uri }}"><i class="fa fa-twitter"></i></a></li>
+            <li><a target="_blank" href="https://plus.google.com/share?url={{ request.build_absolute_uri }}"><i class="fa fa-google-plus"></i> </a></li>
+        </ul>
+    </div>
+{% endblock %}

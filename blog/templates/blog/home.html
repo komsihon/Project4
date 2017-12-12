@@ -1,0 +1,58 @@
+{% extends 'blog/base.html' %}
+{% load i18n humanize staticfiles %}
+
+{% block blog_content %}
+    {% include 'snippets/fb_sdk.html' %}
+    {% if entries %}
+        {% for entry in items_paginated %}
+            <div class="blog-item">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-2">
+                        <div class="entry-meta">
+                            <span id="publish_date">{{ entry.pub_date }}</span>
+                            <span><i class="fa fa-user"></i> <a href="#">{{ entry.member.full_name  }}</a></span>
+                            <span><i class="fa fa-comment"></i> <a href="{% url 'blog:details' entry.slug %}#comments">{{ entry.comment_count }} Comments</a></span>
+                            <span><i class="fa fa-heart"></i><a href="#">{{ entry.likes  }} Likes</a></span>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-12 col-sm-10 blog-content">
+                        {% if  entry.image %}
+                        <a href="#"><img class="img-responsive img-blog" src="{{ entry.image.url }}" width="100%" alt="" /></a>
+                        {% endif %}
+                        <h2><a href="{% url 'blog:details' entry.slug %}">{{ entry.title }}</a></h2>
+                        <h3>{{ entry.summary }}</h3>
+                        <a class="btn btn-primary readmore" href="{% url 'blog:details' entry.slug %}">Read More <i class="fa fa-angle-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="post alert alert-danger" align="center" style="">
+			<h2 style="line-height: 35px;">
+				Sorry, there is no article corresponding to your criteria <br/> Try another one please.
+			</h2>
+		</div>
+    {% endif %}
+    {{ items_paginated.page_range }}
+    <div class="paginator">
+        {% if items_paginated.has_previous %}
+           <a href="{% url 'blog:home' %}?page={{ items_paginated.previous_page_number }}" >{{ items_paginated.previous_page_number }}</a>
+        {% endif %}
+            <span>{{ items_paginated.number }}</span>
+        {% if items_paginated.has_next %}
+           <a href="{% url 'blog:home' %}?page={{ items_paginated.next_page_number }}" >{{ items_paginated.next_page_number }}</a>
+        {% endif %}
+    </div>
+
+{% endblock %}
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function() {
+            $('ul.navbar-nav li').removeClass('active')
+            $('ul.navbar-nav li.blog').addClass('active')
+        })()
+    </script>
+{% endblock %}
+

@@ -1,0 +1,188 @@
+{% extends 'core/app_base_admin.html' %}
+{% load i18n humanize staticfiles auth_tokens %}
+
+{% block page_title %}
+<title> {% if post %}{{ post.title }}{% else %}{% trans "New post" %}{% endif %} - {{ service.project_name }} </title>
+{% endblock %}
+
+{% block head_style %}
+    {{ block.super }}
+    <style>
+        .verify {border: 1px solid #e74c3c}  {# Highlights form errors (Check performed by javascript) #}
+        div#upload-container { float: left; margin-top: 3px; width: 74% }
+        div#upload-container .image {background: url('{% static 'ikwen/img/no_photo.png' %}') no-repeat center; background-size: 100%; border: solid 1px #DBE6FF; height: 225px; float: left; margin: 5px; overflow: hidden; width: 280px}
+        div#upload-container .image .progress {float: left; background: #3C63FF; height: 10px; margin-top: 228px}
+        div#upload-container .image .spinner {margin-top: 90px}
+        div#upload-container .uploader {display: none; height: 225px; position: absolute; text-align: center; width: 280px}
+        div#upload-container .image:hover .uploader {display: block}
+        .qq-uploader {background: rgba(0, 0, 0, .7); height: 40px; padding-top: 8px}
+        .qq-upload-button {background: none; border: none; box-shadow: none; color: #fff; text-shadow: none; height: 100px; width: 100%}
+        .qq-upload-button-hover {box-shadow: none; color: #fff}
+        .qq-upload-list {display: none}
+    </style>
+{% endblock %}
+
+{% block breadcrumb_location %}
+    <li>
+        <a href="{% url 'blog:list_blog' %}">{% trans "Posts" %}</a>
+    </li>
+    {% if post %}
+        <li>{{ post.title }}</li>
+    {% else %}
+        <li>{% trans 'New' %}</li>
+    {% endif %}
+{% endblock %}
+
+{% block admin_content %}
+    <div id="admin-content" class="change-form">
+        <div class="container-fluid">
+            {% url 'blog:change_blog' as change_category_url %}
+            {% if errors %}<p class="alert alert-danger">{{ errors }}</p>{% endif %}
+            <form id="submit-post" class="admin-form" method="post" action="{{ change_category_url|append_auth_tokens:request }}">{% csrf_token %}
+
+                <input type="hidden" name="slug" id="slug" value="{{ post.slug }}" />
+                <input type="hidden" name="post_id" value="{{ post.id }}" />
+                <input type="hidden" name="photos_ids" id="photos_ids" value="" />
+                <input type="hidden" name="image_url" id="image_url" value="" />
+                {% include 'core/snippets/model_admin_form.html' %}
+                <section class="photos" style="width: 100%">
+                    <label class="required" style="float: left; width: 100%">{% trans "Cover image" %}</label>
+                    <div id="upload-container">
+                        {% if post.image and post.image.name %}
+                        <div class="image" style="background-image: url('{{ post.get_image_url }}')">
+                        {% else %}
+                        <div class="image">
+                        {% endif %}
+                            <span class="progress"></span>
+                            <div class="uploader"></div>
+                            {% include 'core/snippets/spinner.html' %}
+                        </div>
+                    </div>
+                    <p class="help clear">{% trans "Nice cover photo to help customer have an idea" %} (640px &times; 426px Recommended)</p>
+                </section>
+                <div class="form-group col-xs-12 col-sm-4 col-md-3" style="clear: both; padding-top: 15px">
+                    <button class="btn btn-sm btn-primary btn-block">{% trans "Save" %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script src="{% static 'ikwen/ajaxuploader/js/fileuploader.js' %}"></script>
+    <script type="text/javascript">
+        (function() {
+        $('div#admin-nav .post').addClass('active');
+            $('.form-row').addClass('form-group');
+            $('.form-row input, .form-row select, .form-row textarea').addClass('form-control input-sm');
+            $('.form-row textarea').addClass('form-control input-sm');
+                {% if request.GET.name %}
+                    $('#id_title').val("{{ request.GET.name }}");
+                {% endif %}
+                {% if error %}
+                    ikwen.showFloatingNotice("{{ error }}", '', 6);
+                {% endif %}
+
+                $('form#submit-post').on('change', 'input, textarea', function() {
+                    var post = getLocalPost();
+                    localStorage.setItem('post', JSON.stringify(post));
+                }).submit(function() {
+                    return checkInput();
+                });
+                var pageLoading = true,
+                    post;
+                function getLocalPost() {
+                    post = localStorage.getItem('post') ? JSON.parse(localStorage.getItem('post')):{};
+                    if (pageLoading) {
+                        // Do not override locally saved post with form data upon page loading
+                        pageLoading = false;
+                        return post
+                    }
+                    var photos = [];
+                    if (post != {} && post.photos) photos = post.photos; //Keep a copy of photos objects
+                    var postAsArray = $('form#submit-post').serialize().split('&');
+                    for (var i=0; i<postAsArray.length; i++) {
+                        var elt = postAsArray[i].split('=');
+                        post[elt[0]] = decodeURIComponent(elt[1]).replace(/\+/g, ' ');
+                    }
+                    post.photos = photos; //Then restore the photos objects on the update serialized form
+                    return post
+                }
+                function checkInput() {
+                    var check = true;
+                    $('input.required').each(function() {
+                        if (!(this).val()) {
+                            ikwen.showFloatingNotice("{% trans "Missing information. Please check." %}", '', 6);
+                            $(this).addClass('verify');
+                            check = false;
+                        }
+                    });
+
+                    return check;
+                }
+                var uploader = new qq.FileUploader({
+                    action: "{% url 'blog:post_photo_uploader' %}",
+                    element: $('div#upload-container .uploader')[0],
+                    buttonText: "{% trans "Upload cover" %}",
+                    multiple: false,
+                    onProgress: function(id, fileName, loaded, total) {
+                        var ratio = loaded / total,
+                            percent = ratio * 100;
+                        $('div#upload-container .image .progress').animate({width: percent + '%'});
+                        if (ratio == 1) $('div#upload-container .image .spinner').show()
+                    },
+                    onComplete: function(id, fileName, responseJSON) {
+                        if(responseJSON.success) {
+                            var imageUrl = responseJSON.url,
+                                img = new Image(),
+                                post = getLocalPost();
+                            img.onload = function() {
+                                $('div#upload-container .image').css('background-color', "#fff")  // Causes the placeholder image to disappear
+                                        .css('background-image', "url('" + imageUrl +"')")
+                                        .find('.progress, .spinner').hide();
+                            };
+                            img.src = imageUrl;
+                            post.image_url = imageUrl;
+                            $('#image_url').val(imageUrl);
+                            localStorage.setItem('post', JSON.stringify(post));
+                        } else {
+                            alert("upload failed!");
+                        }
+                    },
+                    params: {
+                        'csrf_token': '{{ csrf_token }}',
+                        'csrf_name': 'csrfmiddlewaretoken',
+                        'csrf_xname': 'X-CSRFToken'
+                    }
+                });
+
+
+                {% if post %}
+                    $('#image_url').val("{{ post.get_image_url }}");
+                {% else %}
+                    post = getLocalPost();  // Post from an unterminated submit
+                    if (post) {
+                        $('#id_category').val(post.category_id);
+                        $('#id_name').val(post.title);
+                        $('#id_summary').val(post.summary);
+                        $('#image_url').val(post.image_url);
+                        $('#id_entry').val(post.entry);
+                        $('#id_media_link').val(post.id_media_link);
+                        $('#id_tags').val(post.id_tags);
+                        $('#id_publish').prop('checked', post.publish);
+
+                    }
+                {% endif %}
+
+                var $new = $('<option value="new">{% trans "New" %} ...</option>');
+                $new.appendTo('#id_category');
+                $('#id_category').on('change', function() {
+                    var val = $(this).val();
+                    if (val === 'new') {
+                        window.location = "{% url 'kako:change_category' %}"
+                    }
+                });
+        })()
+    </script>
+{% endblock %}

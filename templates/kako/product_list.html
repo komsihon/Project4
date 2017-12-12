@@ -1,0 +1,127 @@
+{% extends 'core/app_base_admin.html' %}
+{% load i18n humanize staticfiles auth_tokens %}
+
+{% block page_title %}
+<title>{% trans "Items" %} - {{ service.project_name }}</title>
+{% endblock %}
+
+{% block head_style %}
+    {{ block.super }}
+    <style>
+        .ik-li.product .about p {margin-bottom: 0}
+        .ik-li.product .about p strong {padding-left: 10px}
+        .ik-li.product .actions .glyphicon-edit:not(.edit) {color: #ddd}
+    </style>
+{% endblock %}
+
+{% block selection_actions %}
+    <div class="actions">
+        {% if request.GET.smart_link %}
+            <i class="glyphicon glyphicon-link link" title="{% trans "Link products" %}"></i>
+        {% else %}
+            <i class="glyphicon glyphicon-trash trash" title="{% trans "Delete selected" %}"></i>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block breadcrumb_location %}
+    <li>{% trans "Page items" %}</li>
+{% endblock %}
+
+{% block admin_content %}
+    <div id="admin-content">
+        <div class="container-fluid">
+            {% include 'kako/snippets/product_list_results.html' %}
+            </div>
+
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function() {
+            $('div#admin-nav .products').addClass('active');
+            var searchDescriptor = [{
+                endpoint: '{% url 'kako:product_list' %}',
+                resultTplSelector: '#results li.ik-li'
+            }];
+            function beforeSearch() {
+                var val = $('form#context-search input').val();
+                $('div#results .search-text').text(val);
+            }
+            function afterSearch() {
+                var val = $('form#context-search input').val(),
+                    endpoint = '{% url 'kako:change_product' %}?name=' + val;
+                {% if request.GET.collection_id %}
+                    endpoint += '&collection_id={{ request.GET.collection_id }}';
+                {% endif %}
+                $('#new-product').attr('href', endpoint);
+                {% if request.GET.smart_link and smart_object.items_fk_list %}
+                    var $elt;
+                    {% for pk in smart_object.items_fk_list %}
+                        $elt = $('#{{ pk }}');
+                        if (!$elt.hasClass('selected')) $('#{{ pk }} .select').click();
+                    {% endfor %}
+                {% endif %}
+            }
+            $('li.ik-li.product .duplicate').hide()
+            $('li.product .actions .update-stock').hide()
+            $('div.info .about').hide()
+
+            $('#admin-content').on('click', 'li.ik-li.product .duplicate', function() {
+                var id = $(this).parents('.ik-li.product').data('id');
+                window.location = '{% url 'kako:change_product' %}?product_id=' + id + '&duplicate=yes';
+            }).on('click', 'li.product .actions .update-stock', function() {
+                var productId = $(this).parents('.ik-li.product').data('id'),
+                    currentStock = $(this).parents('.ik-li.product').data('stock');
+                $('div#update-stock input').val(currentStock);
+                $('div#update-stock button.btn-success').data('product-id', productId);
+            }).on('click', 'li.product .actions .update-price', function() {
+                var productId = $(this).parents('.ik-li.product').data('id'),
+                    retailPrice = $(this).parents('.ik-li.product').data('retail_price');
+                $('div#update-price input').val(retailPrice);
+                $('div#update-price button.btn-success').data('product-id', productId);
+            });
+            $('div#update-stock button.btn-success').click(function() {
+                var newStock = $('div#update-stock input').val(),
+                    productId = $(this).data('product-id');
+                $.getJSON('{% url 'kako:update_product_stock' %}', {stock: newStock, product_id: productId}, function(resp) {
+                    if (resp.error) {
+                        ikwen.showFloatingNotice("Unknown error occurred", '', 3);
+                        return
+                    }
+                    $('#' + productId + ' .about .stock').text(newStock)
+                })
+            });
+            $('div#update-price button.btn-success').click(function() {
+                var newPrice = $('div#update-price input').val(),
+                    productId = $(this).data('product-id');
+                $.getJSON('{% url 'kako:update_product_retail_price' %}', {price: newPrice, product_id: productId}, function(resp) {
+                    if (resp.error) {
+                        ikwen.showFloatingNotice("Unknown error occurred", '', 3);
+                        return
+                    }
+                    $('#' + productId + ' .retail_price .value').text(newPrice)
+                })
+            });
+            ikwen.setupSearch('#context-search input', '#results', searchDescriptor, beforeSearch, afterSearch);
+            ikwen.deleteEndpoint = '{% url 'kako:put_product_in_trash' %}';
+            {% if messages %}
+                {% for msg in messages %}
+                    ikwen.showFloatingNotice('{{ msg }}', '', 6);
+                    {% if msg.tags == 'success' %}localStorage.removeItem('product');{% endif %}
+                {% endfor %}
+            {% endif %}
+            {% if request.GET.smart_link %}
+                $('.glyphicon-link').click(function() {
+                    var selection = $('#selection-control').data('selection');
+                    window.location = '{% url 'marketing:set_smart_object_content' 'add' %}?smart_object_id={{ smart_object.id }}&selection=' + selection;
+                });
+                {% for product_id in smart_object.items_fk_list %}
+                    $('#{{ product_id }} .select').click();
+                {% endfor %}
+            {% endif %}
+        })()
+    </script>
+{% endblock %}

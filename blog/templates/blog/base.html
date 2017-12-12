@@ -1,0 +1,91 @@
+{% extends 'webnode/base.html' %}
+{% load staticfiles auth_tokens %}
+{% block page_content %}
+    {% block page_header %}
+    {% endblock %}
+    <section id="blog" class="container blog">
+        <div class="row blog-content">
+            <div  class="col-md-8" style="">
+            {% block blog_content %}
+            {% endblock %}
+            </div>
+            <aside class="col-md-4">
+                <div class="widget search">
+                    <form role="form" action="{% url 'blog:search'   %}" method="get" autocomplete="off">
+                        <input type="text"  name="radix" class="form-control search_box" autocomplete="off" placeholder="Search blog">
+                    </form>
+                </div><!--/.search-->
+                {% if suggestions %}
+                <div class="widget categories">
+                    <h3>Post suggestions</h3>
+                    <div class="row" style="">
+                        <div class="col-sm-12">
+                            {% for suggestion in suggestions %}
+                            <div class="single_comments">
+                                <a href="{% url 'blog:details' suggestion.slug %}"  style="color: #0f0f0f">
+                                    <img src="{% static 'webnode/img/blog/avatar3.png' %}" alt=""  />
+                                    <p>{{ suggestion.title }} </p>
+                                </a>
+                                <div class="entry-meta small muted">
+                                    <span>By <a href="#">{{ suggestion.member.full_name }}</a></span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div><!--/.recent comments-->
+                {% endif %}
+
+
+                <div class="widget categories">
+                    <h3>Categories</h3>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <ul class="blog_category">
+                                {% for category in categories %}
+                                <li><a href="{% url 'blog:post_per_category'  category.slug %}">{{ category.name }} <span class="badge">{{ category.post_count }}</span></a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div><!--/.categories-->
+                {% if recent_posts %}
+                <div class="widget categories">
+                    <h3>Most consulted</h3>
+                    <div class="row">
+                        {% for suggestion in recent_posts %}
+                        <div class="single_comments">
+                            <a href="{% url 'blog:details' suggestion.slug %}" style="color: #0f0f0f">
+                                <img src="{% static 'webnode/img/blog/avatar3.png' %}" alt=""  />
+                                <p>{{ suggestion.title }} </p>
+                            </a>
+                            <div class="entry-meta small muted">
+                                <span>By <a href="#">{{ suggestion.member.full_name }}</a></span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </aside>
+        </div>
+    </section>
+        <!-- /#page-content-wrapper -->
+{% endblock %}
+
+    <!-- jQuery -->
+{#    <script src="{% static 'js/jquery-1.12.4.min.js' %}"></script>#}
+
+    <!-- Bootstrap Core JavaScript -->
+{#    <script src="{% static 'js/bootstrap.min.js' %}"></script>#}
+
+    {% block js %}
+        {{ block.super }}
+        <script type="text/javascript">
+        (function() {
+            $('form#search input.input-sm').attr('placeholder', 'Search ikwen')
+             $('ul.navbar-nav li').removeClass('active')
+            $('ul.navbar-nav li.blog').addClass('active')
+        })()
+    </script>
+    {% endblock %}

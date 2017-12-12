@@ -1,0 +1,158 @@
+{% extends 'webnode/base.html' %}
+{% load static auth_tokens %}
+{% block page_content %}
+    {% if slideshow %}
+    <section id="main-slider" class="no-margin">
+        <div class="carousel slide">
+            <ol class="carousel-indicators">
+                {% for slide in slideshow %}
+                <li data-target="#main-slider" data-slide-to="{{ forloop.counter0 }}"></li>
+                {% endfor %}
+            </ol>
+            <div class="carousel-inner">
+                {% for slide in slideshow %}
+                    {% if slide.image.name %}
+                        <div class="item" style="background-image: url({{ slide.image.url }}">
+                            <div class="container">
+                                <div class="row slide-margin">
+                                    <div class="col-sm-6 hidden-xs animation animated-item-4">
+                                        <div class="slider-img">
+                                            <img src="" class="img-responsive">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!--/.item-->
+                    {% endif %}
+                {% endfor %}
+            </div><!--/.carousel-inner-->
+        </div><!--/.carousel-->
+        <a class="prev hidden-xs" href="#main-slider" data-slide="prev">
+            <i class="fa fa-chevron-left"></i>
+        </a>
+        <a class="next hidden-xs" href="#main-slider" data-slide="next">
+            <i class="fa fa-chevron-right"></i>
+        </a>
+    </section><!--/#main-slider-->
+    {% endif %}
+
+
+    {% for entry in home_entry_list %}
+        <section class="feature h-section">
+            <div class="container">
+                <div class="center wow fadeInDown">
+                    <a href="{% url 'webnode:item_list' entry.slug %}"><h2>{{ entry.title }}</h2></a>
+                    <p class="lead">{{ entry.description }}</p>
+                </div>
+                <div class="row">
+                    <div class="features home">
+                        {% for product in  entry.product_list %}
+                            {% for item in  product.items %}
+                            <div class="col-lg-3 col-sm-4 col-xs-12 wow item fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                                <div class="feature-wrap subtle-shade">
+                                    <a href="{% url 'webnode:product_details' item.slug %}">
+                                        <img src="{{ item.get_photos_url_list.0.small }}" class="img-responsive">
+                                    </a>
+                                    <a href="{% url 'webnode:product_details' item.slug %}"> <h2>{{ item.name }}</h2></a>
+                                    <h3>{{ item.summary | safe }}</h3>
+                                </div>
+                            </div><!--/.col-md-4-->
+                            {% endfor %}
+                        {% endfor %}
+                    </div><!--/.services-->
+                </div><!--/.row-->
+            </div><!--/.container-->
+        </section><!--/#feature-->
+    {% endfor %}
+
+    {% if entries %}
+    <section class="feature  h-section" id="blog">
+        <div class="container">
+            <div class="center wow fadeInDown">
+                <a href="{% url 'blog:home' %}"><h2>News</h2></a>
+{#                <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut <br> et dolore magna aliqua. Ut enim ad minim veniam</p>#}
+            </div>
+            <div class="row">
+                <div class="features blogs">
+                    {% for entry in entries %}
+                    <div class="blog col-md-6 col-sm-6 col-xs-12 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                        <div class="feature-wrap col-md-12 col-sm-12 col-xs-12">
+                             {% if  entry.image %}
+                            <a href="#" class="col-md-4 col-sm-3 col-xs-12">
+                                <img class="img-responsive img-blog" src="{{ entry.image.url }}" alt="" />
+                            </a>
+                            {% endif %}
+                            <div class="col-md-8 col-sm-9 col-xs-12"  style="float: left">
+                                <h2><a href="{% url 'blog:details' entry.slug %}">{{ entry.title | truncatewords:"5" }}</a></h2>
+                                <h3 style="">{{ entry.summary | safe | truncatewords:"10" }}</h3>
+                            </div>
+
+                            <a class="readmore clearfix" href="{% url 'blog:details' entry.slug %}" style="float: right">Read More</a>
+
+                        </div>
+                    </div><!--/.col-md-4-->
+                    {% endfor %}
+                </div>
+            </div><!--/.row-->
+        </div><!--/.container-->
+    </section><!--/#feature-->
+    {% endif %}
+
+    {% if smart_portfolio %}
+    <section id="recent-works" class="h-section">
+        <div class="container">
+            <div class="center wow fadeInDown">
+                <a href="{% url 'webnode:portfolio' %}"><h2>Recent Works</h2></a>
+{#                <p class="lead">{{ recent_work.description }}</p>#}
+            </div>
+
+            <div class="row">
+                {% for work in smart_portfolio %}
+                    <div class="col-xs-12 col-sm-4 col-md-3 work">
+                        <div class="recent-work-wrap">
+                            <img class="img-responsive" src="{{ work.get_photos_url_list.0.small }}" alt="">
+                            <div class="overlay">
+                                <div class="recent-work-inner">
+                                    <h3><a href="#">{{ work.name }}</a> </h3>
+                                    <p>{{ work.summary | safe  | truncatewords:"15" }}</p>
+                                    <a class="preview" href="{{ work.get_photos_url_list.0.small }}" rel="prettyPhoto"><i class="fa fa-eye"></i> View</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div><!--/.row-->
+        </div><!--/.container-->
+    </section><!--/#recent-works-->
+    {% endif %}
+
+    {% if partners_list %}
+    <section id="partner" class="h-section">
+        <div class="container">
+            <div class="center wow fadeInDown" style="padding-bottom: 0">
+                <h2>Our Partners</h2>
+{#                <p class="lead">{{ smart_partners.description }}</p>#}
+            </div>
+            <div class="partners">
+                <ul>
+                    {% for partner in  partners_list %}
+                    <li> <a href="#"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="{{ partner.get_photos_url_list.0.small }}"></a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div><!--/.container-->
+    </section><!--/#partner-->
+    {% endif %}
+
+{% endblock %}
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function() {
+            $('ul.navbar-nav li').removeClass('active')
+            $('ul.navbar-nav li.home').addClass('active')
+            $('.carousel.slide .carousel-inner').find('div.item:first-child').addClass('active')
+            $('.carousel.slide .carousel-indicators').find('li:first-child').addClass('active')
+        })()
+    </script>
+{% endblock %}

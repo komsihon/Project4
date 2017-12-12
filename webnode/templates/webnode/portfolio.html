@@ -1,0 +1,48 @@
+{% extends 'webnode/base.html' %}
+{% load staticfiles auth_tokens %}
+{% block page_content %}
+    <section id="portfolio">
+        <div class="container">
+            <div class="center">
+               <h2>Portfolio</h2>
+{#               <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut <br> et dolore magna aliqua. Ut enim ad minim veniam</p>#}
+            </div>
+
+
+            <ul class="portfolio-filter text-center">
+                <li><a class="btn btn-default active" href="#" data-filter="*">All Works</a></li>
+                {% for category in category_list %}
+                <li><a class="btn btn-default" href="#" data-filter=".{{ category.slug }}">{{ category.name }}</a></li>
+                {% endfor %}
+            </ul>
+
+            <div class="row">
+                <div class="portfolio-items">
+                    {% for work in smart_portfolio %}
+                        <div class="portfolio-item {{ work.category.slug }} col-xs-12 col-sm-4 col-md-3">
+                            <div class="recent-work-wrap">
+                                <img class="img-responsive" src="{{ work.get_photos_url_list.0.small }}" alt="">
+                                <div class="overlay">
+                                    <div class="recent-work-inner">
+                                        <h3><a href="#">{{ work.name }}</a> </h3>
+                                        <p>{{ work.summary | safe  | truncatewords:"15" }}</p>
+                                        <a class="preview" href="{{ work.get_photos_url_list.0.small }}" rel="prettyPhoto"><i class="fa fa-eye"></i> View</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section><!--/#portfolio-item-->
+{% endblock %}
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function() {
+            $('ul.navbar-nav li').removeClass('active')
+            $('ul.navbar-nav li.portfolio').addClass('active')
+        })()
+    </script>
+{% endblock %}

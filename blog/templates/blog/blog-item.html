@@ -1,0 +1,182 @@
+{% extends 'blog/base.html' %}
+{% load i18n staticfiles auth_tokens %}
+{% block meta %}
+    <meta name="abstract" content="{{ blog.title }}"/>
+    <meta property="og:title" content="{{ blog.title }} {% trans "sur" %} "/>
+    <meta property="og:description" content="{{ blog.summary }}"/>
+    <meta property="og:image" content="{{ post.media.url }}"/>
+
+{% endblock %}
+{% block page_title %} <title>{{ blog.title }}</title> {% endblock %}
+
+{% block blog_content %}
+    {% include 'snippets/fb_sdk.html' %}
+    <div class="blog-item">
+        {% if  blog.image %}
+        <img class="img-responsive img-blog" src="{{ blog.image.url }}" width="100%" alt="" />
+        {% endif %}
+        <div class="row">
+            <div class="col-xs-12 col-sm-2 text-center">
+                <div class="entry-meta">
+                    <span id="publish_date">{{ blog.pub_date }}</span>
+                    <span>
+                        {% url 'ikwen:profile' blog.member.id as member_url %}
+                        <i class="fa fa-user"></i>
+                        <a href="#" target="_blank">{{ blog.member.full_name }}</a>
+                    </span>
+                    <span><i class="fa fa-comment"></i> <a href="blog-item.html#comments">{{ blog.comment_count }}  Comments</a></span>
+                    <span><i class="fa fa-heart"></i><a href="#">56 Likes</a></span>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-10 blog-content">
+                <h2>{{ blog.title }}</h2>
+                {{ blog.entry }}.x`
+            </div>
+        </div>
+    </div><!--/.blog-item-->
+
+    <div class="media reply_section" style="padding: 10px;">
+        <div class="pull-left post_reply text-center" style="margin-top: 0;">
+            <strong style="float: left; margin-top: 8px">{% trans "Share" %}: </strong>
+            <ul style="float: left; margin-left: 15px;">
+                <li><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"><i class="fa fa-facebook"></i></a></li>
+                <li><a target="_blank" href="https://twitter.com/share?url={{ request.build_absolute_uri }}"><i class="fa fa-twitter"></i></a></li>
+                <li><a target="_blank" href="https://plus.google.com/share?url={{ request.build_absolute_uri }}"><i class="fa fa-google-plus"></i> </a></li>
+            </ul>
+        </div>
+{#        <div class="media-body post_reply_content">#}
+{#            <h3>Antone L. Huges</h3>#}
+{#            <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariaturp</p>#}
+{##}
+{#        </div>#}
+    </div>
+
+    <h1 id="comments_title">{{ blog.comment_count }} Comments</h1>
+    {% for comment in comments %}
+        <div class="media comment_section">
+            <div class="pull-left post_comments">
+                <a href="#"><img src="images/blog/girl.png" class="img-circle" alt="" /></a>
+            </div>
+            <div class="media-body post_reply_comments">
+                <h3>{{ comment.name }} ({{ comment.email }})</h3>
+                <h4>{{ comment.pub_date }}</h4>
+                <p>{{ comment.entry }}</p>
+            </div>
+        </div>
+    {% endfor %}
+    <div class="media comment_section comment tpl">
+        <div class="pull-left post_comments">
+            <a href="#"><img src="images/blog/girl.png" class="img-circle" alt="" /></a>
+        </div>
+        <div class="media-body post_reply_comments">
+            <h3></h3>
+            <h4></h4>
+            <p></p>
+        </div>
+    </div>
+    <form id="main-contact-form" class="contact-form" name="contact-form"  role="form" style="margin-top: 100px;">{% csrf_token %}
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="form-group c-name">
+                    <label>Name *</label>
+                    <input type="text" class="form-control u-name" required>
+                    <em class="hidden"> * {% trans 'Enter your name please' %}</em>
+                </div>
+                <div class="form-group c-email">
+                    <label>Email *</label>
+                    <input type="email" class="form-control u-email" required>
+                    <em class="hidden"> * {% trans 'Incorrect email format' %}</em>
+                </div>
+            </div>
+            <div class="col-sm-7">
+                <div class="form-group c-comment">
+                    <label>Message *</label>
+                    <textarea name="message" id="message" required class="form-control u-comment" rows="8"></textarea>
+                    <em class="hidden"> {% trans 'Unable to save a comment without comment. Enter your comment please' %}</em>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary btn-lg" required="required" style="float: right;">Submit Message</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+
+{% endblock %}
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        String.prototype.isValidEmail = function() {
+            return /^[^\W][a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\@[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\.[a-zA-Z]{2,4}$/.test(this)
+        };
+        (function() {
+            {% if request.user.is_authenticated %}
+                $('input.u-name').val("{{ request.user.full_name }}")
+                $('input.u-email').val("{{ request.user.email }}")
+            {% endif %}
+            $('form button').click(function (){
+                var entry = $('form textarea.u-comment').val(),
+                    name =  $('form input.u-name').val(),
+                    email =  $('form input[type=email]').val(),
+                    error_count =  0,
+                    postId = "{{ blog.id }}";
+                if (!email.isValidEmail()){
+                    $('div.c-email').find('em').fadeIn();
+                    error_count += 1
+                }
+                if (name == '' ){
+                    $('div.c-name').find('em').fadeIn();
+                    error_count += 1
+                }
+                if (entry == '' ){
+                    $('div.c-comment').find('em').fadeIn();
+                    error_count += 1
+                }
+
+                if (error_count > 0) return false;
+                var endpoint = "{% url 'blog:save_comment' %}";
+                var params = {format: 'json', post_id: postId, email: email, name: name, comment:entry};
+                if ($('form.send-mail-announcer .copy-to-sender').attr('checked')) params.copy_to_sender = 'yes';
+                $('body, button.confirm').css('cursor','wait');
+                $.getJSON(endpoint, params, function(data) {
+                    $('body, button.confirm').css('cursor','default');
+                    if (data.error) {
+                        $('div#top-notice-ctnr span').html(data.error).addClass('failure');
+                        $('#top-notice-ctnr').fadeIn().delay(5000).fadeOut();
+                    } else {
+                        $('div#top-notice-ctnr span').html('{% trans "Your comment was successfully save" %}');
+                        $('#top-notice-ctnr').fadeIn().delay(5000).fadeOut();
+                        $('form input').val('');
+                        $('form textarea').text('');
+                        $('form textarea.u-comment').val('');
+                        populateComment(data)
+                    }
+                    return false
+                });
+                return false
+            });
+            $('form textarea').focusin(function() {$(this).parent('div.c-comment').find('em').hide()});
+            $('form input[type=text]').focusin(function() {$(this).parent('div.c-name').find('em').hide()});
+            $('form input[type=email]').focusin(function() {$(this).parent('div.c-email').find('em').hide()});
+
+            function populateComment(comment) {
+                var $newComment = $('.comment.tpl').clone().removeClass('tpl');
+                $newComment = applyCommentTemplate($newComment, comment).insertBefore('.tpl').show()
+            }
+            function applyCommentTemplate($tpl, comment){
+                var completeName = comment.name + "(" + comment.email + ")";
+                $tpl.find('.media-body h3').text(completeName + ' ' + comment.email);
+                $tpl.find('.media-body p').text(comment.entry);
+                $tpl.find('.media-body h4').text(comment.publ_date);
+                return $tpl
+            }
+            $('#lightbox').find('.dialog .close').click(function() {
+                $('#lightbox').fadeOut()
+            });
+            $('#share').click(function() {
+                $('#lightbox').fadeIn()
+            })
+        })()
+    </script>
+{% endblock %}

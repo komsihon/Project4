@@ -1,0 +1,42 @@
+- model: kakocase.businesscategory
+  pk: 5692287b3301e0706b51a9b1
+  fields:
+    name: High Tech
+    slug: high-tech
+
+- model: kakocase.businesscategory
+  pk: 5692287b3301e0706b51a9b2
+  fields:
+    name: Beverage
+    slug: beverage
+
+- model: webnode.operatorprofile
+  pk: 56922874b37b33706b51f001
+  fields:
+    service: 56eb6d04b37b3379b531b101
+    company_name: Tecno Mobile Telecom
+    company_name_slug: tecno-mobile-telecom
+    city: Yaounde
+
+- model: webnode.operatorprofile
+  pk: 56922874b37b33706b51f002
+  fields:
+    service: 56eb6d04b37b3379b531b102
+    company_name: Les Brasseries du Cameroun
+    company_name_slug: les-brasseries-du-cameroun
+    city: Yaounde
+
+- model: webnode.operatorprofile
+  pk: 56922874b37b33706b51f003
+  fields:
+    service: 56eb6d04b37b3379b531b103
+    company_name: Point Fokal
+    city: Douala
+
+- model: webnode.operatorprofile
+  pk: 56922874b37b33706b51f005
+  fields:
+    service: 56eb6d04b37b3379b531b105
+    company_name: Campost
+    company_name_slug: campost
+    city: Yaounde

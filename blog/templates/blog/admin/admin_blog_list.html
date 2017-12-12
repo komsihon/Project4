@@ -1,0 +1,96 @@
+    {% extends "core/app_base_admin.html" %}
+    {% load i18n humanize staticfiles auth_tokens %}
+
+    {% block page_title %}
+    <title> {% trans "Categories" %} - {{ service.project_name }} </title>
+    {% endblock %}
+
+    {% block head_style %}
+        {{ block.super }}
+        <style>
+        </style>
+    {% endblock %}
+
+    {% block selection_actions %}
+        <div class="actions">
+            {% if request.GET.smart_link %}
+                <i class="action icon link" title="{% trans "Link categories" %}"></i>
+            {% else %}
+                <i class="action icon trash" title="{% trans "Delete selected" %}"></i>
+            {% endif %}
+        </div>
+    {% endblock %}
+
+    {% block breadcrumb_location %}
+        <li>{% trans "Manage blog list" %}</li>
+    {% endblock %}
+
+    {% block admin_content %}
+        <div id="admin-content">
+            <ul class="tiles object-list tiles-panel">
+                {% for post in entries %}
+                    <li class="ik-li category" id="{{ post.id }}" data-id="{{ post.id }}">
+                        <div class="content">
+                            <div class="subtle-shade select">
+                                <i class="glyphicon glyphicon-ok"></i>
+                            </div>
+                            {% url 'blog:change_blog'  post.id as change_post_url %}
+                            {% if post.image and post.image.name %}
+                                <a href="{{ change_post_url|append_auth_tokens:request }}" class="image" style="background-image: url('{{ post.image.thumb_url }}')"></a>
+                            {% else %}
+                                <a href="{{ change_category_url|append_auth_tokens:request }}" class="image" style="background-image: url({% static 'ikwen/img/no_photo.png' %})"></a>
+                            {% endif %}
+                            <div class="info">
+                                <a href="{{ change_post_url|append_auth_tokens:request }}" class="full_name">{{ post.title }}</a>
+{#                                <p class="about">{{ post.items_count }} {% trans "items" %}</p>#}
+                            </div>
+                            <div class="actions">
+                                <i class="action glyphicon glyphicon-trash trash" title="{% trans "Delete this post" %}"></i>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </li>
+                {% empty %}
+                    <li style="padding: 10px 15px 5px">
+                        <p class="text-muted">{% trans "No post" %}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+                <div class="add-new-tile">
+                    <p>
+                        <span class="search-text"></span>
+                        <a href="{% url 'blog:change_blog' %}"
+                           class="btn btn-sm btn-success" style="margin-left: 6px; min-width: 90px">{% trans "Add" %}</a>
+                    </p>
+                </div>
+        </div>
+    {% endblock %}
+    {% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function() {
+            $('div#admin-nav .blog').addClass('active');
+            var searchDescriptor = [{
+                endpoint: '{% url 'blog:list_blog' %}',
+                resultTplSelector: '#results li.ik-li'
+            }];
+            function beforeSearch() {
+                var val = $('form#context-search input').val();
+                $('div#results .search-text').text(val);
+            }
+            function afterSearch() {
+                var val = $('form#context-search input').val(),
+                    endpoint = '{% url 'blog:change_blog' %}?name=' + val;
+
+                $('#new-post').attr('href', endpoint);
+            }
+            ikwen.setupSearch('#context-search input', '#results', searchDescriptor, beforeSearch, afterSearch);
+            ikwen.deleteEndpoint = '{% url 'kako:put_product_in_trash' %}';
+            {% if request.GET.success %}
+                ikwen.showFloatingNotice("{% trans "Post successfully saved." %}", '', 6);
+                localStorage.removeItem('post');
+            {% endif %}
+
+        })()
+    </script>
+{% endblock %}
