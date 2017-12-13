@@ -1,7 +1,6 @@
 from django.conf.urls import patterns, include, url
 
 from django.contrib import admin
-from ikwen_kakocase.shopping.views import FlatPageView
 from ikwen_webnode.webnode.views import *
 admin.autodiscover()
 
@@ -10,7 +9,7 @@ urlpatterns = patterns(
     url(r'^laakam/', include(admin.site.urls)),
     url(r'^blog/', include('ikwen_webnode.blog.urls', namespace='blog')),
     url(r'^ikwen/theming/', include('ikwen.theming.urls', namespace='theming')),
-    url(r'^marketing/', include('ikwen_kakocase.commarketing.urls', namespace='marketing')),
+    url(r'^marketing/', include('ikwen_webnode.commarketing.urls', namespace='marketing')),
     url(r'^kakocase/', include('ikwen_kakocase.kakocase.urls', namespace='kakocase')),
 
     url(r'^$', Home.as_view(), name='home'),
