@@ -1,56 +1,21 @@
 {% extends "core/base_admin.html" %}
-{% load i18n humanize staticfiles auth_tokens %}
-
-{% block app_admin_nav %}
-    {# Create Application custom admin menu here #}
-    <div>
-        <ul class="nav nav-pills nav-stacked">
-            <li role="presentation" class="banner">
-                {% url 'marketing:banner_list' as banner_list_url %}
-                <a href="{{ banner_list_url }}">{% trans "Slideshows" %}</a>
-            </li>
-            <li role="presentation" class="menus">{% url 'marketing:smart_category_list' as smart_category_list_url %}
-                <a href="{{ smart_category_list_url|append_auth_tokens:request }}">{% trans "Menus" %}</a>
-            </li>
-            <li role="presentation" class="elements">{% url 'kako:product_list' as product_url %}
-                <a href="{{ product_url|append_auth_tokens:request }} ">{% trans "Items" %}</a>
-            </li>
-
-            <li role="presentation" class="blog">
-                <a href="{% url 'blog:list_blog' %}">{% trans "Blog" %}</a>
-            </li>
-        </ul>
-    </div>
-{% endblock %}
-
+{% load i18n humanize static auth_tokens %}
 
 {% block admin_nav %}
     <div id="admin-nav" class="edge-panel-left">
         <div class="wrapper">
-            <div class="stage" {% if filter and filter|length > 0 %}style=""{% endif %}>
-{#                {% if filter and filter|length > 0 %}#}
-{#                    <nav id="filter-nav">#}
-{#                        <span style="text-align: right">#}
-{#                            <img class="show-filter" src="{% static 'ikwen/img/arrow-right.png' %}" width="18"#}
-{#                                 height="18">#}
-{#                        </span>#}
-{#                        <span>#}
-{#                            <img class="show-menu" src="{% static 'ikwen/img/arrow-left.png' %}" width="18" height="18">#}
-{#                            &nbsp;&nbsp;{% trans "Filter" %}#}
-{#                        </span>#}
-{#                    </nav>#}
-{#                {% endif %}#}
+            <div class="stage">
                 <div class="menu">
                     <ul class="nav nav-pills nav-stacked">
-                        <li role="presentation" class="banner">
+                        <li role="presentation" class="homepage">
                             {% url 'marketing:banner_list' as banner_list_url %}
-                            <a href="{{ banner_list_url }}">{% trans "Slideshows" %}</a>
+                            <a href="{{ banner_list_url }}">{% trans "Homepage" %}</a>
                         </li>
                         <li role="presentation" class="menus">{% url 'marketing:smart_category_list' as smart_category_list_url %}
-                            <a href="{{ smart_category_list_url|append_auth_tokens:request }}">{% trans "Menus" %}</a>
+                            <a href="{{ smart_category_list_url }}">{% trans "Menus" %}</a>
                         </li>
-                        <li role="presentation" class="elements">{% url 'kako:product_list' as product_url %}
-                            <a href="{{ product_url|append_auth_tokens:request }} ">{% trans "Items" %}</a>
+                        <li role="presentation" class="items">{% url 'kako:product_list' as product_url %}
+                            <a href="{{ product_url }} ">{% trans "Items" %}</a>
                         </li>
 
                         <li role="presentation" class="blog">
@@ -101,27 +66,6 @@
                         </ul>
                     {% endif %}
                 </div>
-                {% if filter and filter|length > 0 %}
-                    <ul class="nav nav-pills nav-stacked filter">
-                        {% for elt in filter %}
-                            <li>
-                                <a href="javascript:;" data-toggle="collapse" data-target="#{{ elt.parameter_name }}"
-                                   aria-expanded="true">
-                                    {{ elt.title }} <i class="fa fa-fw fa-caret-down"></i>
-                                </a>
-                                <ul id="#{{ elt.parameter_name }}" data-param="{{ elt.parameter_name }}"
-                                    class="nav nav-pills nav-stacked collapse in choices" aria-expanded="true"
-                                    style="padding-left: 15px">
-                                    {% for choice in elt.choices %}
-                                        <li data-value="{{ choice.0 }}">
-                                            <a href="javascript:;">{{ choice.1 }}</a>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
                 <div class="clear"></div>
             </div>
         </div>
