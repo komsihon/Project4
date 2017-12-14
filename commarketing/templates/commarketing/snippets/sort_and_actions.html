@@ -4,11 +4,11 @@
             placeholder: "sortable-placeholder",
             forcePlaceholderSize: true,
             update: function (event, ui) {
-                var sorted = [];
+                var sorted = [], model_name = $('.tiles li').parents('.tiles').data('model-name');
                 $('.tiles li').each(function (i) {
                     sorted.push($(this).attr('id') + ':' + i)
                 });
-                $.getJSON('', {sorted: sorted.join(',')})
+                $.getJSON('', {model_name: model_name, sorted: sorted.join(',')})
             }
         }).disableSelection();
         $('#admin-content').on('click', '.category .active.on', function() {
