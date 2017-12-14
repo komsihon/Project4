@@ -1,0 +1,169 @@
+{% load i18n static auth_tokens %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {% block meta %}{% endblock %}
+        {% include 'core/snippets/favicon.html' %}
+        {% block page_title %}{% endblock %}
+        {% block head_style %}
+            <link href="{% static 'webnode/css/bootstrap.min.css' %}" rel="stylesheet">
+            <link href="{% static 'webnode/css/font-awesome.min.css' %}" rel="stylesheet">
+            <link href="{% static 'webnode/css/prettyPhoto.css' %}" rel="stylesheet">
+            <link href="{% static 'webnode/css/animate.min.css' %}" rel="stylesheet">
+            <link href="{% static 'webnode/css/improve/main.css' %}" rel="stylesheet">
+            <link href="{% static 'webnode/css/responsive.css' %}" rel="stylesheet">
+            <link href="{% static 'webnode/css/improve/base.css' %}" rel="stylesheet">
+            {% if config.theme %}
+                {% with theme=config.theme %}
+                    <link rel='stylesheet' href="{% static 'webnode/themes/' %}{{ theme.template.slug }}/{{ theme.slug }}.css" />
+                {% endwith %}
+            {% endif %}
+        {% endblock %}
+        {% block head_js %}
+            <!--[if lt IE 9]>
+            <script src="{% static 'webnode/js/html5shiv.js' %}"></script>
+            <script src="{% static 'webnode/js/respond.min.js' %}"></script>
+            <![endif]-->
+        {% endblock %}
+    </head><!--/head-->
+
+    <body>
+        <header id="header">
+            <div class="top-bar">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-6 col-xs-12">
+                            {% if config.contact_phone %}<div class="top-number"><p><i class="fa fa-phone-square"></i> {{ config.contact_phone  }}</p></div>{% endif %}
+                        </div>
+                        <div class="col-sm-6 col-xs-12">
+                           <div class="social">
+                                <ul class="social-share">
+                                    {% if config.facebook_link %}
+                                    <li><a href="{{ config.facebook_link }}" target="_blank"><i class="fa fa-facebook"></i></a></li>
+                                    {% endif %}
+                                    {% if config.twitter_link %}
+                                    <li><a href="{{ config.twitter_link }}" target="_blank"><i class="fa fa-twitter"></i></a></li>
+                                    {% endif %}
+                                    {% if config.google_plus_link %}
+                                    <li><a href="{{ config.linkedin_link }}" target="_blank"><i class="fa fa-google-plus"></i></a></li>
+                                    {% endif %}
+                                </ul>
+    {#                            <div class="search">#}
+    {#                                <form role="form">#}
+    {#                                    <input type="text" class="search-form" autocomplete="off" placeholder="Search">#}
+    {#                                    <i class="fa fa-search"></i>#}
+    {#                                </form>#}
+    {#                           </div>#}
+                           </div>
+                        </div>
+                    </div>
+                </div><!--/.container-->
+            </div><!--/.top-bar-->
+
+            <nav class="navbar navbar-inverse main" role="banner">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        {% if config.theme.logo.name %}
+                            <a class="navbar-brand" href="{% url 'webnode:home' %}"><img src="{{ config.theme.logo.url }}" alt="Logo {{ service.project_name }}"></a>
+                        {% else %}
+                            <a class="navbar-brand" href="{% url 'webnode:home' %}"><img src="{% static 'webnode/img/webnode.png' %}" alt="logo"></a>
+                        {% endif %}
+                    </div>
+
+                    <div class="collapse navbar-collapse navbar-right">
+                        <ul class="nav navbar-nav">
+                            <!--<li class="home"><a href="{% url 'webnode:home' %}">{% trans 'Home' %}</a></li>-->
+                            {% for menu in menu_list %}
+                                <li class="{{ menu.slug }}"><a href="{% url 'webnode:item_list' menu.slug %}">{% trans menu.title %}</a></li>
+                            {% endfor %}
+
+                            {% if activate_portfolio_link %}
+                                <li class="porfolio"><a href="{% url 'webnode:portfolio' %}">{{ portfolio_menu.title }}</a></li>
+                            {% endif %}
+                            {% if activate_blog_link %}
+                                <li class="blog"><a href="{% url 'blog:home' %}">{% trans 'BLOG' %}</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div><!--/.container-->
+            </nav><!--/nav-->
+
+        </header><!--/header-->
+        {% block page_content %}{% endblock %}
+        <section id="bottom">
+            <div class="container wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="widget">
+                            <h3>{% trans 'Company' %}</h3>
+                            <ul>
+                                <li><a href="{% url 'flatpage' 'about-us' %}">{% trans 'About us' %}</a></li>
+{#                                <li><a href="#">Copyright</a></li>#}
+                                <li><a href="{% url 'flatpage' 'agreement' %}">{% trans 'Terms of use' %}</a></li>
+                                <li><a href="{% url 'flatpage' 'legal-mentions' %}">{% trans 'Legal mentions' %}</a></li>
+                            </ul>
+                        </div>
+                    </div><!--/.col-md-3-->
+                    <div class="col-sm-4">
+                        <div class="widget">
+                            <h3>{% trans 'Contact' %}</h3>
+                            <ul>
+    {#                            {% if config.address %}<li><i class="fa fa-map-marker"></i> {{ config.address  }}</li>{% endif %}#}
+                                {% if config.contact_phone %}<li><i class="fa fa-phone-square"></i> {{ config.contact_phone  }}</li>{% endif %}
+                                {% if config.contact_email %}<li><i class="fa fa-envelope"></i> {{ config.contact_email  }}</li>{% endif %}
+                                {% if config.address %}<li><i class="fa fa-globe"></i> {{ config.address  }}</li>{% endif %}
+                            </ul>
+                        </div>
+                    </div><!--/.col-md-3-->
+
+
+                    <div class="col-sm-4">
+                        <div class="widget">
+                            <h3>{% trans 'About' %}</h3>
+                            <ul>
+                                 {% if config.address %}<li><a href="#">{{ config.short_description }}</a></li>{% endif %}
+                            </ul>
+                        </div>
+                    </div><!--/.col-md-3-->
+                </div>
+            </div>
+        </section><!--/#bottom-->
+
+        <footer id="footer" class="midnight-blue">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <p>&copy; {{ year }} <a href="{{ service.url|append_auth_tokens:request }}" style="color: #666; text-decoration: none"><strong>{{ config.company_name }}</strong></a>.
+                                <span>{% trans "All rights reserved" %}</span>
+                                - <a href="{{ settings.LEGAL_MENTIONS_URL|append_auth_tokens:request }}" style="color: #666; text-decoration: none">{% trans "Legal mentions" %}</a>
+                            </p>
+                    </div>
+                    <div class="col-sm-6">
+                        <ul class="pull-right">
+                            <li><a href="{% url 'ikwen:sign_in' %}">{% trans 'Login' %}</a></li>
+                            <li><a href="{% url 'webnode:home' %}">{% trans 'Home' %}</a></li>
+                            <li><a href="{% url 'blog:home' %}">Blog</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </footer><!--/#footer-->
+
+        {% block js %}
+            <script src="{% static 'webnode/js/jquery.js' %}"></script>
+            <script src="{% static 'webnode/js/bootstrap.min.js' %}"></script>
+            <script src="{% static 'webnode/js/jquery.prettyPhoto.js' %}"></script>
+            <script src="{% static 'webnode/js/jquery.isotope.min.js' %}"></script>
+            <script src="{% static 'webnode/js/main.js' %}"></script>
+            <script src="{% static 'webnode/js/wow.min.js' %}"></script>
+        {% endblock %}
+    </body>
+</html>

@@ -1,0 +1,49 @@
+{% extends 'webnode/improve/base.html' %}
+{% load static auth_tokens %}
+{% block page_content %}
+    {% block page_header %}
+    {% endblock %}
+    <section id="blog" class="container blog">
+        <div class="row blog-content">
+            <div  class="col-md-8" style="">
+            {% block blog_content %}
+            {% endblock %}
+            </div>
+            <aside class="col-md-4">
+                {% if suggestions %}
+                <div class="widget categories">
+                    <h3>Suggestions</h3>
+                    <div class="row" style="">
+                        <div class="col-sm-12">
+                            {% for suggestion in suggestions %}
+                            <div class="single_comments item_details">
+                                <a href="{% url 'webnode:product_details' suggestion.slug %}"  style="color: #0f0f0f">
+                                    <img  src="{{ suggestion.get_photos_url_list.0.thumb }}" class="img-responsive" alt=""/>
+                                    <div class="details">
+                                        <h5>{{ suggestion.name }} </h5>
+                                        <div style="float:left; clear: both ">{{ suggestion.summary | safe |truncatewords:"10" }}</div>
+                                    </div>
+
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div><!--/.recent comments-->
+                {% endif %}
+            </aside>
+        </div>
+    </section>
+        <!-- /#page-content-wrapper -->
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function() {
+            $('form#search input.input-sm').attr('placeholder', 'Search ikwen')
+             $('ul.navbar-nav li').removeClass('active')
+            $('ul.navbar-nav li.+{{ suggestion.slug }}').addClass('active')
+        })()
+    </script>
+{% endblock %}

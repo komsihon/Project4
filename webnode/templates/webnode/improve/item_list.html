@@ -1,0 +1,39 @@
+{% extends 'webnode/improve/base.html' %}
+{% load static auth_tokens %}
+{% block page_content %}
+<section id="feature" class="transparent-bg">
+    <div class="container">
+        <div class="center wow fadeInDown">
+            <h2>{{ smart_category.title }}</h2>
+            <p class="lead"></p>
+        </div>
+        <div class="row">
+            {% for item in  item_list %}
+            <div class="features">
+            {% if activate_block_title %}
+                <h2 style="margin-left: 12px; padding-bottom: 15px">{{ item.category.name }}</h2>
+            {% endif %}
+            {% for product in  item.items %}
+                <div class="col-md-3 col-sm-4 col-xs-12 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                    <div class="feature-wrap subtle-shade">
+                        <a href="{% url 'webnode:product_details' product.slug %}"><img src="{{ product.get_photos_url_list.0.small }}" class="img-responsive"></a>
+                        <a href="{% url 'webnode:product_details' product.slug %}"><h2>{{ product.name }}</h2></a>
+                        <h3>{{ product.description | safe }}</h3>
+                    </div>
+                </div><!--/.col-md-4-->
+            {% endfor %}
+            </div><!--/.services-->
+            {% endfor %}
+        </div><!--/.row-->
+    </div><!--/.container-->
+</section><!--/#feature-->
+{% endblock %}
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function() {
+            $('ul.navbar-nav li').removeClass('active')
+            $('ul.navbar-nav li.{{ smart_category.slug }}').addClass('active')
+        })()
+    </script>
+{% endblock %}
