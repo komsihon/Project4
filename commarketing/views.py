@@ -205,6 +205,7 @@ class ChangeHomepageSection(ChangeObjectBase):
             smart_object.description = form.cleaned_data['description']
             smart_object.text_position = form.cleaned_data['text_position']
             smart_object.cta = form.cleaned_data['cta']
+            smart_object.target_url = form.cleaned_data['target_url']
             smart_object.background_image = True if request.POST.get('background_image') else False
             smart_object.save()
 

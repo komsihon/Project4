@@ -10,4 +10,4 @@ class SmartCategoryAdmin(admin.ModelAdmin):
 
 
 class HomepageSectionAdmin(admin.ModelAdmin):
-    fields = ('title', 'description', 'cta', 'text_position', 'background_image',)
+    fields = ('title', 'description', 'cta', 'target_url', 'text_position', 'background_image',)
