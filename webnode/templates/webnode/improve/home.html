@@ -17,6 +17,7 @@
         section.home-section.bg-img-false .cta {color: #4e4e4e}
         .slide .cta:hover {color: #bf0309}
         section.home-section {background: no-repeat center; background-size: cover}
+        section.home-section.text-center .description {float: none; margin: auto}
         .home-section-cta {margin-top: 80px}
         section.home-section .title {padding-top: 10px}
         section.home-section.bg-img-true,  section.home-section.bg-img-true .title {color: #fff}
@@ -92,42 +93,8 @@
     </section><!--/#main-slider-->
     {% endif %}
 
-    {% for entry in home_entry_list %}
-        <section class="feature h-section">
-            <div class="container">
-                <div class="center wow fadeInDown">
-                    <a href="{% url 'webnode:item_list' entry.slug %}"><h2>{{ entry.title }}</h2></a>
-                    <p class="lead">{{ entry.description }}</p>
-                </div>
-                <div class="row">
-                    <div class="features home">
-                        {% for product in  entry.product_list %}
-                            {% for item in  product.items %}
-                                {% if config.theme.display == 'Comfortable' %}
-                                    <div class="col-lg-6 col-sm-6 col-xs-12 cmf wow item fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
-                                {% elif config.theme.display == 'Cozy' %}
-                                    <div class="col-lg-4 col-sm-4 col-xs-12 cozy wow item fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
-                                {% else %}
-                                    <div class="col-lg-3 col-sm-4 col-xs-12 wow item fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
-                                {% endif %}
-                                <div class="feature-wrap subtle-shade">
-                                    <a href="{% url 'webnode:product_details' item.slug %}">
-                                        <img src="{{ item.get_photos_url_list.0.small }}" class="img-responsive">
-                                    </a>
-                                    <a href="{% url 'webnode:product_details' item.slug %}"> <h2>{{ item.name }}</h2></a>
-                                    <h3>{{ item.summary | safe }}</h3>
-                                </div>
-                            </div><!--/.col-md-4-->
-                            {% endfor %}
-                        {% endfor %}
-                    </div><!--/.services-->
-                </div><!--/.row-->
-            </div><!--/.container-->
-        </section><!--/#feature-->
-    {% endfor %}
-
     {% for section in homepage_section_list %}
-        <section class="feature h-section home-section bg-img-{{ section.background_image|lower }}"
+        <section class="feature h-section home-section bg-img-{{ section.background_image|lower }} text-{{ section.text_position|lower }}"
                 {% if section.background_image %}style="background-image: url({% get_media_prefix %}{{ section.image.name }})"{% endif %}>
             <div class="container">
                 <div class="center wow fadeInDown">
@@ -135,8 +102,8 @@
                 </div>
                 <div class="row">
                     <div class="features home-section-text-{{ section.text_position|lower }} wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
-                        {% if not section.background_image %}
-                            <div class="img col-sm-6 col-md-5 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                        {% if section.image.name and not section.background_image %}
+                            <div class="img col-xs-12 col-sm-6 col-md-5 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
                                 <img src="{% get_media_prefix %}{{ section.image.name }}" alt="{{ section.title }}" />
                             </div>
                         {% endif %}
@@ -152,85 +119,6 @@
             <div class="clearfix"></div>
         </section>
     {% endfor %}
-
-    {% if entries %}
-    <section class="feature  h-section" id="blog">
-        <div class="container">
-            <div class="center wow fadeInDown">
-                <a href="{% url 'blog:home' %}"><h2>BLOG</h2></a>
-{#                <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut <br> et dolore magna aliqua. Ut enim ad minim veniam</p>#}
-            </div>
-            <div class="row">
-                <div class="features blogs">
-                    {% for entry in entries %}
-                    <div class="blog col-md-6 col-sm-6 col-xs-12 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
-                        <div class="feature-wrap col-md-12 col-sm-12 col-xs-12">
-                             {% if  entry.image %}
-                            <a href="#" class="col-md-4 col-sm-3 col-xs-12">
-                                <img class="img-responsive img-blog" src="{{ entry.image.url }}" alt="" />
-                            </a>
-                            {% endif %}
-                            <div class="col-md-8 col-sm-9 col-xs-12"  style="float: left">
-                                <h2><a href="{% url 'blog:details' entry.slug %}">{{ entry.title | truncatewords:"5" }}</a></h2>
-                                <h3 style="">{{ entry.summary | safe | truncatewords:"10" }}</h3>
-                            </div>
-
-                            <a class="readmore clearfix" href="{% url 'blog:details' entry.slug %}" style="float: right">Read More</a>
-
-                        </div>
-                    </div><!--/.col-md-4-->
-                    {% endfor %}
-                </div>
-            </div><!--/.row-->
-        </div><!--/.container-->
-    </section><!--/#feature-->
-    {% endif %}
-
-    {% if smart_portfolio %}
-    <section id="recent-works" class="h-section">
-        <div class="container">
-            <div class="center wow fadeInDown">
-                <a href="{% url 'webnode:portfolio' %}"><h2>{{ smart_portfolio.title }}</h2></a>
-{#                <p class="lead">{{ recent_work.description }}</p>#}
-            </div>
-
-            <div class="row">
-                {% for work in smart_portfolio_items %}
-                    <div class="col-xs-12 col-sm-4 col-md-3 work">
-                        <div class="recent-work-wrap">
-                            <img class="img-responsive" src="{{ work.get_photos_url_list.0.small }}" alt="">
-                            <div class="overlay">
-                                <div class="recent-work-inner">
-                                    <h3><a href="#">{{ work.name }}</a> </h3>
-                                    <p>{{ work.summary | safe  | truncatewords:"15" }}</p>
-                                    <a class="preview" href="{{ work.get_photos_url_list.0.small }}" rel="prettyPhoto"><i class="fa fa-eye"></i> View</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div><!--/.row-->
-        </div><!--/.container-->
-    </section><!--/#recent-works-->
-    {% endif %}
-
-    {% if partners_list %}
-    <section id="partner" class="h-section">
-        <div class="container">
-            <div class="center wow fadeInDown" style="padding-bottom: 0">
-                <h2>Our Partners</h2>
-{#                <p class="lead">{{ smart_partners.description }}</p>#}
-            </div>
-            <div class="partners">
-                <ul>
-                    {% for partner in  partners_list %}
-                    <li> <a href="#"><img class="img-responsive wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="300ms" src="{{ partner.get_photos_url_list.0.small }}"></a></li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div><!--/.container-->
-    </section><!--/#partner-->
-    {% endif %}
 {% endblock %}
 
 {% block js %}
