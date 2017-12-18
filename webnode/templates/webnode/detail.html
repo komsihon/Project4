@@ -1,11 +1,10 @@
 {% extends 'webnode/details_base.html' %}
-{% load i18n staticfiles auth_tokens %}
+{% load i18n static auth_tokens %}
 {% block meta %}
     <meta name="abstract" content="{{ product.name }} "/>
     <meta property="og:title" content="{{ product.name }} {% trans "sur" %} "/>
     <meta property="og:description" content="{{ product.description }}"/>
     <meta property="og:image" content="{{ product.get_photos_url_list.0 }}"/>
-
 {% endblock %}
 {% block page_title %} <title>{{ product.name }}</title> {% endblock %}
 

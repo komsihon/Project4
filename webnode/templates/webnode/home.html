@@ -1,5 +1,8 @@
 {% extends 'webnode/base.html' %}
-{% load static auth_tokens %}
+{% load i18n static auth_tokens %}
+
+{% block page_title %}<title>Coach Improve - {% trans "Home" %}</title>{% endblock %}
+
 {% block page_content %}
     {% if slideshow %}
     <section id="main-slider" class="no-margin">
@@ -143,15 +146,15 @@
         </div><!--/.container-->
     </section><!--/#partner-->
     {% endif %}
-
 {% endblock %}
+
 {% block js %}
     {{ block.super }}
     <script type="text/javascript">
         (function() {
-            $('ul.navbar-nav li').removeClass('active')
-            $('ul.navbar-nav li.home').addClass('active')
-            $('.carousel.slide .carousel-inner').find('div.item:first-child').addClass('active')
+            $('ul.navbar-nav li').removeClass('active');
+            $('ul.navbar-nav li.home').addClass('active');
+            $('.carousel.slide .carousel-inner').find('div.item:first-child').addClass('active');
             $('.carousel.slide .carousel-indicators').find('li:first-child').addClass('active')
         })()
     </script>

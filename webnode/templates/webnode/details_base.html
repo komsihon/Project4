@@ -1,5 +1,5 @@
 {% extends 'webnode/base.html' %}
-{% load staticfiles auth_tokens %}
+{% load static auth_tokens %}
 {% block page_content %}
     {% block page_header %}
     {% endblock %}
@@ -37,19 +37,13 @@
         <!-- /#page-content-wrapper -->
 {% endblock %}
 
-    <!-- jQuery -->
-{#    <script src="{% static 'js/jquery-1.12.4.min.js' %}"></script>#}
-
-    <!-- Bootstrap Core JavaScript -->
-{#    <script src="{% static 'js/bootstrap.min.js' %}"></script>#}
-
-    {% block js %}
-        {{ block.super }}
-        <script type="text/javascript">
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
         (function() {
             $('form#search input.input-sm').attr('placeholder', 'Search ikwen')
              $('ul.navbar-nav li').removeClass('active')
             $('ul.navbar-nav li.+{{ suggestion.slug }}').addClass('active')
         })()
     </script>
-    {% endblock %}
+{% endblock %}

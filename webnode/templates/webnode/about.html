@@ -1,7 +1,7 @@
 {% extends 'webnode/base.html' %}
-{% load staticfiles auth_tokens %}
+{% load static auth_tokens %}
 {% block page_content %}
-<section id="about-us">
+    <section id="about-us">
         <div class="container">
 			<div class="center wow fadeInDown">
 				<h2>About Corlate</h2>
@@ -233,7 +233,7 @@
     {{ block.super }}
     <script type="text/javascript">
         (function() {
-            $('ul.navbar-nav li').removeClass('active')
+            $('ul.navbar-nav li').removeClass('active');
             $('ul.navbar-nav li.about').addClass('active')
         })()
     </script>
