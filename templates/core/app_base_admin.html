@@ -26,6 +26,20 @@
                     {% if perms.accesscontrol.sudo %}
                         <div class="divider"></div>
                         <ul class="nav nav-pills nav-stacked">
+                            <li role="presentation" class="subscription-plans">
+                                <a href="{% url 'billing:product_list' %}">{% trans "Plans" context "Subscription plans" %}</a>
+                            </li>
+                            <li role="presentation" class="subscriptions">
+                                <a href="{% url 'billing:product_list' %}">
+                                    {% trans "Subscriptions" %}
+                                </a>
+                            </li>
+                        </ul>
+                    {% endif %}
+
+                    {% if perms.accesscontrol.sudo %}
+                        <div class="divider"></div>
+                        <ul class="nav nav-pills nav-stacked">
                             {% if not settings.IS_DELIVERY_COMPANY %}
                             <li role="presentation" class="flatpages">
                                 {% url 'ikwen:flatpage_list' as flatpage_list_url %}
