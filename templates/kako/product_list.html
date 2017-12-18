@@ -7,10 +7,19 @@
 
 {% block head_style %}
     {{ block.super }}
+    <link rel='stylesheet' href="{% static 'kakocase/css/admin.css' %}" />
     <style>
-        .ik-li.product .about p {margin-bottom: 0}
-        .ik-li.product .about p strong {padding-left: 10px}
+        .ik-li .info {margin-top: 15px}
+        .ik-li.product .about {display: none}
         .ik-li.product .actions .glyphicon-edit:not(.edit) {color: #ddd}
+        #results .spinner {padding-top: 8%; position: fixed; right: 0; top: 0}
+        @media (min-width: 768px) {
+            #admin-tools + #results {margin-top: 45px}
+            #results .spinner {padding-top: 10%}
+        }
+        @media (min-width: 992px) {
+            #results .spinner {padding-top: 12%}
+        }
     </style>
 {% endblock %}
 
@@ -25,15 +34,14 @@
 {% endblock %}
 
 {% block breadcrumb_location %}
-    <li>{% trans "Page items" %}</li>
+    <li>{% trans "Items" %}</li>
 {% endblock %}
 
 {% block admin_content %}
     <div id="admin-content">
-        <div class="container-fluid">
+        <div class="container-fluid stage">
             {% include 'kako/snippets/product_list_results.html' %}
-            </div>
-
+        </div>
     </div>
 {% endblock %}
 
@@ -41,7 +49,7 @@
     {{ block.super }}
     <script type="text/javascript">
         (function() {
-            $('div#admin-nav .products').addClass('active');
+            $('div#admin-nav .items').addClass('active');
             var searchDescriptor = [{
                 endpoint: '{% url 'kako:product_list' %}',
                 resultTplSelector: '#results li.ik-li'
@@ -65,10 +73,6 @@
                     {% endfor %}
                 {% endif %}
             }
-            $('li.ik-li.product .duplicate').hide()
-            $('li.product .actions .update-stock').hide()
-            $('div.info .about').hide()
-
             $('#admin-content').on('click', 'li.ik-li.product .duplicate', function() {
                 var id = $(this).parents('.ik-li.product').data('id');
                 window.location = '{% url 'kako:change_product' %}?product_id=' + id + '&duplicate=yes';
@@ -109,7 +113,7 @@
             ikwen.deleteEndpoint = '{% url 'kako:put_product_in_trash' %}';
             {% if messages %}
                 {% for msg in messages %}
-                    ikwen.showFloatingNotice('{{ msg }}', '', 6);
+                    ikwen.showFloatingNotice('{{ msg }}', '{{ msg.tags }}', 6);
                     {% if msg.tags == 'success' %}localStorage.removeItem('product');{% endif %}
                 {% endfor %}
             {% endif %}
