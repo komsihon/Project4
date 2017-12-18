@@ -1,6 +1,7 @@
 from ikwen.accesscontrol.models import Member
 from ikwen.billing.models import CloudBillingPlan, IkwenInvoiceItem, InvoiceEntry
 from ikwen.core.utils import get_service_instance
+from ikwen.flatpages.models import FlatPage
 from ikwen.partnership.models import ApplicationRetailConfig
 from ikwen.theming.models import Theme, Template
 from django.conf import settings
@@ -8,18 +9,16 @@ from ikwen.accesscontrol.backends import UMBRELLA
 from ikwen.core.models import Service, Application
 
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse
 from django.http.response import HttpResponseForbidden, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.http import urlquote
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 
-from ikwen_kakocase.commarketing.models import Banner, SmartCategory, SLIDE, FULL_WIDTH_SECTION
+from ikwen_webnode.commarketing.models import Banner, SmartCategory, SLIDE, FULL_WIDTH_SECTION, HomepageSection
 from ikwen.core.views import BaseView
 from ikwen_kakocase.kako.models import Product
-from ikwen_kakocase.kako.views import ChangeProduct
 from ikwen_kakocase.kakocase.models import ProductCategory
 import random
 
@@ -34,7 +33,16 @@ HOME = 'home'
 POST_PER_PAGE = 5
 
 
-class Home(WebNodeBaseView):
+class TemplateSelector(object):
+    def get_template_names(self):
+        s = get_service_instance()
+        tokens = self.template_name.split('/')
+        if s.project_name_slug == 'improve':
+            tokens.insert(1, 'improve')
+        return ['/'.join(tokens)]
+
+
+class Home(TemplateSelector, WebNodeBaseView):
     template_name = 'webnode/home.html'
 
     def get_context_data(self, **kwargs):
@@ -58,10 +66,9 @@ class Home(WebNodeBaseView):
             pass
         else:
             smart_portfolio = SmartCategory.objects.get(pk=settings.PORTFOLIO_ID)
-            smartPortfolio = grab_product_list_from_porfolio(smart_portfolio, HOME)
-            recent_work = smart_portfolio
-            context['smart_portfolio'] = smartPortfolio
-            context['recent_work'] = recent_work
+            smart_portfolio_items = grab_product_list_from_porfolio(smart_portfolio, HOME)
+            context['smart_portfolio_items'] = smart_portfolio_items
+            context['smart_portfolio'] = smart_portfolio
 
         posts = Post.objects.filter(publish=True)
         post_list = []
@@ -70,10 +77,9 @@ class Home(WebNodeBaseView):
         random.shuffle(post_list)
         entries = post_list[:4]
         context['entries'] = entries
-        context['slideshow'] = Banner.objects.filter(display=SLIDE, is_active=True).order_by('-id')
+        context['slideshow'] = Banner.objects.filter(display=SLIDE, is_active=True).order_by('order_of_appearance')
         context['services'] = Banner.objects.filter(display=SLIDE, is_active=True).order_by('-id')
-        context['fw_section_list'] = Banner.objects.filter(display=FULL_WIDTH_SECTION)
-
+        context['homepage_section_list'] = HomepageSection.objects.filter(is_active=True).order_by('order_of_appearance')
 
         context['home_entry_list'] = home_entry_list[:4]
         context['partners_list'] = partner_list
@@ -85,7 +91,7 @@ class AdminHome(BaseView):
     template_name = 'admin_home.html'
 
 
-class ProductDetails(WebNodeBaseView):
+class ProductDetails(TemplateSelector, WebNodeBaseView):
     template_name = 'webnode/detail.html'
 
     def get_context_data(self, **kwargs):
@@ -104,7 +110,7 @@ class ProductDetails(WebNodeBaseView):
         return context
 
 
-class Portfolio(WebNodeBaseView):
+class Portfolio(TemplateSelector, WebNodeBaseView):
     template_name = 'webnode/portfolio.html'
 
     def get_context_data(self, **kwargs):
@@ -122,7 +128,7 @@ class Portfolio(WebNodeBaseView):
         return context
 
 
-class ItemList(WebNodeBaseView):
+class ItemList(TemplateSelector, WebNodeBaseView):
     template_name = 'webnode/item_list.html'
 
     def get_context_data(self, **kwargs):
@@ -146,14 +152,12 @@ class ItemList(WebNodeBaseView):
         return context
 
 
-class AboutUs(BaseView):
+class FlatPageView(TemplateSelector, WebNodeBaseView):
     template_name = 'webnode/about.html'
 
     def get_context_data(self, **kwargs):
-        context = super(AboutUs, self).get_context_data(**kwargs)
-        # about_category = ProductCategory.objects.get(slug='about')
-        # context['about'] = Product.objects.filter(category=about_category)
-        # context['partners'] = Banner.objects.filter(display=partners_category)[:5]
+        context = super(FlatPageView, self).get_context_data(**kwargs)
+        context['page'] = get_object_or_404(FlatPage, url=kwargs['url'])
         return context
 
 
@@ -360,11 +364,3 @@ class DeployCloud(BaseView):
             context = self.get_context_data(**kwargs)
             context['form'] = form
             return render(request, 'core/cloud_setup/deploy.html', context)
-
-
-def run_sudo_cmd(request, *args, **kwargs):
-    import subprocess
-    # subprocess.call(['sudo', 'ln', '-sf', 'home/komsihon/PycharmProjects/KakocaseDelivery/apache.conf',
-    #                  '/etc/apache2/sites-enabled/test.conf'])
-    subprocess.call(['sudo', 'touch', '/home/roddy/PycharmProjects/sudo_file.txt'])
-    return HttpResponse('Finished')
