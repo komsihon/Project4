@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.translation import gettext as _
 
 
 class BannerAdmin(admin.ModelAdmin):
@@ -6,8 +7,12 @@ class BannerAdmin(admin.ModelAdmin):
 
 
 class SmartCategoryAdmin(admin.ModelAdmin):
-    fields = ('title', 'content_type', 'badge_text',)
+    fields = ('title', 'content_type',)
 
 
 class HomepageSectionAdmin(admin.ModelAdmin):
-    fields = ('title', 'description', 'cta', 'target_url', 'text_position', 'background_image',)
+    fieldsets = (
+        (None, {'fields': ('title', 'content_type')}),
+        (_("Details"), {'fields': ('description', 'cta', 'target_url', 'text_position', 'background_image')}),
+    )
+    fields = ('title', 'content_type', 'description', 'cta', 'target_url', 'text_position', 'background_image',)

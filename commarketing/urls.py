@@ -9,7 +9,7 @@ from ikwen_webnode.commarketing.views import ChangeSmartObject, SmartCategoryLis
 urlpatterns = patterns(
     '',
     url(r'^banners/$', permission_required('commarketing.ik_manage_marketing')(BannerList.as_view()), name='banner_list'),
-    url(r'^smartCategories/$', permission_required('commarketing.ik_manage_marketing')(SmartCategoryList.as_view()), name='smart_category_list'),
+    url(r'^menus/$', permission_required('commarketing.ik_manage_marketing')(SmartCategoryList.as_view()), name='smart_category_list'),
     url(r'^smartObject/(?P<object_type>[-\w]+)/$', permission_required('commarketing.ik_manage_marketing')(ChangeSmartObject.as_view()), name='change_smart_object'),
     url(r'^smartObject/(?P<object_type>[-\w]+)/(?P<smart_object_id>[-\w]+)/$', permission_required('commarketing.ik_manage_marketing')(ChangeSmartObject.as_view()), name='change_smart_object'),
     url(r'^homepageSection/$', permission_required('commarketing.ik_manage_marketing')(ChangeHomepageSection.as_view()), name='change_homepage_section'),

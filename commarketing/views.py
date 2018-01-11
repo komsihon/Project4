@@ -16,39 +16,23 @@ from django.utils.translation import gettext as _
 from django.utils.text import slugify
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
+from django.views.generic import TemplateView
 
 from ikwen_webnode.commarketing.admin import SmartCategoryAdmin, BannerAdmin, HomepageSectionAdmin
 from ikwen_kakocase.kakocase.views import SortableListMixin
 
 from ikwen.accesscontrol.templatetags.auth_tokens import append_auth_tokens
 
-from ikwen_webnode.commarketing.models import Banner, Push, SmartCategory, HomepageSection, CATEGORIES, SLIDE, POPUP, \
-    FULL_WIDTH_SECTION, FULL_SCREEN_POPUP, TILES
-from ikwen.core.utils import add_event, get_model_admin_instance
-from ikwen.core.views import BaseView, HybridListView, ChangeObjectBase
-from ikwen_kakocase.kako.models import Product, RecurringPaymentService
-from ikwen_kakocase.kakocase.models import OperatorProfile, PROVIDER_PUSHED_PRODUCT_EVENT, ProductCategory
+from ikwen_webnode.commarketing.models import Banner, SmartCategory, HomepageSection, SLIDE, FLAT
+from ikwen.core.utils import get_model_admin_instance
+from ikwen.core.views import HybridListView, ChangeObjectBase
+from ikwen_kakocase.kakocase.models import ProductCategory
 
 BANNER = 'banner'
 SMART_CATEGORY = 'smartcategory'
 
 
-@permission_required('commarketing.ik_manage_marketing')
-def submit_push(request, product_type, product_id, *args, **kwargs):
-    about = request.GET['about']
-    if product_type == 'service':
-        product = get_object_or_404(RecurringPaymentService, pk=product_id)
-    else:
-        product = get_object_or_404(Product, pk=product_id)
-    Push.objects.create(product=product, about=about)
-    for retailer_profile in OperatorProfile.objects.filter(business_type=OperatorProfile.RETAILER):
-        member = retailer_profile.service.member
-        add_event(retailer_profile.service, PROVIDER_PUSHED_PRODUCT_EVENT, member=member, object_id=product_id)
-    response = {'success': True}
-    return HttpResponse(json.dumps(response), 'content-type: text/json')
-
-
-class BannerList(SortableListMixin, BaseView):
+class BannerList(SortableListMixin, TemplateView):
     template_name = 'commarketing/banner_list.html'
     model = Banner
     search_field = 'title'
@@ -69,7 +53,7 @@ class SmartCategoryList(SortableListMixin, HybridListView):
     context_object_name = 'smart_category_list'
 
 
-class ChangeSmartObject(BaseView):
+class ChangeSmartObject(TemplateView):
     template_name = 'commarketing/change_smart_object.html'
 
     def get_context_data(self, **kwargs):
@@ -88,14 +72,7 @@ class ChangeSmartObject(BaseView):
             fields = ("title", "content_type", "description", "badge_text")
         if smart_object_id:
             smart_object = get_object_or_404(model, pk=smart_object_id)
-            if smart_object.content_type == CATEGORIES:
-                smart_object.content = [ProductCategory.objects.get(pk=pk) for pk in smart_object.items_fk_list]
-            else:
-                try:
-                    smart_object.content = [Product.objects.get(pk=pk) for pk in smart_object.items_fk_list]
-                except Product.DoesNotExist:
-                    # smart_object.content = [RecurringPaymentService.objects.get(pk=pk) for pk in smart_object.items_fk_list]
-                    smart_object.content = []
+            smart_object.content = [ProductCategory.objects.get(pk=pk) for pk in smart_object.items_fk_list]
         object_admin = get_model_admin_instance(model, model_admin)
         ModelForm = modelform_factory(model, fields=fields)
         form = ModelForm(instance=smart_object)
@@ -197,12 +174,16 @@ class ChangeHomepageSection(ChangeObjectBase):
         if form.is_valid():
             title = form.cleaned_data['title']
             slug = slugify(title)
+            content_type = form.cleaned_data['content_type']
             image_url = request.POST.get('image_url')
             if not smart_object:
                 smart_object = HomepageSection()
             smart_object.title = title
             smart_object.slug = slug
-            smart_object.description = form.cleaned_data['description']
+            if content_type == FLAT:
+                smart_object.description = form.cleaned_data['description']
+            else:
+                smart_object.description = request.POST['menu']
             smart_object.text_position = form.cleaned_data['text_position']
             smart_object.cta = form.cleaned_data['cta']
             smart_object.target_url = form.cleaned_data['target_url']

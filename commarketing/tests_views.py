@@ -6,7 +6,7 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from django.utils import unittest
 
-from commarketing.models import Banner, CATEGORIES, SmartCategory, SLIDE
+from commarketing.models import Banner, SmartCategory, SLIDE
 from ikwen_kakocase.kako.tests_views import wipe_test_data
 
 
@@ -66,7 +66,6 @@ class MarketingViewsTestCase(unittest.TestCase):
                          )
         slide = Banner.objects.get(slug='store-opening', display=SLIDE)  # Slug must be correctly set
         self.assertEqual(slide.title, 'Store opening')
-        self.assertEqual(slide.content_type, CATEGORIES)
         response = self.client.get(reverse('marketing:banner_list'))
         self.assertEqual(response.status_code, 200)
         slides = response.context['slide_list']
