@@ -16,11 +16,11 @@ from django.core.files import File
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
+from django.views.generic import TemplateView
 from ikwen.accesscontrol.templatetags.auth_tokens import append_auth_tokens
 
 from ikwen.core.utils import get_model_admin_instance, DefaultUploadBackend
 from ikwen_kakocase.commarketing.models import SmartCategory
-from ikwen_kakocase.shopping.views import ShoppingBaseView
 from ikwen_webnode.blog.admin import PostAdmin
 from ikwen_webnode.blog.models import Post, Comments, PostCategory, PostLikes, Photo
 from django.http import HttpResponse
@@ -33,39 +33,7 @@ from conf import settings
 POST_PER_PAGE = 5
 
 
-class WebNodeBaseView(ShoppingBaseView):
-
-    def get_context_data(self, **kwargs):
-        context = super(WebNodeBaseView, self).get_context_data(**kwargs)
-
-        from ikwen_webnode.webnode.views import grab_product_list_from_porfolio
-        if not getattr(settings, 'IS_UMBRELLA', False):
-            activate_blog_link = False
-            activate_portfolio_link = False
-            Home_link_id = getattr(settings, 'HOME_ID', None)
-            Partner_link_id = getattr(settings, 'PARTNER_ID', None)
-            Portfolio_link_id = getattr(settings, 'PORTFOLIO_ID', None)
-            posts = Post.objects.filter(publish=True)
-            try:
-                smart_portfolio = SmartCategory.objects.get(pk=Portfolio_link_id)
-            except SmartCategory.DoesNotExist:
-                pass
-            else:
-                smartPortfolio = grab_product_list_from_porfolio(smart_portfolio, None)
-                if len(smartPortfolio) > 0:
-                    activate_portfolio_link = True
-                    context['portfolio_menu'] = smart_portfolio
-                context['activate_portfolio_link'] = activate_portfolio_link
-            if posts.count() > 0:
-                activate_blog_link = True
-                context['blog_menu'] = SmartCategory.objects.filter(appear_in_menu=True)
-            context['activate_blog_link'] = activate_blog_link
-            context['menu_list'] = SmartCategory.objects.filter(appear_in_menu=True).exclude(pk=Home_link_id)\
-                .exclude(pk=Partner_link_id).exclude(pk=Portfolio_link_id)
-        return context
-
-
-class BlogBaseView(WebNodeBaseView):
+class BlogBaseView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(BlogBaseView, self).get_context_data(**kwargs)
         rand = random.random()
