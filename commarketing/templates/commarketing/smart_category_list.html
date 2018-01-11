@@ -2,7 +2,7 @@
 {% load i18n humanize staticfiles auth_tokens %}
 
 {% block page_title %}
-<title> {% trans "Smart Categories" %} - {{ service.project_name }} </title>
+<title> {% trans "Menus" %} - {{ service.project_name }} </title>
 {% endblock %}
 
 {% block head_style %}
@@ -17,7 +17,7 @@
 {% endblock %}
 
 {% block breadcrumb_location %}
-    <li>{% trans "Smart Categories" %}</li>
+    <li>{% trans "Menus" %}</li>
 {% endblock %}
 
 {% block admin_content %}
@@ -25,42 +25,38 @@
         <div class="container-fluid">
             <div id="results">
                 <ul class="tiles object-list tiles-panel">
-                {% for category in smart_category_list %}
-                    <li class="ik-li category{% if category.appear_in_menu %} appear-in-menu{% endif %}" id="{{ category.id }}" data-id="{{ category.id }}">
+                {% for menu in smart_category_list %}
+                    <li class="ik-li category{% if menu.appear_in_menu %} appear-in-menu{% endif %}" id="{{ menu.id }}" data-id="{{ menu.id }}">
                         <div class="content">
-                            <div class="subtle-shade select">
-                                <i class="glyphicon glyphicon-ok"></i>
-                            </div>
-                            {% url 'marketing:change_smart_object' 'smartcategory' category.id as change_category_url %}
-                            {% if category.image and category.image.name %}
-                                <a href="{{ change_category_url }}" class="image" style="background-image: url({{ category.image.small_url }})"></a>
+                            {% if menu.content_type == 'Module' %}
+                                {% url 'ikwen:change_module' menu.module.id as change_menu_url %}
                             {% else %}
-                                <a href="{{ change_category_url }}" class="image" style="background-image: url({% static 'ikwen/img/no_photo.png' %})"></a>
+                                {% url 'marketing:change_smart_object' 'smartcategory' menu.id as change_menu_url %}
+                            {% endif %}
+                            {% if menu.image and menu.image.name %}
+                                <a href="{{ change_menu_url }}" class="image" style="background-image: url({{ menu.image.small_url }})"></a>
+                            {% else %}
+                                <a href="{{ change_menu_url }}" class="image" style="background-image: url({% static 'ikwen/img/no_photo.png' %})"></a>
                             {% endif %}
                             <div class="info">
-                                <a href="{{ change_category_url }}" class="full_name">{{ category.title }}</a>
-                                <p class="about">{{ category.items_count }} {% trans "items" %}</p>
+                                <a href="{{ change_menu_url }}" class="full_name">{{ menu.title }}</a>
+                                <p class="about">{{ menu.items_count }} {% trans "items" %}</p>
                             </div>
                             <div class="actions">
-                                {% if category.content_type == 'Categories' %}
-                                    <a href="{% url 'kako:category_list' %}?smart_link=yes&smart_object_id={{ category.id }}"
-                                       class="action glyphicon glyphicon-link" title="{% trans "Link Categories" %}"></a>
-                                {% else %}
-                                    <a href="{% url 'kako:product_list' %}?smart_link=yes&smart_object_id={{ category.id }}"
-                                       class="action glyphicon glyphicon-link" title="{% trans "Link Products" %}"></a>
-                                {% endif %}
-                                {% if category.is_active %}
+                                {% if menu.is_active %}
                                     <i class="action glyphicon glyphicon-ok toggle active off" title="{% trans "Deactivate" %}"></i>
                                 {% else %}
                                     <i class="action glyphicon glyphicon-ok toggle active on" title="{% trans "Activate" %}"></i>
                                 {% endif %}
-                                {% if category.appear_in_menu %}
+                                {% if menu.appear_in_menu %}
                                     <i class="action glyphicon glyphicon-th-list toggle main-menu off" title="{% trans "Remove from main menu" %}"></i>
                                 {% else %}
                                     <i class="action glyphicon glyphicon-th-list toggle main-menu on" title="{% trans "Add to main menu" %}"></i>
                                 {% endif %}
-                                <a href="{{ change_category_url }}" class="glyphicon glyphicon-edit" title="{% trans "Edit item" %}"></a>
-                                <i class="action glyphicon glyphicon-trash trash" title="{% trans "Delete item" %}"></i>
+                                <a href="{{ change_menu_url }}" class="glyphicon glyphicon-edit" title="{% trans "Edit item" %}"></a>
+                                {% if menu.content_type != 'Module' %}
+                                    <i class="action glyphicon glyphicon-trash trash" title="{% trans "Delete item" %}"></i>
+                                {% endif %}
                             </div>
                             <div class="clearfix"></div>
                         </div>
@@ -85,7 +81,6 @@
 
 {% block js %}
     {{ block.super }}
-    <script src="{% static 'kakocase/js/jquery-ui.js' %}"></script>
     <script type="text/javascript">
         (function() {
             $('div#admin-nav .smart-categories').addClass('active');

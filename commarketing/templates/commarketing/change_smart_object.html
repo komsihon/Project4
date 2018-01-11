@@ -17,15 +17,9 @@
 {% endblock %}
 
 {% block breadcrumb_location %}
-    {% if object_type == 'banner' %}
-        <li style="text-transform: capitalize">{% url 'marketing:banner_list' as banner_list_list_url %}
-            <a href="{{ banner_list_list_url|append_auth_tokens:request }}">{{ object_type }}</a>
-        </li>
-    {% else %}
-        <li style="text-transform: capitalize">{% url 'marketing:smart_category_list' as smart_category_list_url %}
-            <a href="{{ smart_category_list_url|append_auth_tokens:request }}">{{ object_type }}</a>
-        </li>
-    {% endif %}
+    <li style="text-transform: capitalize">{% url 'marketing:smart_category_list' as smart_category_list_url %}
+        <a href="{{ smart_category_list_url }}">{% trans "Menus" %}</a>
+    </li>
     {% if smart_object %}
         <li>{{ smart_object.title }}</li>
     {% else %}
@@ -37,7 +31,7 @@
     <div id="admin-content" class="change-form">
         {% url 'marketing:change_smart_object' object_type as change_smart_object_url %}
         {% if errors %}<p class="alert alert-danger">{{ errors }}</p>{% endif %}
-        <form id="submit-category" class="admin-form" method="post" action="{{ change_smart_object_url|append_auth_tokens:request }}">{% csrf_token %}
+        <form id="submit-category" class="admin-form" method="post" action="{{ change_smart_object_url }}">{% csrf_token %}
             <input type="hidden" name="smart_object_id" value="{{ smart_object.id }}" />
             <input type="hidden" name="image_url" id="image_url" />
             <input type="hidden" name="items_fk_list" id="items_fk_list" value="{{ smart_object.items_fk_list }}" />
@@ -58,9 +52,9 @@
                     </div>
                     <p class="help clear">{% trans "Nice cover photo to help customer have an idea" %}</p>
                 </section>
-            </div>
-            <div class="form-group col-xs-12 col-sm-4 col-md-3" style="clear: both; padding-top: 15px">
-                <button class="btn btn-sm btn-primary btn-block">{% trans "Save" %}</button>
+                <div class="form-group col-xs-12 col-sm-4 col-md-3" style="clear: both; padding-top: 15px">
+                    <button class="btn btn-sm btn-primary btn-block">{% trans "Save" %}</button>
+                </div>
             </div>
         </form>
     </div>

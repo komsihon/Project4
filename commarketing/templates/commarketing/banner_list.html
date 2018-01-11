@@ -2,7 +2,7 @@
 {% load i18n humanize staticfiles auth_tokens %}
 
 {% block page_title %}
-<title> {% trans "Banners" %} - {{ service.project_name }} </title>
+<title> {% trans "Homepage" %} - {{ service.project_name }} </title>
 {% endblock %}
 
 {% block head_style %}
@@ -125,7 +125,6 @@
 
 {% block js %}
     {{ block.super }}
-    <script src="{% static 'kakocase/js/jquery-ui.js' %}"></script>
     <script type="text/javascript">
         (function() {
             $('div#admin-nav .homepage').addClass('active');

@@ -74,7 +74,6 @@
                 localStorage.removeItem('smartCategory');
             {% endif %}
             {% for msg in messages %}
-                ikwen.showFloatingNotice("{{ msg }}", '', 6);
                 {% if msg.tags == 'success' %}
                     localStorage.removeItem('smartObject');
                 {% endif %}

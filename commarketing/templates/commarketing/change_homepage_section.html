@@ -8,6 +8,18 @@
 {% block head_style %}
     {{ block.super }}
     <link href="{% static 'ikwen/css/uploader-single.css' %}" media="screen" rel="stylesheet" type="text/css" />
+    <style>
+        section.details {float: left; margin-top: 15px}
+        {% if smart_object %}
+            {% if smart_object.content_type == 'Flat' %}
+                .field-menu {display: none}
+            {% elif smart_object.content_type == 'Menu' %}
+                section.details, section.photos  {display: none}
+            {% endif %}
+        {% else %}
+            section.details, section.photos, .field-menu {display: none}
+        {% endif %}
+    </style>
 {% endblock %}
 
 {% block head_js %}
@@ -74,6 +86,17 @@
             <input type="hidden" name="items_fk_list" id="items_fk_list" value="{{ smart_object.items_fk_list }}" />
             <div class="container-fluid">
                 {% include 'core/snippets/model_admin_form.html' %}
+                <div class="form-row field-menu form-group">
+                    <div>
+                        <label class="required" for="id_menu">Menu:</label>
+                        <select id="id_menu" name="menu" class="form-control input-sm">
+                            <option value="" selected="selected">---------</option>
+                            {% for menu in menu_list %}
+                                <option value="{{ menu.slug }}">{{ menu.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
                 <section class="photos" style="width: 100%">
                     <label class="required" style="float: left; width: 100%">{% trans "Image" %}</label>
                     <div id="upload-container">
@@ -107,7 +130,6 @@
             $('.form-row input, .form-row select, .form-row textarea').addClass('form-control input-sm');
             $('.form-row textarea').addClass('form-control input-sm');
             {% for msg in messages %}
-                ikwen.showFloatingNotice("{{ msg }}", '', 6);
                 {% if msg.tags == 'success' %}
                     localStorage.removeItem('smartObject');
                 {% endif %}
@@ -198,6 +220,21 @@
                     $('#image_url').val(smartObject.image_url);
                     $('div#upload-container .image').css('background-image', "url('" + smartObject.image_url +"')");
                 }
+            {% endif %}
+            $('#id_content_type').change(function() {
+                var val = $(this).val();
+                if (val === 'Flat') {
+                    $('.details, .photos').show();
+                    $('.field-menu').hide();
+                    $('.field-cta').insertAfter('.field-description').show();
+                } else if (val === 'Menu') {
+                    $('.details, .photos').hide();
+                    $('.field-menu').show();
+                    $('.field-cta').insertAfter('.field-menu').show();
+                } else $('.details, .photos, .field-menu, .field-cta').hide();
+            });
+            {% if smart_object.content_type == 'Menu' %}
+                $('.field-cta').insertAfter('.field-menu').show();
             {% endif %}
         })()
     </script>
