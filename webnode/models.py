@@ -10,10 +10,9 @@ from ikwen.core.utils import to_dict
 
 class OperatorProfile(AbstractConfig):
     max_objects = models.IntegerField(default=100,
-                                       help_text="Max number of products this provider may have.")
+                                      help_text="Max number of products this provider may have.")
     theme = models.ForeignKey(Theme, blank=True, null=True)
     max_products = models.IntegerField(default=100)
-
 
     class Meta:
         verbose_name = "Operator"
