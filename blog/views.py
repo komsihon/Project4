@@ -26,7 +26,7 @@ from ikwen_webnode.blog.models import Post, Comments, PostCategory, PostLikes, P
 from django.http import HttpResponse
 import json
 from django.template.defaultfilters import slugify
-from ikwen.core.views import BaseView, HybridListView
+from ikwen.core.views import HybridListView
 
 from conf import settings
 
@@ -214,7 +214,7 @@ class AdminBlogHome(HybridListView):
         return super(AdminBlogHome, self).get(request, *args, **kwargs)
 
 
-class ChangeBlog(BaseView):
+class ChangeBlog(TemplateView):
     template_name = 'blog/admin/admin_change_blog.html'
 
     def get_post_admin(self):
