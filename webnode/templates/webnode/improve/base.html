@@ -81,16 +81,17 @@
                     <div class="collapse navbar-collapse navbar-right">
                         <ul class="nav navbar-nav">
                             <!--<li class="home"><a href="{% url 'webnode:home' %}">{% trans 'Home' %}</a></li>-->
+                            <li class="{{ menu.slug }}">
                             {% for menu in menu_list %}
-                                <li class="{{ menu.slug }}"><a href="{% url 'webnode:item_list' menu.slug %}">{% trans menu.title %}</a></li>
+                                {% if menu.content_type == 'FlatPage'  %}
+                                    <a href="{% url 'flatpage' menu.url %}">{% trans menu.title %}</a>
+                                {% elif menu.content_type == 'ItemList' %}
+                                    <a href="{% url 'webnode:item_list' menu.slug %}">{% trans menu.title %}</a>
+                                {% elif menu.content_type == 'Module' %}
+                                    <a href="{% url menu.module.url_name %}">{% trans menu.title %}</a>
+                                {% endif %}
                             {% endfor %}
-
-                            {% if activate_portfolio_link %}
-                                <li class="porfolio"><a href="{% url 'webnode:portfolio' %}">{{ portfolio_menu.title }}</a></li>
-                            {% endif %}
-                            {% if activate_blog_link %}
-                                <li class="blog"><a href="{% url 'blog:home' %}">{% trans 'BLOG' %}</a></li>
-                            {% endif %}
+                            </li>
                         </ul>
                     </div>
                 </div><!--/.container-->
@@ -141,9 +142,9 @@
             <div class="container">
                 <div class="row">
                     <div class="col-sm-6">
-                        <p>&copy; {{ year }} <a href="{{ service.url|append_auth_tokens:request }}" style="color: #666; text-decoration: none"><strong>{{ config.company_name }}</strong></a>.
+                        <p>&copy; {{ year }} <a href="{{ service.url }}" style="color: #666; text-decoration: none"><strong>{{ config.company_name }}</strong></a>.
                                 <span>{% trans "All rights reserved" %}</span>
-                                - <a href="{{ settings.LEGAL_MENTIONS_URL|append_auth_tokens:request }}" style="color: #666; text-decoration: none">{% trans "Legal mentions" %}</a>
+                                - <a href="{{ settings.LEGAL_MENTIONS_URL }}" style="color: #666; text-decoration: none">{% trans "Legal mentions" %}</a>
                             </p>
                     </div>
                     <div class="col-sm-6">
