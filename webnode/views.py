@@ -1,3 +1,4 @@
+from django.views.generic import TemplateView
 from ikwen.accesscontrol.models import Member
 from ikwen.billing.models import CloudBillingPlan, IkwenInvoiceItem, InvoiceEntry
 from ikwen.core.utils import get_service_instance
@@ -16,15 +17,13 @@ from django.utils.http import urlquote
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 
-from ikwen_webnode.commarketing.models import Banner, SmartCategory, SLIDE, FULL_WIDTH_SECTION, HomepageSection
-from ikwen.core.views import BaseView
+from ikwen_webnode.commarketing.models import Banner, SmartCategory, SLIDE, HomepageSection
 from ikwen_kakocase.kako.models import Product
 from ikwen_kakocase.kakocase.models import ProductCategory
 import random
 
 
 from ikwen_webnode.blog.models import Post
-from ikwen_webnode.blog.views import WebNodeBaseView
 
 from conf import settings
 from ikwen_webnode.webnode.cloud_setup import deploy, DeploymentForm
@@ -42,7 +41,7 @@ class TemplateSelector(object):
         return ['/'.join(tokens)]
 
 
-class Home(TemplateSelector, WebNodeBaseView):
+class Home(TemplateSelector, TemplateView):
     template_name = 'webnode/home.html'
 
     def get_context_data(self, **kwargs):
@@ -87,11 +86,11 @@ class Home(TemplateSelector, WebNodeBaseView):
         return context
 
 
-class AdminHome(BaseView):
+class AdminHome(TemplateView):
     template_name = 'admin_home.html'
 
 
-class ProductDetails(TemplateSelector, WebNodeBaseView):
+class ProductDetails(TemplateSelector, TemplateView):
     template_name = 'webnode/detail.html'
 
     def get_context_data(self, **kwargs):
@@ -110,13 +109,13 @@ class ProductDetails(TemplateSelector, WebNodeBaseView):
         return context
 
 
-class Portfolio(TemplateSelector, WebNodeBaseView):
+class Portfolio(TemplateSelector, TemplateView):
     template_name = 'webnode/portfolio.html'
 
     def get_context_data(self, **kwargs):
         context = super(Portfolio, self).get_context_data(**kwargs)
         category_list = []
-        smart_portfolio = SmartCategory.objects.get( pk=settings.PORTFOLIO_ID)
+        smart_portfolio = SmartCategory.objects.get(pk=settings.PORTFOLIO_ID)
         smartPortfolio = grab_product_list_from_porfolio(smart_portfolio, None)
         context['smart_portfolio'] = smartPortfolio
         for category_id in smart_portfolio.items_fk_list:
@@ -128,7 +127,7 @@ class Portfolio(TemplateSelector, WebNodeBaseView):
         return context
 
 
-class ItemList(TemplateSelector, WebNodeBaseView):
+class ItemList(TemplateSelector, TemplateView):
     template_name = 'webnode/item_list.html'
 
     def get_context_data(self, **kwargs):
@@ -152,7 +151,7 @@ class ItemList(TemplateSelector, WebNodeBaseView):
         return context
 
 
-class FlatPageView(TemplateSelector, WebNodeBaseView):
+class FlatPageView(TemplateSelector, TemplateView):
     template_name = 'webnode/about.html'
 
     def get_context_data(self, **kwargs):
@@ -243,7 +242,7 @@ def get_menus_context():
     return categories
 
 
-class DeployCloud(BaseView):
+class DeployCloud(TemplateView):
     template_name = 'core/cloud_setup/deploy.html'
 
     def get_context_data(self, **kwargs):
