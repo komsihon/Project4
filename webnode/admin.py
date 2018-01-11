@@ -31,7 +31,7 @@ else:
 
     _fieldsets = [
         (_('Company'), {'fields': ('company_name', 'short_description', 'slogan', 'description',)}),
-        (_('Website'), _website_fields),
+        # (_('Website'), _website_fields),
         (_('Address & Contact'), {'fields': ('contact_email', 'contact_phone', 'address', 'country', 'city',
                                               'latitude', 'longitude',)}),
         (_('Social'), {'fields': ('facebook_link', 'twitter_link', 'google_plus_link', 'youtube_link', 'instagram_link',
