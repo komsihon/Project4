@@ -13,10 +13,10 @@ admin.autodiscover()
 urlpatterns = patterns(
     '',
     # url(r'^change_product/$', permission_required('webnode.ik_manage_content')(ChangeProduct.as_view()), categories, name='change_product'),
-    url(r'^list_blog/$', permission_required('webnode.ik_manage_content')(AdminBlogHome.as_view()), name='list_blog'),
-    url(r'^change_blog/$', permission_required('webnode.ik_manage_content')(ChangeBlog.as_view()), name='change_blog'),
-    url(r'^change_blog/(?P<post_id>[-\w]+)/$', permission_required('webnode.ik_manage_content')(ChangeBlog.as_view()),
-        name='change_blog'),
+    url(r'^listBlogPost/$', permission_required('webnode.ik_manage_content')(AdminBlogHome.as_view()), name='list_blog'),
+    url(r'^changeBlogPost/$', permission_required('webnode.ik_manage_content')(ChangeBlog.as_view()), name='change_blog'),
+    url(r'^changeBlogPost/(?P<post_id>[-\w]+)/$', permission_required('webnode.ik_manage_content')(ChangeBlog.as_view()),
+        name='changeBlogPost'),
     url(r'^post_photo_uploader$', post_photo_uploader, name='post_photo_uploader'),
     url(r'^delete_photo$', delete_photo, name='delete_photo'),
 
