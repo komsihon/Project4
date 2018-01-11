@@ -37,7 +37,7 @@ __author__ = 'Kom Sihon'
 from django import forms
 
 if getattr(settings, 'LOCAL_DEV', False):
-    CLOUD_HOME = '/home/roddy/PycharmProjects/CloudTest/'
+    CLOUD_HOME = '/home/komsihon/PycharmProjects/CloudTest/'
 else:
     CLOUD_HOME = '/home/ikwen/Cloud/'
 
@@ -142,48 +142,6 @@ def deploy(app, member, project_name, billing_plan, theme, monthly_cost,
     subprocess.call(['mongorestore', '-d', database, db_folder])
     add_database_to_settings(database)
 
-    # Create default value; for partner, Portfolio and HOME pages if they are not already in the database
-    try:
-        SmartCategory.objects.using(database).get(slug='partners')
-    except SmartCategory.DoesNotExist:
-        default_partners_sm = SmartCategory(title='partners', slug='partners', is_active=False, content_type='Categories')
-        partners_category = ProductCategory(name='partners', slug='partners')
-        partners_category.save(using=database)
-        default_partners_sm.items_fk_list.append(partners_category.id)
-        default_partners_sm.save(using=database)
-        default_partners_sm_id = default_partners_sm.id
-    else:
-        default_partners_sm = SmartCategory.objects.using(database).get(slug='partners')
-        default_partners_sm_id = default_partners_sm.id
-
-    try:
-        SmartCategory.objects.using(database).get(slug='portfolio')
-    except SmartCategory.DoesNotExist:
-        default_portfolio_sm = SmartCategory(title='portfolio', slug='portfolio', is_active=False,
-                                            content_type='Categories')
-        portfolio_category = ProductCategory(name='portfolio', slug='portfolio')
-        portfolio_category.save(using=database)
-        default_portfolio_sm.items_fk_list.append(portfolio_category.id)
-        default_portfolio_sm.save(using=database)
-        default_portfolio_sm_id = default_partners_sm.id
-    else:
-        default_portfolio_sm = SmartCategory.objects.using(database).get(slug='portfolio')
-        default_portfolio_sm_id = default_portfolio_sm.id
-
-    try:
-        SmartCategory.objects.using(database).get(slug='home')
-    except SmartCategory.DoesNotExist:
-        default_home_sm = SmartCategory(title='home', slug='home', is_active=False,
-                                            content_type='Categories')
-        home_category = ProductCategory(name='home', slug='home')
-        home_category.save(using=database)
-        default_home_sm.items_fk_list.append(home_category.id)
-        default_home_sm.save(using=database)
-        default_home_sm_id = default_partners_sm.id
-    else:
-        default_home_sm = SmartCategory.objects.using(database).get(slug='home')
-        default_home_sm_id = default_home_sm.id
-
     # Re-create settings.py file as well as apache.conf file for the newly created project
     secret_key = generate_django_secret_key()
     allowed_hosts = '"%s", "www.%s"' % (domain, domain)
@@ -192,8 +150,7 @@ def deploy(app, member, project_name, billing_plan, theme, monthly_cost,
         {'secret_key': secret_key, 'ikwen_name': ikwen_name,  # 'business_setting': business_setting,
          'service': service, 'static_root': STATIC_ROOT, 'static_url': STATIC_URL,
          'media_root': media_root, 'media_url': media_url,
-         'allowed_hosts': allowed_hosts, 'debug': getattr(settings, 'DEBUG', False),
-         "portfolio_id":default_portfolio_sm_id, 'partner_id': default_partners_sm_id, 'home_id': default_home_sm_id})
+         'allowed_hosts': allowed_hosts, 'debug': getattr(settings, 'DEBUG', False)})
     fh = open(website_home_folder + '/conf/settings.py', 'w')
     fh.write(settings_tpl.render(settings_context))
     fh.close()
@@ -303,7 +260,6 @@ def deploy(app, member, project_name, billing_plan, theme, monthly_cost,
 
     # Send notification and Invoice to customer
     number = get_next_invoice_number()
-    now = datetime.now()
     invoice_total = 0
     for entry in invoice_entries:
         invoice_total += entry.item.amount * entry.quantity
