@@ -90,9 +90,10 @@
                     <div>
                         <label class="required" for="id_menu">Menu:</label>
                         <select id="id_menu" name="menu" class="form-control input-sm">
-                            <option value="" selected="selected">---------</option>
+                            <option value="">---------</option>
                             {% for menu in menu_list %}
-                                <option value="{{ menu.slug }}">{{ menu.title }}</option>
+                                <option {% if menu.slug == smart_object.description %}selected="selected"{% endif %}
+                                        value="{{ menu.slug }}">{{ menu.title }}</option>
                             {% endfor %}
                         </select>
                     </div>
