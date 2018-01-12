@@ -84,7 +84,7 @@
                             {% for menu in menu_list %}
                             <li class="{{ menu.slug }}">
                                 {% if menu.content_type == 'FlatPage'  %}
-                                    <a href="{% url 'flatpage' menu.url %}">{% trans menu.title %}</a>
+                                    <a href="{% url 'flatpage' menu.description %}">{% trans menu.title %}</a>
                                 {% elif menu.content_type == 'ItemList' %}
                                     <a href="{% url 'webnode:item_list' menu.slug %}">{% trans menu.title %}</a>
                                 {% elif menu.content_type == 'Module' %}
