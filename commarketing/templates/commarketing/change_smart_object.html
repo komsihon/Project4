@@ -8,6 +8,9 @@
 {% block head_style %}
     {{ block.super }}
     <link href="{% static 'ikwen/css/uploader-single.css' %}" media="screen" rel="stylesheet" type="text/css" />
+    <style>
+        .form-row.field-page:not(.ok) {display: none}
+    </style>
 {% endblock %}
 
 {% block selection_actions %}
@@ -37,6 +40,18 @@
             <input type="hidden" name="items_fk_list" id="items_fk_list" value="{{ smart_object.items_fk_list }}" />
             <div class="container-fluid">
                 {% include 'core/snippets/model_admin_form.html' %}
+                <div class="form-row field-page form-group{% if smart_object.content_type == 'FlatPage' %} ok{% endif %}">
+                    <div>
+                        <label class="required" for="id_flatpage">Page:</label>
+                        <select id="id_flatpage" name="page_url" class="form-control input-sm">
+                            <option value="">---------</option>
+                            {% for page in page_list %}
+                                <option {% if page.url == smart_object.description %}selected="selected"{% endif %}
+                                        value="{{ page.url }}">{{ page.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
                 <section class="photos" style="width: 100%">
                     <label class="required" style="float: left; width: 100%">{% trans "Cover image" %}</label>
                     <div id="upload-container">
@@ -69,8 +84,13 @@
             $('.form-row').addClass('form-group');
             $('.form-row input, .form-row select, .form-row textarea').addClass('form-control input-sm');
             $('.form-row textarea').addClass('form-control input-sm');
+            $('#id_content_type').change(function() {
+                var val = $(this).val();
+                if (val === 'FlatPage') {
+                    $('.field-page').show();
+                } else $('.field-page').hide();
+            });
             {% for msg in messages %}
-                ikwen.showFloatingNotice("{{ msg }}", '', 6);
                 {% if msg.tags == 'success' %}
                     localStorage.removeItem('smartObject');
                 {% endif %}
@@ -155,9 +175,7 @@
                 if (smartObject) {
                     $('#id_title').val(smartObject.title);
                     $('#id_content_type').val(smartObject.content_type);
-                    $('#id_display').val(smartObject.display);
                     $('#id_description').val(smartObject.description);
-                    $('#id_cta').val(smartObject.cta);
                     $('#image_url').val(smartObject.image_url);
                     $('div#upload-container .image').css('background-image', "url('" + smartObject.image_url +"')");
                 }
