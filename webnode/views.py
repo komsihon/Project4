@@ -46,43 +46,9 @@ class Home(TemplateSelector, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(Home, self).get_context_data(**kwargs)
-        smart_objects = SmartCategory.objects.filter(appear_in_menu=True).exclude(pk=settings.PORTFOLIO_ID).exclude(pk=settings.PARTNER_ID).exclude(pk=settings.HOME_ID)
-        partners_smart_objects = SmartCategory.objects.filter(appear_in_menu=True, pk=settings.PARTNER_ID)
-        home_entry_list, partner_list = [], []
-        for smart_object in smart_objects:
-            item_list = grab_items_list_from_smart_category(smart_object, HOME)
-            home_entry_list.append(item_list)
-
-
-        for smart_objects in partners_smart_objects:
-            for category in smart_objects.items_fk_list:
-                partners_category = ProductCategory.objects.get(pk=category)
-                partner_list = Product.objects.filter(category=partners_category)
-
-        try:
-            SmartCategory.objects.get(pk=settings.PORTFOLIO_ID)
-        except SmartCategory.DoesNotExist:
-            pass
-        else:
-            smart_portfolio = SmartCategory.objects.get(pk=settings.PORTFOLIO_ID)
-            smart_portfolio_items = grab_product_list_from_porfolio(smart_portfolio, HOME)
-            context['smart_portfolio_items'] = smart_portfolio_items
-            context['smart_portfolio'] = smart_portfolio
-
-        posts = Post.objects.filter(publish=True)
-        post_list = []
-        for post in posts:
-            post_list.append(post)
-        random.shuffle(post_list)
-        entries = post_list[:4]
-        context['entries'] = entries
         context['slideshow'] = Banner.objects.filter(display=SLIDE, is_active=True).order_by('order_of_appearance')
-        context['services'] = Banner.objects.filter(display=SLIDE, is_active=True).order_by('-id')
         context['homepage_section_list'] = HomepageSection.objects.filter(is_active=True).order_by('order_of_appearance')
 
-        context['home_entry_list'] = home_entry_list[:4]
-        context['partners_list'] = partner_list
-        # context['sm_services'] = services
         return context
 
 
