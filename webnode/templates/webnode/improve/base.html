@@ -81,8 +81,8 @@
                     <div class="collapse navbar-collapse navbar-right">
                         <ul class="nav navbar-nav">
                             <!--<li class="home"><a href="{% url 'webnode:home' %}">{% trans 'Home' %}</a></li>-->
-                            <li class="{{ menu.slug }}">
                             {% for menu in menu_list %}
+                            <li class="{{ menu.slug }}">
                                 {% if menu.content_type == 'FlatPage'  %}
                                     <a href="{% url 'flatpage' menu.url %}">{% trans menu.title %}</a>
                                 {% elif menu.content_type == 'ItemList' %}
@@ -90,8 +90,8 @@
                                 {% elif menu.content_type == 'Module' %}
                                     <a href="{% url menu.module.url_name %}">{% trans menu.title %}</a>
                                 {% endif %}
-                            {% endfor %}
                             </li>
+                            {% endfor %}
                         </ul>
                     </div>
                 </div><!--/.container-->
