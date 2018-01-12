@@ -17,6 +17,7 @@ from django.utils.text import slugify
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import TemplateView
+from ikwen.flatpages.models import FlatPage
 
 from ikwen_webnode.commarketing.admin import SmartCategoryAdmin, BannerAdmin, HomepageSectionAdmin
 from ikwen_kakocase.kakocase.views import SortableListMixin
@@ -69,7 +70,7 @@ class ChangeSmartObject(TemplateView):
         else:
             model = SmartCategory
             model_admin = SmartCategoryAdmin
-            fields = ("title", "content_type", "description", "badge_text")
+            fields = ("title", "content_type")
         if smart_object_id:
             smart_object = get_object_or_404(model, pk=smart_object_id)
             smart_object.content = [ProductCategory.objects.get(pk=pk) for pk in smart_object.items_fk_list]
@@ -78,6 +79,7 @@ class ChangeSmartObject(TemplateView):
         form = ModelForm(instance=smart_object)
         model_admin_form = helpers.AdminForm(form, list(object_admin.get_fieldsets(self.request)),
                                              object_admin.get_prepopulated_fields(self.request))
+        context['page_list'] = FlatPage.objects.all()
         context['object_type'] = object_type
         context['smart_object'] = smart_object
         context['model_admin_form'] = model_admin_form
@@ -104,7 +106,10 @@ class ChangeSmartObject(TemplateView):
             title = form.cleaned_data['title']
             slug = slugify(title)
             content_type = form.cleaned_data.get('content_type', 'Slide')
-            description = form.cleaned_data.get('description')
+            if content_type == 'FlatPage':
+                description = request.POST['page_url']
+            else:
+                description = form.cleaned_data.get('description')
             badge_text = form.cleaned_data.get('badge_text')
             order = form.cleaned_data.get('order_of_appearance')
             display = form.cleaned_data.get('display')
