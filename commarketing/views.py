@@ -262,7 +262,10 @@ def toggle_smart_object_attribute(request, *args, **kwargs):
     try:
         obj = SmartCategory.objects.get(pk=object_id)
     except SmartCategory.DoesNotExist:
-        obj = Banner.objects.get(pk=object_id)
+        try:
+            obj = Banner.objects.get(pk=object_id)
+        except Banner.DoesNotExist:
+            HomepageSection.objects.get(pk=object_id)
     if val.lower() == 'true':
         obj.__dict__[attr] = True
     else:
@@ -285,8 +288,12 @@ def delete_smart_object(request, *args, **kwargs):
                 SmartCategory.objects.get(pk=pk).delete()
                 deleted.append(pk)
             except SmartCategory.DoesNotExist:
-                message = "Object %s was not found."
-                break
+                try:
+                    HomepageSection.objects.get(pk=pk).delete()
+                    deleted.append(pk)
+                except HomepageSection.DoesNotExist:
+                    message = "Object %s was not found." % pk
+                    break
     else:
         message = "%d item(s) deleted." % len(deleted)
     response = {'message': message, 'deleted': deleted}
