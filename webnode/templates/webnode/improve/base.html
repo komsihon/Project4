@@ -82,15 +82,17 @@
                         <ul class="nav navbar-nav">
                             <!--<li class="home"><a href="{% url 'webnode:home' %}">{% trans 'Home' %}</a></li>-->
                             {% for menu in menu_list %}
-                            <li class="{{ menu.slug }}">
-                                {% if menu.content_type == 'FlatPage'  %}
-                                    <a href="{% url 'flatpage' menu.description %}">{% trans menu.title %}</a>
-                                {% elif menu.content_type == 'ItemList' %}
-                                    <a href="{% url 'webnode:item_list' menu.slug %}">{% trans menu.title %}</a>
-                                {% elif menu.content_type == 'Module' %}
-                                    <a href="{% url menu.module.url_name %}">{% trans menu.title %}</a>
+                                {% if menu.appear_in_menu %}
+                                <li class="{{ menu.slug }}">
+                                    {% if menu.content_type == 'FlatPage'  %}
+                                        <a href="{% url 'flatpage' menu.description %}">{% trans menu.title %}</a>
+                                    {% elif menu.content_type == 'ItemList' %}
+                                        <a href="{% url 'webnode:item_list' menu.slug %}">{% trans menu.title %}</a>
+                                    {% elif menu.content_type == 'Module' %}
+                                        <a href="{% url menu.module.url_name %}">{% trans menu.title %}</a>
+                                    {% endif %}
+                                </li>
                                 {% endif %}
-                            </li>
                             {% endfor %}
                         </ul>
                     </div>
