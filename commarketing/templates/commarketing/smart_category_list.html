@@ -40,7 +40,9 @@
                             {% endif %}
                             <div class="info">
                                 <a href="{{ change_menu_url }}" class="full_name">{{ menu.title }}</a>
-                                <p class="about">{{ menu.items_count }} {% trans "items" %}</p>
+                                {% if menu.content_type != 'Module' %}
+                                    <p class="about">{{ menu.items_count }} {% trans "items" %}</p>
+                                {% endif %}
                             </div>
                             <div class="actions">
                                 {% if menu.is_active %}
