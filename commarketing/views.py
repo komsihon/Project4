@@ -185,6 +185,7 @@ class ChangeHomepageSection(ChangeObjectBase):
                 smart_object = HomepageSection()
             smart_object.title = title
             smart_object.slug = slug
+            smart_object.content_type = content_type
             if content_type == FLAT:
                 smart_object.description = form.cleaned_data['description']
             else:
