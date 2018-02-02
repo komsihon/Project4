@@ -113,7 +113,6 @@ class ItemList(TemplateSelector, TemplateView):
         context['item_list'] = item_list
         context['smart_category'] = smart_category
         context['activate_block_title'] = activate_block_title
-        # context['partners'] = Banner.objects.filter(display=partners_category)[:5]
         return context
 
 
