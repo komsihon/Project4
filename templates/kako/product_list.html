@@ -23,18 +23,8 @@
     </style>
 {% endblock %}
 
-{% block selection_actions %}
-    <div class="actions">
-        {% if request.GET.smart_link %}
-            <i class="glyphicon glyphicon-link link" title="{% trans "Link products" %}"></i>
-        {% else %}
-            <i class="glyphicon glyphicon-trash trash" title="{% trans "Delete selected" %}"></i>
-        {% endif %}
-    </div>
-{% endblock %}
-
 {% block breadcrumb_location %}
-    <li>{% trans "Items" %}</li>
+    <li>{% trans "Page items" %}</li>
 {% endblock %}
 
 {% block admin_content %}
@@ -45,7 +35,7 @@
                     <div>
                         <i class="glyphicon glyphicon-search"></i>
                         <i class="glyphicon glyphicon-menu-left hide-search back"></i>
-                        <input type="text" class="tool search form-input input-sm" placeholder="{% trans "Search product" %}"/>
+                        <input type="text" id="context-search" class="tool search form-input input-sm" placeholder="{% trans "Search page item" %}"/>
                     </div>
                     {% if filter and filter|length > 0 %}
                         <div class="filter-trigger">
@@ -55,7 +45,7 @@
                             <div class="tool filter">
                                 <label for="{{ elt.parameter_name }}" class="sr-only">{% trans elt.title %}</label>
                                 <select id="{{ elt.parameter_name }}" style="float: left; width: 120px" class="form-control input-sm {{ elt.parameter_name }} widget" name="{{ elt.parameter_name }}">
-                                    <option value="all">{% trans "All" %}</option>
+                                    <option value="">{% trans "All" %}</option>
                                     {% for choice in elt.choices %}
                                         <option value="{{ choice.0 }}">{{ choice.1 }}</option>
                                     {% endfor %}
@@ -78,17 +68,17 @@
     {{ block.super }}
     <script type="text/javascript">
         (function() {
-            $('div#admin-nav .items').addClass('active');
+             $('div#admin-nav .products').addClass('active');
             var searchDescriptor = [{
                 endpoint: '{% url 'kako:product_list' %}',
                 resultTplSelector: '#results li.ik-li'
             }];
             function beforeSearch() {
-                var val = $('form#context-search input').val();
+                var val = $('input#context-search').val();
                 $('div#results .search-text').text(val);
             }
             function afterSearch() {
-                var val = $('form#context-search input').val(),
+                var val = $('input#context-search').val(),
                     endpoint = '{% url 'kako:change_product' %}?name=' + val;
                 {% if request.GET.collection_id %}
                     endpoint += '&collection_id={{ request.GET.collection_id }}';
@@ -138,11 +128,12 @@
                     $('#' + productId + ' .retail_price .value').text(newPrice)
                 })
             });
-            ikwen.setupSearch('#context-search input', '#results', searchDescriptor, beforeSearch, afterSearch);
+
+            $('#context-search').unbind();
+            ikwen.setupSearch('#context-search', '#results', searchDescriptor, beforeSearch, afterSearch);
             ikwen.deleteEndpoint = '{% url 'kako:put_product_in_trash' %}';
             {% if messages %}
                 {% for msg in messages %}
-                    ikwen.showFloatingNotice('{{ msg }}', '{{ msg.tags }}', 6);
                     {% if msg.tags == 'success' %}localStorage.removeItem('product');{% endif %}
                 {% endfor %}
             {% endif %}
@@ -155,6 +146,7 @@
                     $('#{{ product_id }} .select').click();
                 {% endfor %}
             {% endif %}
+
         })()
     </script>
 {% endblock %}

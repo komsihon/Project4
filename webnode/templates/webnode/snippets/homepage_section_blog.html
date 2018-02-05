@@ -1,0 +1,31 @@
+{% load i18n static %}
+<section class="feature  h-section" id="blog">
+    <div class="container">
+        <div class="center wow fadeInDown">
+            <a href="{{ section.target_url }}"><h2 class="title text-{{ section.text_position|lower }}">{{ section.title }} </h2></a>
+{#                <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut <br> et dolore magna aliqua. Ut enim ad minim veniam</p>#}
+        </div>
+        <div class="row">
+            <div class="features blogs">
+                {% for entry in entries %}
+                <div class="blog col-md-6 col-sm-6 col-xs-12 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                    <div class="feature-wrap col-md-12 col-sm-12 col-xs-12">
+                         {% if  entry.image %}
+                        <a href="#" class="col-md-4 col-sm-3 col-xs-12">
+                            <img class="img-responsive img-blog" src="{{ entry.image.url }}" alt="" />
+                        </a>
+                        {% endif %}
+                        <div class="col-md-8 col-sm-9 col-xs-12"  style="float: left">
+                            <h2><a href="{% url 'blog:details' entry.slug %}">{{ entry.title | truncatewords:"5" }}</a></h2>
+                            <h3 style="">{{ entry.summary | safe | truncatewords:"10" }}</h3>
+                        </div>
+
+                        <a class="readmore clearfix" href="{% url 'blog:details' entry.slug %}" style="float: right">Read More</a>
+
+                    </div>
+                </div><!--/.col-md-4-->
+                {% endfor %}
+            </div>
+        </div><!--/.row-->
+    </div><!--/.container-->
+</section><!--/#feature-->

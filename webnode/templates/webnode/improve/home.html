@@ -1,7 +1,7 @@
 {% extends 'webnode/improve/base.html' %}
 {% load i18n static auth_tokens %}
 
-{% block page_title %}<title>Coach Improve - {% trans "Home" %}</title>{% endblock %}
+{% block page_title %}<title>{{ service.project_name }} - {% trans "Home" %}</title>{% endblock %}
 
 {% block head_style %}
     {{ block.super }}

@@ -1,3 +1,4 @@
+import datetime
 from django.views.generic import TemplateView
 from ikwen.accesscontrol.models import Member
 from ikwen.billing.models import CloudBillingPlan, IkwenInvoiceItem, InvoiceEntry
@@ -35,8 +36,15 @@ POST_PER_PAGE = 5
 class TemplateSelector(object):
     def get_template_names(self):
         s = get_service_instance()
+        since = datetime.datetime(2018, 1, 1, 0, 0, 0)
+        try:
+            improve_service = Service.objects.get(project_name_slug='improve')
+        except Service.DoesNotExist:
+            pass
+        else:
+            since = improve_service.since
         tokens = self.template_name.split('/')
-        if s.project_name_slug == 'improve':
+        if s.project_name_slug == 'improve' or s.since >= since:
             tokens.insert(1, 'improve')
         return ['/'.join(tokens)]
 
@@ -56,7 +64,7 @@ class AdminHome(TemplateView):
     template_name = 'admin_home.html'
 
 
-class ProductDetails(TemplateSelector, TemplateView):
+class ProductDetails(TemplateView):
     template_name = 'webnode/detail.html'
 
     def get_context_data(self, **kwargs):
@@ -202,7 +210,7 @@ def grab_product_list_from_porfolio(smart_category, page):
 
 def get_menus_context():
     categories = {
-        'smart_cat_list': SmartCategory.objects.all().exclude(pk=settings.HOME_ID)
+        'smart_cat_list': SmartCategory.objects.all()
     }
     return categories
 

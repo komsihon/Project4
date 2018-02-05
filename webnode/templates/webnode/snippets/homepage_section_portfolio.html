@@ -1,0 +1,26 @@
+{% load i18n static %}
+<section id="recent-works" class="h-section">
+    <div class="container">
+        <div class="center wow fadeInDown">
+            <a href="{% url 'webnode:portfolio' %}"><h2>Recent Works</h2></a>
+{#                <p class="lead">{{ recent_work.description }}</p>#}
+        </div>
+
+        <div class="row">
+            {% for work in smart_portfolio %}
+                <div class="col-xs-12 col-sm-4 col-md-3 work">
+                    <div class="recent-work-wrap">
+                        <img class="img-responsive" src="{{ work.get_photos_url_list.0.small }}" alt="">
+                        <div class="overlay">
+                            <div class="recent-work-inner">
+                                <h3><a href="#">{{ work.name }}</a> </h3>
+                                <p>{{ work.summary | safe  | truncatewords:"15" }}</p>
+                                <a class="preview" href="{{ work.get_photos_url_list.0.small }}" rel="prettyPhoto"><i class="fa fa-eye"></i> View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div><!--/.row-->
+    </div><!--/.container-->
+</section><!--/#recent-works-->

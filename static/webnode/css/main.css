@@ -537,9 +537,7 @@ section.h-section:nth-child(2n) {
   background: #f9f9f9;
 }
 
-.features{
-  padding: 0;
-}
+.features{clear: both;float: left;padding: 0;width: 100%}
 
 .feature-wrap {
   background: #fff;

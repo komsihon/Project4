@@ -36,7 +36,7 @@ def to_display_date(a_datetime):
 class PostCategory(Model):
     name = models.CharField(max_length=240, blank=False, unique=True)
     slug = models.SlugField(max_length=240, blank=False, unique=True)
-    photos = ListField(EmbeddedModelField('Photo'), editable=False)
+    is_active = models.BooleanField(default=False)
 
     def __unicode__(self):
         return "%s" % self.name
@@ -45,7 +45,7 @@ class PostCategory(Model):
         verbose_name_plural = "Categories"
 
     def _get_posts_count(self):
-        return Post.objects.filter(publish=True, category=self).count()
+        return Post.objects.filter(is_active=True, category=self).count()
 
     post_count = property(_get_posts_count)
 
@@ -56,16 +56,16 @@ class Post(Model):
     title = models.CharField(max_length=240, blank=False, unique=True)
     summary = models.CharField(max_length=240, blank=True)
     slug = models.SlugField(max_length=240, blank=False, unique=True, editable=False)
-    # image = models.ImageField(blank=True, null=True, upload_to=UPLOAD_TO)
     image = MultiImageField(upload_to=UPLOAD_TO, blank=True, null=True, max_size=800)
-    media_link = models.URLField(blank=True, null=True, editable=False)
     entry = models.TextField()
     pub_date = models.DateField(default=datetime.now, editable=False)
-    publish = models.BooleanField(default=False)
+    appear_on_home_page = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
     member = models.ForeignKey(Member, editable=False)
     tags = models.CharField(max_length=255, blank=True)
     likes = models.SmallIntegerField(default=0, editable=False)
     rand = models.FloatField(default=random.random, db_index=True, editable=False)
+    consult_count = models.IntegerField(default=10)
 
     def __unicode__(self):
         return "%s" % self.title
@@ -98,7 +98,7 @@ class Post(Model):
             return None
 
     def delete(self, *args, **kwargs):
-        for photo in self.photos:
+        for photo in self.image:
             photo.delete(*args, **kwargs)
 
 
@@ -112,16 +112,17 @@ class Comments(models.Model):
     name = models.CharField(max_length=45, blank=True)
     post = models.ForeignKey(Post)
     entry = models.TextField()
-    pub_date = models.DateField(default=datetime.now)
+    created_on = models.DateField(default=datetime.now)
+    is_active = models.BooleanField(default=False)
 
     def get_display_date(self):
-        return to_display_date(self.pub_date)
+        return to_display_date(self.created_on)
 
     def to_dict(self):
         display_date = self.get_display_date()
         var = to_dict(self)
         var['publ_date'] = display_date
-        del(var['pub_date'])
+        del(var['created_on'])
 
 
 class Photo(models.Model):

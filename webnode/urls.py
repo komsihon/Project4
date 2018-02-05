@@ -17,7 +17,6 @@ else:
         '',
         url(r'^$', Home.as_view(), name='home'),
         url(r'^portfolio$', Portfolio.as_view(), name='portfolio'),
-        url(r'^item_list/(?P<slug>[-\w]+)/$', ItemList.as_view(), name='item_list'),
         url(r'^item/(?P<slug>[-\w]+)/$', ProductDetails.as_view(), name='product_details'),
-    
+        url(r'^(?P<slug>[-\w]+)/$', ItemList.as_view(), name='item_list'),
     )

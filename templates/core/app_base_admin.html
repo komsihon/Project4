@@ -13,9 +13,30 @@
             <a href="{{ product_url }} ">{% trans "Items" %}</a>
         </li>
         {% if module_blog.is_active %}
-        <li role="presentation" class="blog">
-            <a href="{% url 'blog:list_blog' %}">{% trans "Blog" %}</a>
-        </li>
+            <li role="presentation" class="marketing">
+                <a href="javascript:;" data-toggle="collapse" data-target="#blog"
+                   aria-expanded="true" style="padding-right: 0;"> {% trans "Blog" %}
+                    <i class="fa fa-fw fa-caret-down"></i>
+                </a>
+                <ul id="blog" class="nav nav-pills nav-stacked collapse" aria-expanded="true"
+                    style="padding-left: 15px">
+                    <li class="blog-categories">{% url 'blog:list_category' as category_list_url %}
+                        <a href="{{ category_list_url }}">{% trans "Blog categories" %}</a>
+                    </li>
+                    <li class="posts">
+                        <a href="{% url 'blog:list_post' %}">{% trans "Posts" %}</a>
+                    </li>
+
+                    <li class="comments">
+                        <a href="{% url 'blog:list_comment' %}">{% trans "Comments" %}</a>
+
+                    </li>
+
+                </ul>
+            </li>
+{#        <li role="presentation" class="blog">#}
+{#            <a href="{% url 'blog:list_blog' %}">{% trans "Blog" %}</a>#}
+{#        </li>#}
         {% endif %}
     </ul>
 

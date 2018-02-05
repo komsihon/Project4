@@ -37,9 +37,11 @@ logger = logging.getLogger('ikwen')
 
 
 if getattr(settings, 'LOCAL_DEV', False):
-    CLOUD_HOME = '/home/komsihon/PycharmProjects/CloudTest/'
+    CLOUD_HOME = '/home/roddy/PycharmProjects/CloudTest/'
+    SETTINGS_TPL= 'webnode/cloud_setup/settings.local.html'
 else:
     CLOUD_HOME = '/home/ikwen/Cloud/'
+    SETTINGS_TPL= 'webnode/cloud_setup/settings.html'
 
 CLOUD_FOLDER = CLOUD_HOME + 'WebNode/'
 
@@ -152,7 +154,7 @@ def deploy(app, member, project_name, billing_plan, theme, monthly_cost,
     # Re-create settings.py file as well as apache.conf file for the newly created project
     secret_key = generate_django_secret_key()
     allowed_hosts = '"%s", "www.%s"' % (domain, domain)
-    settings_tpl = get_template('webnode/cloud_setup/settings.html')
+    settings_tpl = get_template(SETTINGS_TPL)
     settings_context = Context(
         {'secret_key': secret_key, 'ikwen_name': ikwen_name,  # 'business_setting': business_setting,
          'service': service, 'static_root': STATIC_ROOT, 'static_url': STATIC_URL,

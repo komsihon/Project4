@@ -1,3 +1,4 @@
+from ikwen_kakocase.kakocase.models import ProductCategory
 from ikwen_webnode.commarketing.models import SmartCategory
 from ikwen_kakocase.kakocase.context_processors import project_settings as kakocase_settings
 
@@ -12,4 +13,11 @@ def project_settings(request):
 
 
 def menu_list(request):
-    return {'menu_list': SmartCategory.objects.filter(is_active=True).order_by('order_of_appearance')}
+    item_menu_list = SmartCategory.objects.filter(is_active=True, content_type='ItemList')
+    for menu in item_menu_list:
+        category_list = []
+        for category_id in menu.items_fk_list:
+            category = ProductCategory.objects.get(pk=category_id)
+            category_list.append(category)
+        menu.category_list = category_list
+    return {'item_menu_list': item_menu_list, 'menu_list': SmartCategory.objects.filter(is_active=True).order_by('order_of_appearance')}

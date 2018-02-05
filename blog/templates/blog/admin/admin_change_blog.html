@@ -7,6 +7,7 @@
 
 {% block head_style %}
     {{ block.super }}
+    <link href="{% static 'ikwen/ajaxuploader/css/fileuploader.css' %}" media="screen" rel="stylesheet" type="text/css" />
     <style>
         .verify {border: 1px solid #e74c3c}  {# Highlights form errors (Check performed by javascript) #}
         div#upload-container { float: left; margin-top: 3px; width: 74% }
@@ -19,12 +20,32 @@
         .qq-upload-button {background: none; border: none; box-shadow: none; color: #fff; text-shadow: none; height: 100px; width: 100%}
         .qq-upload-button-hover {box-shadow: none; color: #fff}
         .qq-upload-list {display: none}
+    .tpl {display: none}
+
+        #image-list {background: #EEE; border: dashed 1px #AAA; border-radius: 15px; margin-top: 35px; height: 350px; padding: 15px; overflow-y: auto; width: 1040px}
+        #image-list .media-ctnr {border: solid 1px #ccc; border-radius: 12px; float: left; height: 150px; margin: 10px;padding: 5px; width: 130px}
+        #image-list .media-ctnr:hover {box-shadow: 8px 8px 12px #aaa;}
+        div#image-list .image {background-position: center; background-size: cover; float: left; height: 130px; width: 130px}
+        #image-list .media-ctnr img {border-radius: 10px;max-height: 160px; width: 100%}
+        #image-list .media-ctnr .delete-media {cursor: pointer; font-size: 14px;float: left;padding: 2px 0; text-align: center; width: 100%}
+        #image-list .media-ctnr .delete-media:hover {color: #7a1e31}
+        #upload-contain .qq-upload-button {background:#00aac9; border: 1px solid #37B7CC;border-radius: 2px; color: #fff; padding: 15px 25px; float: left; clear: both; margin-top: 20px;}
+        #upload-contain .qq-upload-success {display: none}
+        #upload-contain {float: left; clear: both}
+        #image-cntr {float: left; clear: both}
+        .loading {background: url("{% static 'blog/img/blog-spinner.gif' %}");background-size: 41% auto;background-color: #ffffffa1;background-position: center; background-repeat: no-repeat; display: none; height: 374px;margin: -12px;position: absolute;width: 1068px}
+
     </style>
+
+        <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    {#    <script src="{% static 'tinymce/js/tinymce/tinymce.min.js' %}"></script>#}
+        <script src="{% static 'ikwen/ajaxuploader/js/fileuploader.js' %}"></script>
 {% endblock %}
 
 {% block breadcrumb_location %}
     <li>
-        <a href="{% url 'blog:list_blog' %}">{% trans "Posts" %}</a>
+        <a href="{% url 'blog:list_post' %}">{% trans "Posts" %}</a>
     </li>
     {% if post %}
         <li>{{ post.title }}</li>
@@ -64,6 +85,19 @@
                     <button class="btn btn-sm btn-primary btn-block">{% trans "Save" %}</button>
                 </div>
             </form>
+            <section id="image-cntr" class="hidden-xs">
+                <div id="image-list" class="">
+                    <div class="loading"></div>
+                    <div class="media-ctnr frame draggable tpl" draggable="true">
+                        <img class="image" />
+                        <span class="delete-media">Delete</span>
+                    </div>
+                </div>
+                <div id="upload-contain" class="images-uploader">
+                    <span class="progress"></span>
+                    <div class="frame upload-list"></div>
+                </div>
+            </section>
         </div>
     </div>
 {% endblock %}
@@ -157,7 +191,6 @@
                     }
                 });
 
-
                 {% if post %}
                     $('#image_url').val("{{ post.get_image_url }}");
                 {% else %}
@@ -174,15 +207,106 @@
 
                     }
                 {% endif %}
-
-                var $new = $('<option value="new">{% trans "New" %} ...</option>');
-                $new.appendTo('#id_category');
-                $('#id_category').on('change', function() {
-                    var val = $(this).val();
-                    if (val === 'new') {
-                        window.location = "{% url 'kako:change_category' %}"
-                    }
+        })()
+    </script>
+    <script type="text/javascript">
+        (function() {
+            tinymce.init({
+                selector: "textarea",theme: "modern",width: 1000,height: 300,
+                plugins: [
+                     "advlist autolink link image lists charmap print preview hr anchor pagebreak",
+                     "searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
+                     "table contextmenu directionality emoticons paste textcolor code"
+                ],
+                content_css: [
+                    '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                ],
+                toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | styleselect",
+                toolbar2: "| link unlink anchor | image media | forecolor backcolor  | print preview code ",
+                image_advtab: true ,
+                paste_data_images: true,
+            });
+            $('.qq-upload-drop-area').remove()
+            var endpoint = "{% url 'blog:get_media' %}";
+            $.getJSON(endpoint, function(data) {
+                $('body, button.confirm').css('cursor','default');
+                if (data.error) {
+                    $('div#top-notice-ctnr span').html(data.error).addClass('failure');
+                    $('#top-notice-ctnr').fadeIn().delay(5000).fadeOut();
+                } else {
+                    populateMedia(data.media_list)
+                    $('#image-cntr').insertAfter('textarea')
+                }
+                return false
                 });
+            function populateMedia(media) {
+                if (media.length == 0) {
+                    var $emptyRow = $('<div class="empty-grid" colspan="10">No data found</div>')
+                    $emptyRow.insertBefore('.media-ctnr.tpl')
+                    return
+                }
+                var $list = $('<div></div>')
+                for (var i = 0; i < media.length; i++) {
+                    var $newRow = $('#image-list .media-ctnr.tpl').clone().removeClass('tpl')
+                    $newRow = applyCommentTemplate($newRow, media[i]).show()
+                    $list.append($newRow)
+                }
+                $list.children().insertBefore('#image-list .media-ctnr.tpl')
+
+            }
+            function applyCommentTemplate($tpl, media){
+                $tpl.attr('filename', media);
+                $tpl.find('.image').attr('src', media);
+                return $tpl
+            }
+            var uploader = new qq.FileUploader({
+                action: "{% url 'ikwen:upload_image' %}",
+                element: $('div#upload-contain .upload-list')[0],
+                buttonText: "Upload files",
+                multiple: false,
+                onSubmit: function(id, fileName) {
+                    var uploadId = 'u' + id;
+                },
+                onProgress: function() {
+                    $('div#image-list .loading').show();
+                },
+                onComplete: function(id, fileName, responseJSON) {
+                    if(responseJSON.success) {
+                        var photo = {id: responseJSON.id, url: responseJSON.path},
+                            img = new Image();
+                        img.onload = function() {
+                            var $newRow = $('#image-list .media-ctnr.tpl').clone().removeClass('tpl')
+                            $newRow.find('.image').attr('src', photo.url);
+                            $('div#image-list .loading').hide();
+                            $newRow.insertBefore('#image-list .media-ctnr.tpl').show()
+                        };
+                        img.src = photo.url;
+
+                    } else {
+                        alert("upload failed!");
+                    }
+                },
+                params: {
+                    'csrf_token': '{{ csrf_token }}',
+                    'is_tiny_mce': 'yes',
+                    'csrf_name': 'csrfmiddlewaretoken',
+                    'csrf_xname': 'X-CSRFToken',
+                }
+            });
+
+            $('body').on('click', '#image-list .media-ctnr .delete-media', function() {
+                var response = confirm("Do you realy want to delete this image ?");
+                if (response != true) return
+                else {
+                    var filename = $(this).parent('.media-ctnr').find('img').attr('src');
+                    $.getJSON('{% url 'blog:delete_photo' %}', {filename: filename});
+                    $(this).fadeOut('normal', function() {
+                        $(this).parent().remove()
+                    });
+                }
+            });
+            $('.qq-upload-drop-area').remove()
+
         })()
     </script>
 {% endblock %}

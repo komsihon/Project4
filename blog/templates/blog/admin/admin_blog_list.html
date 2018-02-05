@@ -2,7 +2,7 @@
 {% load i18n humanize static auth_tokens %}
 
 {% block page_title %}
-<title> {% trans "Categories" %} - {{ service.project_name }} </title>
+<title> {% trans "Post categories" %} - {{ service.project_name }} </title>
 {% endblock %}
 
 {% block head_style %}
@@ -22,7 +22,7 @@
 {% endblock %}
 
 {% block breadcrumb_location %}
-    <li>{% trans "Manage blog list" %}</li>
+    <li>{% trans "Posts" %}</li>
 {% endblock %}
 
 {% block admin_content %}
@@ -34,7 +34,7 @@
                         <div class="subtle-shade select">
                             <i class="glyphicon glyphicon-ok"></i>
                         </div>
-                        {% url 'blog:change_blog'  post.id as change_post_url %}
+                        {% url 'blog:change_post'  post.id as change_post_url %}
                         {% if post.image and post.image.name %}
                             <a href="{{ change_post_url|append_auth_tokens:request }}" class="image" style="background-image: url('{{ post.image.thumb_url }}')"></a>
                         {% else %}
@@ -59,7 +59,7 @@
             <div class="add-new-tile">
                 <p>
                     <span class="search-text"></span>
-                    <a href="{% url 'blog:change_blog' %}"
+                    <a href="{% url 'blog:change_post' %}"
                        class="btn btn-sm btn-success" style="margin-left: 6px; min-width: 90px">{% trans "Add" %}</a>
                 </p>
             </div>
@@ -71,7 +71,7 @@
         (function() {
             $('div#admin-nav .blog').addClass('active');
             var searchDescriptor = [{
-                endpoint: '{% url 'blog:list_blog' %}',
+                endpoint: '{% url 'blog:list_post' %}',
                 resultTplSelector: '#results li.ik-li'
             }];
             function beforeSearch() {
@@ -80,7 +80,7 @@
             }
             function afterSearch() {
                 var val = $('form#context-search input').val(),
-                    endpoint = '{% url 'blog:change_blog' %}?name=' + val;
+                    endpoint = '{% url 'blog:change_post' %}?name=' + val;
 
                 $('#new-post').attr('href', endpoint);
             }

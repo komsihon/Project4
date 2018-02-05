@@ -151,7 +151,11 @@
                     </div>
                     <div class="col-sm-6">
                         <ul class="pull-right">
-                            <li><a href="{% url 'ikwen:sign_in' %}">{% trans 'Login' %}</a></li>
+                            {% if user.is_authenticated %}
+                                <li><a href="{% url "ikwen:logout" %}">{% trans "Logout" %}</a></li>
+                            {% else %}
+                                <li><a href="{% url 'ikwen:sign_in' %}">{% trans 'Login' %}</a></li>
+                            {% endif %}
                             <li><a href="{% url 'webnode:home' %}">{% trans 'Home' %}</a></li>
                             <li><a href="{% url 'blog:home' %}">Blog</a></li>
                         </ul>

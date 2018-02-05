@@ -6,7 +6,7 @@
     <meta property="og:description" content="{{ product.description }}"/>
     <meta property="og:image" content="{{ product.get_photos_url_list.0 }}"/>
 {% endblock %}
-{% block page_title %} <title>{{ product.name }}</title> {% endblock %}
+{% block page_title %} <title>{{ service.project_name }} - {{ product.name }}</title> {% endblock %}
 
 {% block blog_content %}
     {% include 'snippets/fb_sdk.html' %}

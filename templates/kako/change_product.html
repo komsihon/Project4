@@ -144,8 +144,10 @@
                         <label class="required" for="id_sm_category">Menu:</label>
                         <select id="id_smart_category" name="smart_category" class="form-control input-sm">
                             <option value=""  selected="selected">---------</option>
-                            {% for menu in smart_cat_list %}
-                            <option value="{{ menu.menu.id }}">{{ menu.menu.title}}</option>
+                            {% for menu in menu_list %}
+                                {% if menu.content_type != "Module" %}
+                                    <option value="{{ menu.id }}">{{ menu.title}}</option>
+                                {% endif %}
                             {% endfor %}
 {#                            <option value="new">New ...</option>#}
                         </select>
@@ -362,13 +364,13 @@
 
             var menuList = []
 
-            {% for smart_category in smart_cat_list %}
+            {% for smart_category in item_menu_list %}
                 var cat_list = []
                 {% for category in smart_category.category_list %}
                     var cat = {id: "{{ category.id }}", name: "{{ category.name }}"}
                     cat_list.push(cat)
                 {% endfor %}
-                var menu = {'smartId': "{{ smart_category.menu.id }}", 'categoryList': cat_list}
+                var menu = {'smartId': "{{ smart_category.id }}", 'categoryList': cat_list}
                 menuList.push(menu)
             {% endfor %}
 
@@ -397,7 +399,7 @@
                 $('select#id_category').attr('disabled', true)
             }
             $('div.submit button').click(function () {
-                if ($('id_smart_category').val() == ''){
+                if ($('#id_smart_category').val() == ''){
                     ikwen.showFloatingNotice("{% trans "Items must be associted to a menu; <b>Select a menu</b>" %}", '', 3);
                     $("#id_smart_category").focus()
                     return false

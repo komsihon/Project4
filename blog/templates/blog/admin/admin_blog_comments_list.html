@@ -1,0 +1,38 @@
+{% extends 'core/app_base_admin.html' %}
+{% load i18n humanize staticfiles auth_tokens %}
+
+{% block page_title %}
+<title>{% trans "Comments" %} - {{ service.project_name }}</title>
+{% endblock %}
+
+
+{% block breadcrumb_location %}
+    <li>{% trans "Post Comments" %}</li>
+{% endblock %}
+
+{% block admin_content %}
+    <div id="admin-content">
+        <div class="container-fluid">
+            {% include 'blog/snippets/comment_list_results.html' %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function() {
+            $('div#admin-nav .products').addClass('active');
+            ikwen.deleteEndpoint = '{% url 'blog:delete_promo_object' %}';
+            $('#admin-content').on('click', '.product .active.on', function() {
+            var commentId = $(this).parents('.product').data('id');
+            $(this).toggleClass('on off');
+            $.getJSON('{% url 'blog:toggle_object_attribute' %}', {'object_id': commentId, 'attr': 'is_active', 'val': true})
+            }).on('click', '.product .active.off', function() {
+                var commentId = $(this).parents('.product').data('id');
+                $(this).toggleClass('on off');
+                $.getJSON('{% url 'blog:toggle_object_attribute' %}', {'object_id': commentId, 'attr': 'is_active', 'val': false})
+            })
+        })()
+    </script>
+{% endblock %}
