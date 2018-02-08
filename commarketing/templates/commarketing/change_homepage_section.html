@@ -168,10 +168,6 @@
                         check = false;
                     }
                 });
-                var img = $('#image_url').val();
-                if (!img) {
-                    return confirm("{% trans "Categories look better with image. Continue without it ?" %}");
-                }
                 return check;
             }
             var uploader = new qq.FileUploader({
