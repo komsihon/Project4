@@ -1,25 +1,22 @@
 {% load i18n static %}
-<section class="feature h-section home-section bg-img-{{ section.background_image|lower }} text-{{ section.text_position|lower }}"
-        {% if section.background_image %}style="background-image: url({% get_media_prefix %}{{ section.image.name }})"{% endif %}>
+<section class="feature h-section home-section">
     <div class="container">
         <div class="center wow fadeInDown">
-            <a href="{{ section.target_url }}"><h2 class="title text-{{ section.text_position|lower }}">{{ section.title }}</h2></a>
+            <a href="{{ section.target_url }}"><h2 class="title text-{{ section.text_position|lower }}">{{ homepage_section_list.title }}</h2></a>
         </div>
+        <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut <br> et dolore magna aliqua. Ut enim ad minim veniam</p>
         <div class="row">
-            <div class="features home-section-text-{{ section.text_position|lower }} wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
-                {% if section.image.name and not section.background_image %}
-                    <div class="img col-xs-12 col-sm-6 col-md-5 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
-                        <img src="{% get_media_prefix %}{{ section.image.name }}" alt="{{ section.title }}" />
+            {% for item in item_list %}
+                <div class="col-md-3 col-sm-4 col-xs-12 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                    <div class="feature-wrap subtle-shade">
+                        <a href="{% url 'webnode:product_details' item.slug %}"><img src="{{ item.get_photos_url_list.0.small }}" class="img-responsive"></a>
+                        <a href="{% url 'webnode:product_details' item.slug %}"><h2>{{ item.name }}</h2></a>
+                        <h3>{{ item.summary | safe }}</h3>
                     </div>
-                {% endif %}
-                <div class="description {% if section.background_image %}col-sm-8 text-has-shade{% else %}col-sm-6 col-md-5{% endif %} col-xs-12 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
-                    <div>{{ section.description|safe }}</div>
-                    <div class="home-section-cta">
-                        <a href="{{ section.target_url }}" class="cta">{{ section.cta }}</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+                </div><!--/.col-md-4-->
+            {% endfor %}
+        </div><!--/.services-->
+{#            {% endfor %}#}
     </div>
     <div class="clearfix"></div>
 </section>

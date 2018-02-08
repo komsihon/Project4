@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import permission_required
 
 from ikwen_webnode.blog.views import PostDetails, Search, PostPerCategory, PostsList, save_comment, AdminPostHome, \
     save_post_likes, post_photo_uploader, delete_photo, ListCategory, ChangeCategory, load_posts_for_homepage, \
-    ChangePost, CommentList, delete_comment_object, toggle_object_attribute, get_media, delete_photo_list
+    ChangePost, CommentList, delete_comment_object, toggle_object_attribute
 from ikwen_webnode.webnode.views import AdminHome
 
 
@@ -20,8 +20,8 @@ urlpatterns = patterns(
         name='change_post'),
 
     url(r'^list_categories/$', permission_required('webnode.ik_manage_content')(ListCategory.as_view()),name='list_category'),
-    url(r'^change_category/$', permission_required('webnode.ik_manage_content')(ChangeCategory.as_view()), name='change_category'),
-    url(r'^change_category/(?P<category_id>[-\w]+)/$', permission_required('webnode.ik_manage_content')(ChangeCategory.as_view()),name='change_category'),
+    url(r'^changeCategory/$', permission_required('webnode.ik_manage_content')(ChangeCategory.as_view()), name='change_category'),
+    url(r'^changeCategory/(?P<object_id>[-\w]+)/$', permission_required('webnode.ik_manage_content')(ChangeCategory.as_view()),name='change_category'),
 
     url(r'^listcomments/$', permission_required('webnode.ik_manage_content')(CommentList.as_view()),
         name='list_comment'),
@@ -36,9 +36,7 @@ urlpatterns = patterns(
     url(r'^$', PostsList.as_view(), name='home'),
     url(r'^save_comment$', save_comment, name='save_comment'),
     url(r'^save_post_likes$', save_post_likes, name='save_post_likes'),
-    url(r'^delete_comment_object$', delete_comment_object, name='delete_comment_object'),
+    url(r'^delete_promo_object$', delete_comment_object, name='delete_promo_object'),
     url(r'^toggle_object_attribute$', toggle_object_attribute, name='toggle_object_attribute'),
-    url(r'^get_media$', get_media, name='get_media'),
-    url(r'^delete_photo$', delete_photo_list, name='delete_photo'),
 
 )

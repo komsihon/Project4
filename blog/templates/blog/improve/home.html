@@ -1,6 +1,6 @@
 {% extends 'blog/improve/base.html' %}
 {% load i18n humanize staticfiles %}
-
+{% block page_title %} <title>Improve blog  - Home</title> {% endblock %}
 {% block blog_content %}
     {% include 'snippets/fb_sdk.html' %}
     {% if entries %}
@@ -18,7 +18,7 @@
 
                     <div class="col-xs-12 col-sm-10 blog-content">
                         {% if  entry.image %}
-                        <a href="#"><img class="img-responsive img-blog" src="{{ entry.image.url }}" width="100%" alt="" /></a>
+                        <a href="{% url 'blog:details' entry.slug %}"><img class="img-responsive img-blog" src="{{ entry.image.url }}" width="100%" alt="" /></a>
                         {% endif %}
                         <h2><a href="{% url 'blog:details' entry.slug %}">{{ entry.title }}</a></h2>
                         <h3>{{ entry.summary }}</h3>

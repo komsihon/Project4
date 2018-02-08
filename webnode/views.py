@@ -26,7 +26,7 @@ import random
 
 from ikwen_webnode.blog.models import Post
 
-from conf import settings
+# from ikwen_webnode.conf import settings
 from ikwen_webnode.webnode.cloud_setup import deploy, DeploymentForm
 
 HOME = 'home'
@@ -85,20 +85,20 @@ class ProductDetails(TemplateView):
 
 class Portfolio(TemplateSelector, TemplateView):
     template_name = 'webnode/portfolio.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(Portfolio, self).get_context_data(**kwargs)
-        category_list = []
-        smart_portfolio = SmartCategory.objects.get(pk=settings.PORTFOLIO_ID)
-        smartPortfolio = grab_product_list_from_porfolio(smart_portfolio, None)
-        context['smart_portfolio'] = smartPortfolio
-        for category_id in smart_portfolio.items_fk_list:
-            category = ProductCategory.objects.get(pk=category_id)
-            items_Count = Product.objects.filter(category=category).count()
-            if items_Count > 0:
-                category_list.append(category)
-        context['category_list'] = category_list
-        return context
+    #
+    # def get_context_data(self, **kwargs):
+    #     context = super(Portfolio, self).get_context_data(**kwargs)
+    #     category_list = []
+    #     smart_portfolio = SmartCategory.objects.get(pk=settings.PORTFOLIO_ID)
+    #     smartPortfolio = grab_product_list_from_porfolio(smart_portfolio, None)
+    #     context['smart_portfolio'] = smartPortfolio
+    #     for category_id in smart_portfolio.items_fk_list:
+    #         category = ProductCategory.objects.get(pk=category_id)
+    #         items_Count = Product.objects.filter(category=category).count()
+    #         if items_Count > 0:
+    #             category_list.append(category)
+    #     context['category_list'] = category_list
+    #     return context
 
 
 class ItemList(TemplateSelector, TemplateView):

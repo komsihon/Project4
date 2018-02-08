@@ -1,5 +1,8 @@
 {% extends 'webnode/improve/base.html' %}
-{% load staticfiles auth_tokens %}
+{% load staticfiles auth_tokens %}{% block head_style %}
+    {{ block.super }}
+    <link href="{% static 'webnode/css/improve/blog.css' %}" rel="stylesheet">
+{% endblock %}
 {% block page_content %}
     {% block page_header %}
     {% endblock %}
@@ -21,14 +24,13 @@
                     <div class="row" style="">
                         <div class="col-sm-12">
                             {% for suggestion in suggestions %}
-                            <div class="single_comments">
+                            <div class="single_comments col-lg-12">
                                 <a href="{% url 'blog:details' suggestion.slug %}"  style="color: #0f0f0f">
-                                    <img src="{% static 'webnode/img/blog/avatar3.png' %}" alt="" />
+                                    {% if suggestion.image.name %}
+                                        <img src="{{ suggestion.image.url }}" width="100" alt=""  />
+                                    {% endif %}
                                     <p>{{ suggestion.title }} </p>
                                 </a>
-                                <div class="entry-meta small muted">
-                                    <span>By <a href="#">{{ suggestion.member.full_name }}</a></span>
-                                </div>
                             </div>
                             {% endfor %}
                         </div>
@@ -43,7 +45,9 @@
                         <div class="col-sm-6">
                             <ul class="blog_category">
                                 {% for category in categories %}
-                                <li><a href="{% url 'blog:post_per_category'  category.slug %}">{{ category.name }} <span class="badge">{{ category.post_count }}</span></a></li>
+                                    {% if  category.slug %}
+                                        <li><a href="{% url 'blog:post_per_category'  category.slug %}">{{ category.name }} <span class="badge">{{ category.post_count }}</span></a></li>
+                                    {% endif %}
                                 {% endfor %}
                             </ul>
                         </div>
@@ -54,14 +58,13 @@
                     <h3>Most consulted</h3>
                     <div class="row">
                         {% for suggestion in recent_posts %}
-                        <div class="single_comments">
+                        <div class="single_comments  col-lg-12">
                             <a href="{% url 'blog:details' suggestion.slug %}" style="color: #0f0f0f">
-                                <img src="{% static 'webnode/img/blog/avatar3.png' %}" alt=""  />
+                                {% if suggestion.image.name %}
+                                    <img src="{{ suggestion.image.url }}" width="100" alt=""  />
+                                {% endif %}
                                 <p>{{ suggestion.title }} </p>
                             </a>
-                            <div class="entry-meta small muted">
-                                <span>By <a href="#">{{ suggestion.member.full_name }}</a></span>
-                            </div>
                         </div>
                         {% endfor %}
                     </div>

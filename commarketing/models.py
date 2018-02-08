@@ -78,8 +78,7 @@ class SmartObject(Model):
         return ProductCategory.objects.filter(pk__in=self.items_fk_list)
 
     def get_product_queryset(self):
-        return Product.objects.exclude(Q(retail_price__isnull=True) & Q(retail_price=0))\
-            .filter(pk__in=self.items_fk_list, visible=True, is_duplicate=False)
+        return Product.objects.filter(pk__in=self.items_fk_list, visible=True, is_duplicate=False)
 
     def delete(self, *args, **kwargs):
         try:
@@ -166,9 +165,10 @@ class HomepageSection(SmartObject):
             try:
                 # The actual menu points to an Item List
                 smart_category = SmartCategory.objects.get(slug=self.description)
-                category_list = list(smart_category.get_category_queryset())
-                # product_list = ....
-                c = Context({'item_list': smart_category.get_product_queryset()})
+                product_list = []
+                for category in smart_category.get_category_queryset():
+                    product_list.extend(list(Product.objects.filter(category=category)))
+                c = Context({'item_list': product_list})
                 html_template = get_template('webnode/snippets/homepage_section_item_list.html')
                 return html_template.render(c)
             except SmartCategory.DoesNotExist:

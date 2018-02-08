@@ -23,19 +23,17 @@ from ikwen.accesscontrol.templatetags.auth_tokens import append_auth_tokens
 
 from ikwen.core.utils import get_model_admin_instance, DefaultUploadBackend
 from ikwen_kakocase.commarketing.models import SmartCategory
-from ikwen_webnode.blog.admin import PostAdmin, CategoryAdmin
+from ikwen_webnode.blog.admin import PostAdmin, PostCategoryAdmin
 from ikwen_webnode.blog.models import Post, Comments, PostCategory, PostLikes, Photo
 from django.http import HttpResponse
 import json
 from django.template.defaultfilters import slugify
-from ikwen.core.views import HybridListView
+from ikwen.core.views import HybridListView, ChangeObjectBase
 from ikwen_webnode.webnode.views import TemplateSelector
 
 from conf import settings
 
 POST_PER_PAGE = 5
-MEDIA_DIR = settings.MEDIA_ROOT + 'tiny_mce/'
-TINYMCE_MEDIA_URL = settings.MEDIA_URL + 'tiny_mce/'
 
 
 class BlogBaseView(TemplateSelector, TemplateView):
@@ -94,7 +92,7 @@ class PostPerCategory(BlogBaseView):
         context = super(PostPerCategory, self).get_context_data(**kwargs)
         category_slug = kwargs['category_slug']
         category = PostCategory.objects.get(slug=category_slug)
-        radix = 'for ' + category.name + ' category'
+        radix = category.name
 
         entries = Post.objects.filter(category=category)
         context['items_paginated'] = get_paginated_view(self.request, entries, POST_PER_PAGE)
@@ -213,58 +211,11 @@ class ListCategory(HybridListView):
         return context
 
 
-class ChangeCategory(TemplateView):
+class ChangeCategory(ChangeObjectBase):
+    model = PostCategory
+    model_admin = PostCategoryAdmin
+    context_object_name = 'category'
     template_name = 'blog/admin/change_category.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(ChangeCategory, self).get_context_data(**kwargs)
-        category_id = kwargs.get('category_id')  # May be overridden with the one from GET data
-        category_id = self.request.GET.get('category_id', category_id)
-        category = None
-        if category_id:
-            category = get_object_or_404(PostCategory, pk=category_id)
-        category_admin = get_model_admin_instance(PostCategory, CategoryAdmin)
-        ModelForm = modelform_factory(PostCategory, fields=('name', 'slug', 'is_active'))
-        form = ModelForm(instance=category)
-        category_form = helpers.AdminForm(form, list(category_admin.get_fieldsets(self.request)),
-                                          category_admin.get_prepopulated_fields(self.request),
-                                          category_admin.get_readonly_fields(self.request, obj=category))
-        context['category'] = category
-        context['model_admin_form'] = category_form
-        return context
-
-    def post(self, request, *args, **kwargs):
-        category_id = self.request.POST.get('category_id')
-        category = None
-        if category_id:
-            category = get_object_or_404(PostCategory, pk=category_id)
-        category_admin = get_model_admin_instance(PostCategory, CategoryAdmin)
-        ModelForm = category_admin.get_form(self.request)
-        form = ModelForm(request.POST, instance=category)
-        if form.is_valid():
-            name = form.cleaned_data['name']
-            slug = slugify(name)
-            if category_id:
-                category = PostCategory(name=name)
-                category.save()
-            else:
-                category.name = name
-                category.slug = slug
-                category.is_active = True if request.POST.get('is_active') else False
-                category.save()
-            if category_id:
-                next_url = reverse('blog:change_category', args=(category_id, ))
-                messages.success(request, _("Category %s successfully updated." % category.name))
-            else:
-                next_url = self.request.REQUEST.get('next')
-                if not next_url:
-                    next_url = reverse('blog:category_list')
-                messages.success(request, _("Category %s successfully created." % category.name))
-            return HttpResponseRedirect(next_url)
-        else:
-            context = self.get_context_data(**kwargs)
-            context['errors'] = form.errors
-            return render(request, self.template_name, context)
 
 
 class AdminPostHome(HybridListView):
@@ -487,41 +438,3 @@ def delete_comment_object(request, *args, **kwargs):
 
     response = {'message': message}
     return HttpResponse(json.dumps(response), 'content-type: text/json')
-
-
-def get_media(request, *args, **kwargs):
-    media_list = []
-    for root, dirs, files in os.walk(MEDIA_DIR):
-        for filename in files:
-            if filename.lower():
-                filename = TINYMCE_MEDIA_URL + filename
-                media_list.append(os.path.join(filename))
-    response = {
-        'media_list': media_list,
-    }
-    return HttpResponse(
-        json.dumps(response),
-        'content-type: text/json',
-        **kwargs
-    )
-
-
-def delete_photo_list(request, *args, **kwargs):
-    filename = request.GET.get('filename')
-    file_path = ''
-    if filename:
-        file_path = filename.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
-    try:
-        os.remove(file_path)
-        return HttpResponse(
-            json.dumps({'success': True}),
-            content_type='application/json'
-        )
-    except:
-        response = "Error: %s file not found" % filename
-        return HttpResponse(
-            json.dumps({'error': response}),
-            content_type='application/json'
-        )
-
-

@@ -4,7 +4,7 @@
     <meta name="abstract" content="{{ blog.title }}"/>
     <meta property="og:title" content="{{ blog.title }} {% trans "sur" %} "/>
     <meta property="og:description" content="{{ blog.summary }}"/>
-    <meta property="og:image" content="{{ post.media.url }}"/>
+    <meta property="og:image" content="{{ post.image.url }}"/>
 
 {% endblock %}
 {% block page_title %} <title>{{ service.project_name }} - {{ blog.title }}</title> {% endblock %}
@@ -30,7 +30,7 @@
             </div>
             <div class="col-xs-12 col-sm-10 blog-content">
                 <h2>{{ blog.title }}</h2>
-                {{ blog.entry }}
+                <div id="blog-entry">{{ blog.entry }}</div>
             </div>
         </div>
     </div><!--/.blog-item-->

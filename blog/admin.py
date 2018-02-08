@@ -3,9 +3,8 @@ from django.contrib import admin
 from ikwen_webnode.blog.models import Post, PostCategory
 
 
-class CategoryAdmin(admin.ModelAdmin):
+class PostCategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'post_count',)
-    prepopulated_fields = {"slug": ("name",)}
     fields = ('name', )
 
 

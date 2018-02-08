@@ -1,0 +1,205 @@
+{% extends "blog/base.html" %}
+{% load i18n static auth_tokens %}
+{% block meta %}
+<meta name="abstract" content="ikwen blog "/>
+{% endblock %}
+{% block page_title %} <title>ikwen blog  - {{ post.title }}</title> {% endblock %}
+{% block custom_head %}
+    <meta property="og:title" content="{{ post.title }} {% trans "sur" %} "/>
+    <meta property="og:description" content="{{ post.entry }}"/>
+    {% if post.media.name %}
+    <meta property="og:image" content="{{ post.media.url }}"/>
+    {% endif %}
+
+{% endblock %}
+{% block page_content %}
+    {% include 'snippets/fb_sdk.html' %}
+    {% if post.media.name %}
+        <div class="row" style="">
+            <div class="col-lg-12 hidden-xs">
+                <img src="{{ post.media.url }}" width="100%">
+            </div>
+            <div class="col-lg-12 visible-xs" style="background-image: url('{{ post.media.url }}'); background-size: 100% auto; background-position: center; height: 6em"></div>
+        </div>
+    {% endif %}
+    <div class="post">
+        <h1><span class="title">{{ post.title }}</span></h1>
+        <div class="profile  visible-xs" style="width:100%">
+            <img class="poster" src="{{ settings.IKWEN_MEDIA_URL }}{{ post.member.photo.small_name }}">
+            <span class="name">{{ post.member.full_name  }}</span>
+            <span class="create">
+                <span>Member since: </span>
+                <span> {{ post.member.display_date_joined }}</span>
+            </span>
+        </div>
+        <div class="intro">
+            <div class="profile hidden-xs">
+
+                {% if post.member.photo and post.member.photo.name %}
+                    <img class="poster" src="{{ settings.IKWEN_MEDIA_URL }}{{ post.member.photo.small_name }}">
+{#                    <img class="poster" src="{{ post.member.photo.url }}">#}
+                {% endif %}
+                <div class="author">
+                    <span class="name"><a href="#">{{ post.member.full_name }}</a></span>
+                    <span class="create">
+                        <span>Member since: </span>
+                        <span> {{ post.member.display_date_joined }}</span>
+                    </span>
+                </div>
+
+            </div>
+            <span class="text" style="clear: both; float: left">{{ post.entry | safe }}</span>
+        </div>
+        <div class="actions">
+            <div class="post-date">
+                <span class="icon"></span>
+                <span>{{ post.pub_date }}</span>
+            </div>
+        </div>
+        <div class="col-lg-12 bottom">
+            <div class="socials" style="float: right">
+                <span style="float: left">Share:</span>
+                <a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{post.get_uri}}/">
+                    <div class="social fcbk" style="background-position: 0 0"></div>
+                </a>
+                <a target="_blank" href="https://twitter.com/share?url=http://{{post.get_uri}}/">
+                    <div class="social tweet" style="background-position: -31px 0"></div>
+                </a>
+                <a target="_blank" href="https://plus.google.com/share?url=http://{{post.get_uri}}/">
+                    <div class="social google" style="background-position: -64px 0;"></div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <section id="comments" class="col-xs-12">
+            {% for comment in comments %}
+                <div class="comment">
+                    <div class="name">
+                        <span>{{ comment.name }} ({{ comment.email }})</span>
+                        <span class="hidden-xs">{{ comment.pub_date }}</span>
+                    </div>
+                    <div class="com">{{ comment.entry }}</div>
+                </div>
+            {% endfor %}
+            <div class="comment tpl">
+                <div class="name">
+                    <span></span>
+                    <span class="hidden-xs"></span>
+                </div>
+                <div class="com"></div>
+            </div>
+
+        </section>
+    </div>
+
+    <form id="main-contact-form" class="contact-form" name="contact-form"  role="form">{% csrf_token %}
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="form-group c-name">
+                    <label>Name *</label>
+                    <input type="text" class="form-control u-name" required>
+                    <em class=""> * {% trans 'Enter your name please' %}</em>
+                </div>
+                <div class="form-group c-email">
+                    <label>Email *</label>
+                    <input type="email" class="form-control u-email" required>
+                    <em class=""> * {% trans 'Incorrect email format' %}</em>
+                </div>
+                <div class="form-group">
+                    <label>URL</label>
+                    <input type="url" class="form-control">
+                </div>
+            </div>
+            <div class="col-sm-7">
+                <div class="form-group c-comment">
+                    <label>Message *</label>
+                    <textarea name="message" id="message" required class="form-control u-comment" rows="8"></textarea>
+                    <em class=""> {% trans 'Unable to save a comment without comment. Enter your comment please' %}</em>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-lg" required="required" style="float: right;">Submit Message</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+
+{% endblock %}
+ {% block js %}
+        {{ block.super }}
+    <script type="text/javascript">
+        String.prototype.isValidEmail = function() {
+            return /^[^\W][a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\@[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\.[a-zA-Z]{2,4}$/.test(this)
+        };
+        (function() {
+            {% if request.user.is_authenticated %}
+                $('input.u-name').val("{{ request.user.full_name }}")
+                $('input.u-email').val("{{ request.user.email }}")
+            {% endif %}
+            $('form button').click(function (){
+                var entry = $('form textarea.u-comment').val(),
+                    name =  $('form input.u-name').val(),
+                    email =  $('form input[type=email]').val(),
+                    error_count =  0,
+                    postId = "{{ post.id }}";
+                if (!email.isValidEmail()){
+                    $('div.c-email').find('em').fadeIn();
+                    error_count += 1
+                }
+                if (name == '' ){
+                    $('div.c-name').find('em').fadeIn();
+                    error_count += 1
+                }
+                if (entry == '' ){
+                    $('div.c-comment').find('em').fadeIn();
+                    error_count += 1
+                }
+
+                if (error_count > 0) return false;
+                var endpoint = "{% url 'blog:save_comment' %}";
+                var params = {format: 'json', post_id: postId, email: email, name: name, comment:entry};
+                if ($('form.send-mail-announcer .copy-to-sender').attr('checked')) params.copy_to_sender = 'yes';
+                $('body, button.confirm').css('cursor','wait');
+                $.getJSON(endpoint, params, function(data) {
+                    $('body, button.confirm').css('cursor','default');
+                    if (data.error) {
+                        $('div#top-notice-ctnr span').html(data.error).addClass('failure');
+                        $('#top-notice-ctnr').fadeIn().delay(5000).fadeOut();
+                    } else {
+                        $('div#top-notice-ctnr span').html('{% trans "Your comment was successfully save" %}');
+                        $('#top-notice-ctnr').fadeIn().delay(5000).fadeOut();
+                        $('form input').val('');
+                        $('form textarea').text('');
+                        $('form textarea.u-comment').val('');
+                        populateComment(data)
+                    }
+                    return false
+                });
+                return false
+            });
+            $('form textarea').focusin(function() {$(this).parent('div.c-comment').find('em').hide()});
+            $('form input[type=text]').focusin(function() {$(this).parent('div.c-name').find('em').hide()});
+            $('form input[type=email]').focusin(function() {$(this).parent('div.c-email').find('em').hide()});
+
+            function populateComment(comment) {
+                var $newComment = $('.comment.tpl').clone().removeClass('tpl');
+                $newComment = applyCommentTemplate($newComment, comment).insertBefore('.tpl').show()
+            }
+            function applyCommentTemplate($tpl, comment){
+                var completeName = comment.name + "(" + comment.email + ")";
+                $tpl.find('.name span:first').text(completeName);
+                $tpl.find('.com').text(comment.entry);
+                $tpl.find('.name span:last').text(comment.publ_date);
+                return $tpl
+            }
+            $('#lightbox').find('.dialog .close').click(function() {
+                $('#lightbox').fadeOut()
+            });
+            $('#share').click(function() {
+                $('#lightbox').fadeIn()
+            })
+        })()
+    </script>
+{% endblock %}

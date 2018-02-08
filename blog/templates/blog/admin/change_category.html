@@ -36,10 +36,8 @@
 {% block admin_content %}
     <div id="admin-content" class="change-form">
         <div class="container-fluid">
-            {% url 'blog:change_category' as change_category_url %}
             {% if errors %}<p class="alert alert-danger">{{ errors }}</p>{% endif %}
-            <form id="submit-category" class="admin-form" method="post" action="{{ change_category_url }}">{% csrf_token %}
-                <input type="hidden" name="category_id" value="{{ category.id }}" />
+            <form id="submit-category" class="admin-form" method="post">{% csrf_token %}
                 {% include 'core/snippets/model_admin_form.html' %}
                 <div class="form-group col-xs-12 col-sm-4 col-md-3" style="clear: both; padding-top: 15px">
                     <button class="btn btn-sm btn-primary btn-block">{% trans "Save" %}</button>
@@ -58,45 +56,7 @@
             $('.form-row').addClass('form-group');
             $('.form-row input, .form-row select, .form-row textarea').addClass('form-control input-sm');
             $('.form-row textarea').addClass('form-control input-sm');
-            $('form#submit-category').on('change', 'input, textarea', function() {
-                var category = getLocalCategory();
-                localStorage.setItem('category', JSON.stringify(category));
-            }).submit(function() {
-                return checkInput();
-            });
-            var pageLoading = true,
-                category;
-            function getLocalCategory() {
-                category = localStorage.getItem('category') ? JSON.parse(localStorage.getItem('category')):{};
-                if (pageLoading) {
-                    // Do not override locally saved category with form data upon page loading
-                    pageLoading = false;
-                    return category
-                }
-                var categoryAsArray = $('form#submit-category').serialize().split('&');
-                for (var i=0; i<categoryAsArray.length; i++) {
-                    var elt = categoryAsArray[i].split('=');
-                    category[elt[0]] = decodeURIComponent(elt[1]).replace(/\+/g, ' ');
-                }
-                return category
-            }
-            function checkInput() {
-                var check = true;
-                $('input.required').each(function() {
-                    if (!(this).val()) {
-                        ikwen.showFloatingNotice("{% trans "Missing information. Please check." %}", '', 6);
-                        $(this).addClass('verify');
-                        check = false;
-                    }
-                });
-                return check;
-            }
-            category = getLocalCategory();  // Category from an unterminated submit
-            if (category) {
-                $('#id_name').val(category.name);
-                $('#id_slug').val(category.slug);
-                $('#id_is_active').prop('checked', category.is_active);
-            }
+
         })()
     </script>
 {% endblock %}
