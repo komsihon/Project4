@@ -22,6 +22,8 @@
 #blog .features .feature-wrap a {height: 130px; padding-left: 0}
 #blog .features .feature-wrap a img  {max-height: 100%; height: inherit;}
 
+.lead {text-align: center}
+
 .feature-wrap img {height: 38%}
 .feature-wrap h2 {height: 10%}
 .feature-wrap h3 {height: 44%; overflow: hidden}
@@ -54,6 +56,8 @@
     .partners ul li {width: 33%;}
     .recent-work-wrap img {height: 100%}
 }
+.feature .item-list {height:350px; overflow: hidden}
+
 @media (max-width: 992px) {
     .features.home .item:nth-child(n+4) {display: none}
 }

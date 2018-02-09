@@ -20,6 +20,29 @@
         .qq-upload-button-hover {box-shadow: none; color: #fff}
         .qq-upload-list {display: none}
     </style>
+    <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+{#    <script src="{% static 'tinymce/js/tinymce/tinymce.min.js' %}"></script>#}
+    <script src="{% static 'ikwen/ajaxuploader/js/fileuploader.js' %}"></script>
+    <script type="text/javascript">
+        (function() {
+            tinymce.init({
+                selector: "textarea",theme: "modern",width: 1000,height: 300,
+                plugins: [
+                     "advlist autolink link image lists charmap print preview hr anchor pagebreak",
+                     "searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
+                     "table contextmenu directionality emoticons paste textcolor code"
+                ],
+                content_css: [
+                    '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                ],
+                toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | styleselect",
+                toolbar2: "| link unlink anchor | image media | forecolor backcolor  | print preview code ",
+                image_advtab: true ,
+                paste_data_images: true,
+            });
+        })()
+    </script>
 {% endblock %}
 
 {% block breadcrumb_location %}

@@ -168,7 +168,7 @@ class HomepageSection(SmartObject):
                 product_list = []
                 for category in smart_category.get_category_queryset():
                     product_list.extend(list(Product.objects.filter(category=category)))
-                c = Context({'item_list': product_list})
+                c = Context({'item_list': product_list[:4], 'title':smart_category.title})
                 html_template = get_template('webnode/snippets/homepage_section_item_list.html')
                 return html_template.render(c)
             except SmartCategory.DoesNotExist:

@@ -6,7 +6,7 @@
 {% block page_title %} <title>ikwen blog  - {{ post.title }}</title> {% endblock %}
 {% block custom_head %}
     <meta property="og:title" content="{{ post.title }} {% trans "sur" %} "/>
-    <meta property="og:description" content="{{ post.entry }}"/>
+    <meta property="og:description" content="{{ post.entry | safe  }}"/>
     {% if post.media.name %}
     <meta property="og:image" content="{{ post.media.url }}"/>
     {% endif %}

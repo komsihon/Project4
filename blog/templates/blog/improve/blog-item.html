@@ -55,7 +55,7 @@
             <div class="media-body post_reply_comments">
                 <h3>{{ comment.name }} ({{ comment.email }})</h3>
                 <h4>{{ comment.pub_date }}</h4>
-                <p>{{ comment.entry }}</p>
+                <p>{{ comment.entry | safe }}</p>
             </div>
         </div>
     {% endfor %}
