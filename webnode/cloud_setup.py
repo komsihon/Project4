@@ -37,11 +37,9 @@ logger = logging.getLogger('ikwen')
 
 
 if getattr(settings, 'LOCAL_DEV', False):
-    CLOUD_HOME = '/home/roddy/PycharmProjects/CloudTest/'
-    SETTINGS_TPL= 'webnode/cloud_setup/settings.local.html'
+    CLOUD_HOME = '/home/komsihon/PycharmProjects/CloudTest/'
 else:
     CLOUD_HOME = '/home/ikwen/Cloud/'
-    SETTINGS_TPL= 'webnode/cloud_setup/settings.html'
 
 CLOUD_FOLDER = CLOUD_HOME + 'WebNode/'
 
@@ -154,7 +152,7 @@ def deploy(app, member, project_name, billing_plan, theme, monthly_cost,
     # Re-create settings.py file as well as apache.conf file for the newly created project
     secret_key = generate_django_secret_key()
     allowed_hosts = '"%s", "www.%s"' % (domain, domain)
-    settings_tpl = get_template(SETTINGS_TPL)
+    settings_tpl = get_template('webnode/cloud_setup/settings.html')
     settings_context = Context(
         {'secret_key': secret_key, 'ikwen_name': ikwen_name,  # 'business_setting': business_setting,
          'service': service, 'static_root': STATIC_ROOT, 'static_url': STATIC_URL,
@@ -314,12 +312,11 @@ def deploy(app, member, project_name, billing_plan, theme, monthly_cost,
     html_content = get_mail_content(subject, '', template_name='core/mails/service_deployed.html',
                                     extra_context={'service_activated': service, 'invoice': invoice,
                                                    'member': member, 'invoice_url': invoice_url})
-    # msg = EmailMessage(subject, html_content, sender, ['rsihon@gmail.com'])
     msg = EmailMessage(subject, html_content, sender, [member.email])
     bcc = ['contact@ikwen.com']
     if vendor.config.contact_email:
         bcc.append(vendor.config.contact_email)
-        msg.bcc = list(set(bcc))
+    msg.bcc = list(set(bcc))
     msg.content_subtype = "html"
     Thread(target=lambda m: m.send(), args=(msg,)).start()
     logger.debug("Notice email submitted to %s" % member.email)
