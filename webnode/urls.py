@@ -10,7 +10,7 @@ admin.autodiscover()
 if getattr(settings, 'IS_IKWEN', False) or getattr(settings, 'IS_APP_RETAILER', False):
     urlpatterns = patterns(
         '',
-        url(r'^deployCloud/(?P<app_slug>[-\w]+)/$', DeployCloud.as_view(), name='deploy_cloud')
+        url(r'^deployCloud/$', DeployCloud.as_view(), name='deploy_cloud')
     )
 else:
     urlpatterns = patterns(
