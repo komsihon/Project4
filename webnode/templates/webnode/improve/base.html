@@ -85,7 +85,9 @@
                                 {% if menu.appear_in_menu %}
                                 <li class="{{ menu.slug }}">
                                     {% if menu.content_type == 'FlatPage'  %}
-                                        <a href="{% url 'flatpage' menu.description %}">{% trans menu.title %}</a>
+                                        {% if menu.description %}
+                                            <a href="{% url 'flatpage' menu.description %}">{% trans menu.title %}</a>
+                                        {% endif %}
                                     {% elif menu.content_type == 'ItemList' %}
                                         <a href="{% url 'webnode:item_list' menu.slug %}">{% trans menu.title %}</a>
                                     {% elif menu.content_type == 'Module' %}
