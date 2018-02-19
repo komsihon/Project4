@@ -18,7 +18,7 @@
                     <div class="feature-wrap subtle-shade">
                         <a href="{% url 'webnode:product_details' product.slug %}"><img src="{{ product.get_photos_url_list.0.small }}" class="img-responsive"></a>
                         <a href="{% url 'webnode:product_details' product.slug %}"><h2>{{ product.name }}</h2></a>
-                        <h3>{{ product.description | safe }}</h3>
+                        <h3>{{ product.summary | safe }}</h3>
                     </div>
                 </div><!--/.col-md-4-->
             {% endfor %}
