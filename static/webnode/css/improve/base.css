@@ -32,6 +32,11 @@
 .post_reply ul li a i {border: none}
 .single_comments.item_details div.details div {float: left}
 
+.blog-item {font-size: 20px; line-height: 35px; margin-bottom: 10px}
+.blog-suggestions {float: left; text-align: center; padding: 12px 0; width: 100%}
+.blog-suggestions strong {font-size: 20px; float: left}
+.blog-suggestions a {color: #4e4e4e; float: left; font-size: 15px; margin-left: 20px}
+.post_reply {clear: both}
 @media (max-width: 767px) {
     .navbar-brand img {width: 55%}
     body > section {padding: 20px 0}

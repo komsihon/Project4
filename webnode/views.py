@@ -64,22 +64,31 @@ class AdminHome(TemplateView):
     template_name = 'admin_home.html'
 
 
-class ProductDetails(TemplateView):
+class ProductDetails(TemplateSelector, TemplateView):
     template_name = 'webnode/detail.html'
 
     def get_context_data(self, **kwargs):
         context = super(ProductDetails, self).get_context_data(**kwargs)
         slug = kwargs['slug']
         product = Product.objects.get(slug=slug)
+        tags = product.tags
+        tag_list = tags.split(' ')
+        blog_suggestions = []
+        for tag in tag_list:
+            posts = Post.objects.filter(title__icontains=tag, is_active=True)
+            for post in posts:
+                blog_suggestions.append(post)
         category = product.category
         items_qs = Product.objects.filter(category=category)
         suggestions =[]
         for item in items_qs:
             if item != product:
                 suggestions.append(item)
+
         random.shuffle(suggestions)
         context['product'] = product
         context['suggestions'] = suggestions[:4]
+        context['blog_suggestions'] = blog_suggestions
         return context
 
 

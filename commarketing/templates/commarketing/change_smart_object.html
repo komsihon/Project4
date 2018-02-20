@@ -21,7 +21,7 @@
 
 {% block breadcrumb_location %}
     <li style="text-transform: capitalize">{% url 'marketing:smart_category_list' as smart_category_list_url %}
-        <a href="{{ smart_category_list_url }}">{% trans "Homepage" %}</a>
+        <a href="{{ smart_category_list_url }}">{% trans "Menus" %}</a>
     </li>
     {% if smart_object %}
         <li>{{ smart_object.title }}</li>

@@ -21,6 +21,14 @@
             </div>
         </div>
     </div><!--/.blog-item-->
+    {% if blog_suggestions %}
+        <div class="blog-suggestions">
+            <strong>{% trans 'Related posts' %}:</strong>
+            {% for post in blog_suggestions %}
+                <a href="{% url 'blog:details' post.slug %}">{{ post.title }}</a>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     <div class="pull-left post_reply text-center">
         <ul>

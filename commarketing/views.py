@@ -286,7 +286,9 @@ def delete_smart_object(request, *args, **kwargs):
             deleted.append(pk)
         except Banner.DoesNotExist:
             try:
-                SmartCategory.objects.get(pk=pk).delete()
+                menu = SmartCategory.objects.get(pk=pk)
+                ProductCategory.objects.get(slug=menu.slug).delete()
+                menu.delete()
                 deleted.append(pk)
             except SmartCategory.DoesNotExist:
                 try:
