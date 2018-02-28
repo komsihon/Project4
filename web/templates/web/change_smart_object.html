@@ -1,0 +1,191 @@
+{% extends 'core/app_base_admin.html' %}
+{% load i18n humanize staticfiles auth_tokens %}
+
+{% block page_title %}
+<title> {% if smart_object %}{{ smart_object }}{% else %}{% trans "New" %}{% endif %} - {{ service.project_name }} </title>
+{% endblock %}
+
+{% block head_style %}
+    {{ block.super }}
+    <link href="{% static 'ikwen/css/uploader-single.css' %}" media="screen" rel="stylesheet" type="text/css" />
+    <style>
+        .form-row.field-page:not(.ok) {display: none}
+    </style>
+{% endblock %}
+
+{% block selection_actions %}
+    <div class="actions">
+        <i class="action icon trash" title="{% trans "Remove selected" %}"></i>
+    </div>
+{% endblock %}
+
+{% block breadcrumb_location %}
+    {% if object_type == "banner" %}
+        <li style="text-transform: capitalize">{% url 'web:banner_list' as smart_category_list_url %}
+        <a href="{{ smart_category_list_url }}">{% trans "Banners" %}</a>
+    {% else %}
+        <li style="text-transform: capitalize">{% url 'web:smart_category_list' as smart_category_list_url %}
+        <a href="{{ smart_category_list_url }}">{% trans "Menu" %}</a>
+    {% endif %}
+    </li>
+    {% if smart_object %}
+        <li>{{ smart_object.title }}</li>
+    {% else %}
+        <li>{% trans 'New' %}</li>
+    {% endif %}
+{% endblock %}
+
+{% block admin_content %}
+    <div id="admin-content" class="change-form">
+        {% url 'web:change_smart_object' object_type as change_smart_object_url %}
+        {% if errors %}<p class="alert alert-danger">{{ errors }}</p>{% endif %}
+        <form id="submit-category" class="admin-form" method="post" action="{{ change_smart_object_url }}">{% csrf_token %}
+            <input type="hidden" name="smart_object_id" value="{{ smart_object.id }}" />
+            <input type="hidden" name="image_url" id="image_url" />
+            <input type="hidden" name="items_fk_list" id="items_fk_list" value="{{ smart_object.items_fk_list }}" />
+            <div class="container-fluid">
+                {% include 'core/snippets/model_admin_form.html' %}
+                <div class="form-row field-page form-group{% if smart_object.content_type == 'FlatPage' %} ok{% endif %}">
+                    <div>
+                        <label class="required" for="id_flatpage">Page:</label>
+                        <select id="id_flatpage" name="page_url" class="form-control input-sm">
+                            <option value="">---------</option>
+                            {% for page in page_list %}
+                                <option {% if page.url == smart_object.description %}selected="selected"{% endif %}
+                                        value="{{ page.url }}">{{ page.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <section class="photos" style="width: 100%">
+                    <label class="required" style="float: left; width: 100%">{% trans "Cover image" %}</label>
+                    <div id="upload-container">
+                        {% if smart_object.image and smart_object.image.name %}
+                        <div class="image" style="background-image: url('{{ smart_object.image.url }}')">
+                        {% else %}
+                        <div class="image">
+                        {% endif %}
+                            <span class="progress"></span>
+                            <div class="uploader"></div>
+                            {% include 'core/snippets/spinner.html' %}
+                        </div>
+                    </div>
+                    <p class="help clear">{% trans "Nice cover photo to help customer have an idea" %}</p>
+                </section>
+                <div class="form-group col-xs-12 col-sm-4 col-md-3" style="clear: both; padding-top: 15px">
+                    <button class="btn btn-sm btn-primary btn-block">{% trans "Save" %}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script src="{% static 'ikwen/ajaxuploader/js/fileuploader.js' %}"></script>
+    <script type="text/javascript">
+        (function() {
+            $('div#admin-nav .categories').addClass('active');
+            $('.form-row').addClass('form-group');
+            $('.form-row input, .form-row select, .form-row textarea').addClass('form-control input-sm');
+            $('.form-row textarea').addClass('form-control input-sm');
+            $('#id_content_type').change(function() {
+                var val = $(this).val();
+                if (val === 'FlatPage') {
+                    $('.field-page').show();
+                } else $('.field-page').hide();
+            });
+            {% for msg in messages %}
+                {% if msg.tags == 'success' %}
+                    localStorage.removeItem('smartObject');
+                {% endif %}
+            {% endfor %}
+            $('form#submit-category').on('change', 'input, textarea', function() {
+                var smartObject = getLocalSmartObject();
+                localStorage.setItem('smartObject', JSON.stringify(smartObject));
+            }).submit(function() {
+                return checkInput();
+            });
+            var pageLoading = true,
+                smartObject;
+            function getLocalSmartObject() {
+                smartObject = localStorage.getItem('smartObject') ? JSON.parse(localStorage.getItem('smartObject')):null;
+                if (pageLoading) {
+                    // Do not override locally saved category with form data upon page loading
+                    pageLoading = false;
+                    return smartObject
+                }
+                if (smartObject === null) smartObject = {};
+                var categoryAsArray = $('form#submit-category').serialize().split('&');
+                for (var i=0; i<categoryAsArray.length; i++) {
+                    var elt = categoryAsArray[i].split('=');
+                    smartObject[elt[0]] = decodeURIComponent(elt[1]).replace(/\+/g, ' ');
+                }
+                return smartObject
+            }
+            function checkInput() {
+                var check = true;
+                $('input.required').each(function() {
+                    if (!(this).val()) {
+                        ikwen.showFloatingNotice("{% trans "Missing information. Please check." %}", '', 6);
+                        $(this).addClass('verify');
+                        check = false;
+                    }
+                });
+                var img = $('#image_url').val();
+                if (!img) {
+                    return confirm("{% trans "Categories look better with image. Continue without it ?" %}");
+                }
+                return check;
+            }
+            var uploader = new qq.FileUploader({
+                action: "{% url 'ikwen:upload_image' %}",
+                element: $('div#upload-container .uploader')[0],
+                buttonText: "{% trans "Upload cover" %}",
+                multiple: false,
+                onProgress: function(id, fileName, loaded, total) {
+                    var ratio = loaded / total,
+                        percent = ratio * 100;
+                    $('div#upload-container .image .progress').animate({width: percent + '%'});
+                    if (ratio == 1) $('div#upload-container .image .spinner').show()
+                },
+                onComplete: function(id, fileName, responseJSON) {
+                    if(responseJSON.success) {
+                        var imageUrl = responseJSON.path,
+                            img = new Image(),
+                            category = getLocalSmartObject();
+                        img.onload = function() {
+                            $('div#upload-container .image').css('background-color', "#fff")  // Causes the placeholder image to disappear
+                                    .css('background-image', "url('" + imageUrl +"')")
+                                    .find('.progress, .spinner').hide();
+                        };
+                        img.src = imageUrl;
+                        $('#image_url').val(imageUrl);
+                        category.image_url = imageUrl;
+                        localStorage.setItem('smartObject', JSON.stringify(category));
+                    } else {
+                        alert("upload failed!");
+                    }
+                },
+                params: {
+                    'csrf_token': '{{ csrf_token }}',
+                    'csrf_name': 'csrfmiddlewaretoken',
+                    'csrf_xname': 'X-CSRFToken'
+                }
+            });
+            {% if smart_object and smart_object.image.name %}
+                $('#image_url').val("{{ smart_object.image.url }}");
+            {% else %}
+                smartObject = getLocalSmartObject();  // Category from an unterminated submit
+                if (smartObject) {
+                    $('#id_title').val(smartObject.title);
+                    $('#id_content_type').val(smartObject.content_type);
+                    $('#id_description').val(smartObject.description);
+                    $('#image_url').val(smartObject.image_url);
+                    $('div#upload-container .image').css('background-image', "url('" + smartObject.image_url +"')");
+                }
+            {% endif %}
+            ikwen.deleteEndpoint = '{% url 'web:set_smart_object_content' 'remove' %}?smart_object_id={{ smart_object.id }}';
+        })()
+    </script>
+{% endblock %}

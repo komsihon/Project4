@@ -9,7 +9,7 @@ urlpatterns = patterns(
     url(r'^laakam/', include(admin.site.urls)),
     url(r'^blog/', include('ikwen_webnode.blog.urls', namespace='blog')),
     url(r'^ikwen/theming/', include('ikwen.theming.urls', namespace='theming')),
-    url(r'^marketing/', include('ikwen_webnode.commarketing.urls', namespace='marketing')),
+    url(r'^web/', include('ikwen_webnode.web.urls', namespace='web')),
     url(r'^kakocase/', include('ikwen_kakocase.kakocase.urls', namespace='kakocase')),
 
     url(r'^$', Home.as_view(), name='home'),
@@ -17,7 +17,8 @@ urlpatterns = patterns(
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^ikwen/', include('ikwen.core.urls', namespace='ikwen')),
     url(r'^billing/', include('ikwen.billing.urls', namespace='billing')),
-    url(r'^kako/', include('ikwen_kakocase.kako.urls', namespace='kako')),
+    url(r'^items/', include('ikwen_webnode.items.urls', namespace='items')),
     url(r'^page/(?P<url>[-\w]+)/$', FlatPageView.as_view(), name='flatpage'),
     url(r'^', include('ikwen_webnode.webnode.urls', namespace='webnode')),
+    # url(r'^', include('ikwen_webnode.items.urls', namespace='items')),
 )

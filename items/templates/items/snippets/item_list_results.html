@@ -1,0 +1,63 @@
+{% load i18n staticfiles humanize media_from_provider %}
+    <ul class="object-list">
+    {% for item in objects_page.object_list %}
+        <li class="ik-li img-lg item" id="{{ item.id }}" data-id="{{ item.id }}"
+            {% if item.stock %}data-stock="{{ item.stock }}{% endif %}"
+            {% if item.retail_price %}data-retail_price="{{ item.retail_price }}{% endif %}">
+            {% url 'items:change_item' item.id as item_url %}
+            {% if item.image.name %}
+                <a {% if not request.GET.smart_link %}href="{{ item_url }}"{% endif %} class="image" style="background-image: url({{ item.image.small_url|from_provider:item.provider }})"></a>
+            {% else %}
+                <a {% if not request.GET.smart_link %}href="{{ item_url }}"{% endif %} class="image" style="background-image: url({% static 'ikwen/img/no_photo.jpg' %})"></a>
+            {% endif %}
+            <div class="info">
+                <a href="{{ item_url }}">
+                    <span class="name">{{ item.name }}</span>
+                </a>
+            </div>
+            <div class="actions">
+                <i class="glyphicon glyphicon-trash trash" title="{% trans "Delete item" %}"></i>
+            </div>
+        </li>
+    {% endfor %}
+        <li class="ik-li img-lg item tpl" style="display: none">
+            <a class="image bg-img target_url"></a>
+            <div class="info">
+                <a class="target_url">
+                    <span class="name"></span>
+                </a>
+            </div>
+            <div class="actions">
+                <i class="glyphicon glyphicon-trash trash" title="{% trans "Delete item" %}"></i>
+            </div>
+        </li>
+    </ul>
+    <div class="empty" style="display: none; padding: 10px 15px 5px">
+        <p class="text-muted">{% trans "Not found" %}</p>
+        <p>
+            <span class="search-text"></span>
+            <a href="{% url 'items:change_item' %}" id="new-item"
+               class="btn btn-sm btn-success" style="margin-left: 6px; min-width: 90px">{% trans "Add" %}</a>
+        </p>
+    </div>
+    {% if objects_page.paginator.num_pages > 1 %}
+    <ul class="pagination">
+        <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
+        {% for page in objects_page.paginator.page_range %}
+            <li class="page{% if page == objects_page.number %} active{% endif %}" data-val="{{ page }}">
+                <a href="#">
+                    {{ page }} {% if page == objects_page.number %}<span class="sr-only">(current)</span>{% endif %}
+                </a>
+            </li>
+        {% endfor %}
+        <li><a href="#" aria-label="Next"><span aria-hidden="true">»</span></a></li>
+    </ul>
+    {% endif %}
+    <div id="page-navigation" class="text-muted">
+        {% if objects_page.paginator.num_pages > 1 %}
+            <p>{% blocktrans with count=objects_page.paginator.count start=objects_page.start_index end=objects_page.end_index %}
+                {{ start }} – {{ end }} of {{ count }} results{% endblocktrans %}</p>
+        {% else %}
+            <p>{% blocktrans with count=objects_page.paginator.count %}{{ count }} results{% endblocktrans %}</p>
+        {% endif %}
+    </div>

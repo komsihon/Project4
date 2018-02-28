@@ -17,7 +17,7 @@
                         <div class="col-sm-12">
                             {% for suggestion in suggestions %}
                             <div class="single_comments item_details">
-                                <a href="{% url 'webnode:product_details' suggestion.slug %}"  style="color: #0f0f0f">
+                                <a href="{% url 'webnode:product_details' suggestion.category.slug suggestion.slug %}"  style="color: #0f0f0f">
                                     <img  src="{{ suggestion.get_photos_url_list.0.thumb }}" class="img-responsive" alt=""/>
                                     <div class="details">
                                         <h5>{{ suggestion.name }} </h5>

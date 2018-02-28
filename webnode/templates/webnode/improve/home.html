@@ -6,44 +6,6 @@
 {% block head_style %}
     {{ block.super }}
     <style>
-        .top-bar {display: none}
-        .navbar.main {position: absolute; background: none; width: 100%; z-index: 10}
-        .navbar-inverse .navbar-nav > li > a {color: #fff}
-        .navbar-inverse .navbar-nav > li > a:hover{background: none; color: #aaa}
-        .veil {background: rgba(0, 0, 0, .6); height: 100%; position: absolute; width: 100%}
-        .slide-title {color: #fff; font-size: 3.5em; margin-top: 120px; text-align: center; line-height: 50px }
-        .slide-cta {margin-top: 200px; text-align: center}
-        .cta {border: 2px solid; color: #fff; font-size: 24px; padding: 8px 30px}
-        section.home-section.bg-img-false .cta {color: #4e4e4e}
-        .slide .cta:hover {color: #bf0309}
-        section.home-section {background: no-repeat center; background-size: cover}
-        section.home-section.text-center .description {float: none; margin: auto}
-        .home-section-cta {margin-top: 80px}
-        section.home-section .title {padding-top: 10px}
-        section.home-section.bg-img-true,  section.home-section.bg-img-true .title {color: #fff}
-        section.home-section .img {overflow: hidden}
-        section.home-section .description {font-size: 1.3em}
-        .home-section-text-left .description {float: left; text-align: left}
-        .home-section-text-left .img {float: right}
-        .home-section-text-right .description {float: right; text-align: right}
-        .home-section-text-right .img {float: left}
-        .home-section-text-center .img {display: none}
-        @media (max-width: 767px) {
-            .navbar-collapse {background: #000; margin-left: -15px}
-            .slide-title {font-size: 2em; line-height: 1.3em; margin-top: 160px;}
-            .slide-cta {margin-top: 70px}
-            .cta {font-size: 18px; padding: 6px 20px}
-            section.home-section.bg-img-true {min-height: 500px}
-            section.home-section.bg-img-false .cta {color: #4e4e4e}
-            section.home-section .img {padding-left: 0; margin-bottom: 20px}
-            .home-section-text-left .description, .home-section-text-right .description {float: none; text-align: center}
-            .home-section-text-left .img {float: left}
-            .home-section-text-center .img {display: block}
-            .home-section-cta {margin-top: 30px}
-        }
-        @media (min-width: 768px) {
-            section.home-section {min-height: 730px}
-        }
     </style>
 {% endblock %}
 
@@ -66,14 +28,16 @@
                             <div class="veil"></div>
                             <div class="container">
                                 <div class="row slide-margin">
-                                    <div class="animation animated-item-4 slide-title text-has-shade">
+                                    <div class="animation animated-item-4 slide-title">
                                         {{ slide.title }}
                                     </div>
-                                    <div class="animation animated-item-4 slide-cta text-has-shade">
-                                        <a href="{{ slide.target_url }}" class="cta">
-                                            {{ slide.cta }}
-                                        </a>
-                                    </div>
+                                    {% if slide.cta %}
+                                        <div class="animation animated-item-4 slide-cta">
+                                            <a href="{{ slide.target_url }}" class="cta">
+                                                {{ slide.cta }}
+                                            </a>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div><!--/.item-->

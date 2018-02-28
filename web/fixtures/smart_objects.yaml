@@ -1,0 +1,35 @@
+- model: web.banner
+  pk: 56a9b37b3301e0706b549221
+  fields:
+    title: New Trendy
+    slug: new-trendy
+    display: Slide
+    image: web/banners/new-trendy.jpg
+    items_fk_list: []
+
+- model: web.banner
+  pk: 56a9b37b3301e0706b549222
+  fields:
+    title: Sales
+    slug: sales
+    display: Slide
+    image: web/banners/sales.jpg
+    items_fk_list: []
+
+- model: web.smartcategory
+  pk: 56a9b37b3301e0706b549223
+  fields:
+    title: New arrivals
+    slug: new-arrivals
+    content_type: Categories
+    image: web/smart_categories/new-arrivals.jpg
+    items_fk_list: []
+
+- model: web.smartcategory
+  pk: 56a9b37b3301e0706b549224
+  fields:
+    title: Trending Designs
+    slug: trending-designs
+    content_type: Products
+    image: web/smart_categories/trending-designs.jpg
+    items_fk_list: []

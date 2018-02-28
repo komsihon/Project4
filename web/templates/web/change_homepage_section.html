@@ -1,0 +1,241 @@
+{% extends 'core/app_base_admin.html' %}
+{% load i18n humanize staticfiles auth_tokens %}
+
+{% block page_title %}
+<title> {% if smart_object %}{{ smart_object }}{% else %}{% trans "New" %}{% endif %} - {{ service.project_name }} </title>
+{% endblock %}
+
+{% block head_style %}
+    {{ block.super }}
+    <link href="{% static 'ikwen/css/uploader-single.css' %}" media="screen" rel="stylesheet" type="text/css" />
+    <style>
+        section.details {float: left; margin-top: 15px}
+        {% if smart_object %}
+            {% if smart_object.content_type == 'Flat' %}
+                .field-menu {display: none}
+            {% elif smart_object.content_type == 'Menu' %}
+                section.details, section.photos  {display: none}
+            {% endif %}
+        {% else %}
+            section.details, section.photos, .field-menu {display: none}
+        {% endif %}
+    </style>
+{% endblock %}
+
+{% block head_js %}
+    {{ block.super }}
+    <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+    <script>
+        (function () {
+            var properties = {
+                menubar: false,
+                statusbar: false,
+                plugins: [
+                    'advlist autolink lists link image charmap print preview anchor',
+                    'searchreplace visualblocks code fullscreen',
+                    'insertdatetime media table contextmenu paste code'
+                ],
+                paste_data_images: true,
+                content_css: [
+                    '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                    '//www.tinymce.com/css/codepen.min.css'
+                ]
+            };
+            var summaryProperties = properties, descriptionProperties = JSON.parse(JSON.stringify(properties));
+
+            summaryProperties['selector'] = '#id_summary';
+            summaryProperties['height'] = 150;
+            summaryProperties['toolbar'] = 'undo redo | bold italic underline | bullist numlist outdent indent';
+
+            descriptionProperties['selector'] = '#id_description';
+            descriptionProperties['height'] = 300;
+            descriptionProperties['toolbar'] = 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image';
+            if ($(window).width() >= 768) {
+                summaryProperties['width'] = 450;
+                descriptionProperties['width'] = 740
+            }
+            tinymce.init(summaryProperties);
+            tinymce.init(descriptionProperties);
+        })()
+    </script>
+{% endblock %}
+
+{% block selection_actions %}
+    <div class="actions">
+        <i class="action icon trash" title="{% trans "Remove selected" %}"></i>
+    </div>
+{% endblock %}
+
+{% block breadcrumb_location %}
+    <li style="text-transform: capitalize">{% url 'web:banner_list' as banner_list_list_url %}
+        <a href="{{ banner_list_list_url }}">{% trans "Home page section" %}</a>
+    </li>
+    {% if smart_object %}
+        <li>{{ smart_object.title }}</li>
+    {% else %}
+        <li>{% trans 'New' %}</li>
+    {% endif %}
+{% endblock %}
+
+{% block admin_content %}
+    <div id="admin-content" class="change-form">
+        {% url 'web:change_smart_object' object_type as change_smart_object_url %}
+        {% if errors %}<p class="alert alert-danger">{{ errors }}</p>{% endif %}
+        <form id="submit-category" class="admin-form" method="post" action="{{ change_smart_object_url|append_auth_tokens:request }}">{% csrf_token %}
+            <input type="hidden" name="smart_object_id" value="{{ smart_object.id }}" />
+            <input type="hidden" name="image_url" id="image_url" />
+            <input type="hidden" name="items_fk_list" id="items_fk_list" value="{{ smart_object.items_fk_list }}" />
+            <div class="container-fluid">
+                {% include 'core/snippets/model_admin_form.html' %}
+                <div class="form-row field-menu form-group">
+                    <div>
+                        <label class="required" for="id_menu">Menu:</label>
+                        <select id="id_menu" name="menu" class="form-control input-sm">
+                            <option value="">---------</option>
+                            {% for menu in menu_list %}
+                                <option {% if menu.slug == smart_object.description %}selected="selected"{% endif %}
+                                        value="{{ menu.slug }}">{{ menu.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <section class="photos" style="width: 100%">
+                    <label class="required" style="float: left; width: 100%">{% trans "Image" %}</label>
+                    <div id="upload-container">
+                        {% if smart_object.image and smart_object.image.name %}
+                        <div class="image" style="background-image: url('{{ smart_object.image.url }}')">
+                        {% else %}
+                        <div class="image">
+                        {% endif %}
+                            <span class="progress"></span>
+                            <div class="uploader"></div>
+                            {% include 'core/snippets/spinner.html' %}
+                        </div>
+                    </div>
+                    <p class="help clear">{% trans "Image to help customer have an idea" %}</p>
+                </section>
+            </div>
+            <div class="form-group col-xs-12 col-sm-4 col-md-3" style="clear: both; padding-top: 15px">
+                <button class="btn btn-sm btn-primary btn-block">{% trans "Save" %}</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script src="{% static 'ikwen/ajaxuploader/js/fileuploader.js' %}"></script>
+    <script type="text/javascript">
+        (function() {
+            $('div#admin-nav .categories').addClass('active');
+            $('.form-row').addClass('form-group');
+            $('.form-row input, .form-row select, .form-row textarea').addClass('form-control input-sm');
+            $('.form-row textarea').addClass('form-control input-sm');
+            {% for msg in messages %}
+                {% if msg.tags == 'success' %}
+                    localStorage.removeItem('smartObject');
+                {% endif %}
+            {% endfor %}
+            $('form#submit-category').on('change', 'input, textarea', function() {
+                var smartObject = getLocalSmartObject();
+                localStorage.setItem('smartObject', JSON.stringify(smartObject));
+            }).submit(function() {
+                return checkInput();
+            });
+            var pageLoading = true,
+                smartObject;
+            function getLocalSmartObject() {
+                smartObject = localStorage.getItem('smartObject') ? JSON.parse(localStorage.getItem('smartObject')):null;
+                if (pageLoading) {
+                    // Do not override locally saved category with form data upon page loading
+                    pageLoading = false;
+                    return smartObject
+                }
+                if (smartObject === null) smartObject = {};
+                var categoryAsArray = $('form#submit-category').serialize().split('&');
+                for (var i=0; i<categoryAsArray.length; i++) {
+                    var elt = categoryAsArray[i].split('=');
+                    smartObject[elt[0]] = decodeURIComponent(elt[1]).replace(/\+/g, ' ');
+                }
+                return smartObject
+            }
+            function checkInput() {
+                var check = true;
+                $('input.required').each(function() {
+                    if (!(this).val()) {
+                        ikwen.showFloatingNotice("{% trans "Missing information. Please check." %}", '', 6);
+                        $(this).addClass('verify');
+                        check = false;
+                    }
+                });
+                return check;
+            }
+            var uploader = new qq.FileUploader({
+                action: "{% url 'ikwen:upload_image' %}",
+                element: $('div#upload-container .uploader')[0],
+                buttonText: "{% trans "Upload cover" %}",
+                multiple: false,
+                onProgress: function(id, fileName, loaded, total) {
+                    var ratio = loaded / total,
+                        percent = ratio * 100;
+                    $('div#upload-container .image .progress').animate({width: percent + '%'});
+                    if (ratio == 1) $('div#upload-container .image .spinner').show()
+                },
+                onComplete: function(id, fileName, responseJSON) {
+                    if(responseJSON.success) {
+                        var imageUrl = responseJSON.path,
+                            img = new Image(),
+                            category = getLocalSmartObject();
+                        img.onload = function() {
+                            $('div#upload-container .image').css('background-color', "#fff")  // Causes the placeholder image to disappear
+                                    .css('background-image', "url('" + imageUrl +"')")
+                                    .find('.progress, .spinner').hide();
+                        };
+                        img.src = imageUrl;
+                        $('#image_url').val(imageUrl);
+                        category.image_url = imageUrl;
+                        localStorage.setItem('smartObject', JSON.stringify(category));
+                    } else {
+                        alert("upload failed!");
+                    }
+                },
+                params: {
+                    'csrf_token': '{{ csrf_token }}',
+                    'csrf_name': 'csrfmiddlewaretoken',
+                    'csrf_xname': 'X-CSRFToken'
+                }
+            });
+            {% if smart_object and smart_object.image.name %}
+                $('#image_url').val("{{ smart_object.image.url }}");
+            {% else %}
+                smartObject = getLocalSmartObject();  // Category from an unterminated submit
+                if (smartObject) {
+                    $('#id_title').val(smartObject.title);
+                    $('#id_text_position').val(smartObject.text_position);
+{#                    $('#id_background_image').val(smartObject.display);#}
+                    $('#id_description').val(smartObject.description);
+                    $('#id_cta').val(smartObject.cta);
+                    $('#image_url').val(smartObject.image_url);
+                    $('div#upload-container .image').css('background-image', "url('" + smartObject.image_url +"')");
+                }
+            {% endif %}
+            $('#id_content_type').change(function() {
+                var val = $(this).val();
+                if (val === 'Flat') {
+                    $('.details, .photos').show();
+                    $('.field-menu').hide();
+                    $('.field-cta').insertAfter('.field-description').show();
+                } else if (val === 'Menu') {
+                    $('.details, .photos').hide();
+                    $('.field-menu').show();
+                    $('.field-cta').insertAfter('.field-menu').show();
+                } else $('.details, .photos, .field-menu, .field-cta').hide();
+            });
+            {% if smart_object.content_type == 'Menu' %}
+                $('.field-cta').insertAfter('.field-menu').show();
+            {% else %}
+                $('.field-cta').insertAfter('.field-menu').show();
+            {% endif %}
+        })()
+    </script>
+{% endblock %}

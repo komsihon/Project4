@@ -40,7 +40,7 @@
     first_name: Simo
     last_name: Kamdem
     full_name: Simo Kamdem
-    customer_on_fk_list: [56eb6d04b37b3379b531b103]
+    customer_on_fk_list: [56eb6d04b37b3379b531b101]
 
 - model: accesscontrol.member
   pk: 56eb6d04b37b3379b531e015
@@ -63,3 +63,16 @@
     password: pbkdf2_sha256$12000$nNK3SeCKYSvl$CuoviZNeie9YzaWhukVCi9iQtNmpu3QBbK2yHGHEUxc=  # admin
     phone: 677000006
     first_name: Melounou
+
+- model: accesscontrol.member
+  pk: 56eb6d04b37b3379b531e017
+  fields:
+    username: member7
+    email: member7@ikwen.com
+    password: pbkdf2_sha256$12000$nNK3SeCKYSvl$CuoviZNeie9YzaWhukVCi9iQtNmpu3QBbK2yHGHEUxc=  # admin
+    phone: 677000007
+    first_name: Clarence
+    last_name: Foyet
+    gender: Male
+    is_iao: Yes
+    is_superuser: Yes

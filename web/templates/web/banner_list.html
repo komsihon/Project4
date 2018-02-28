@@ -1,0 +1,135 @@
+{% extends 'core/app_base_admin.html' %}
+{% load i18n humanize staticfiles auth_tokens %}
+
+{% block page_title %}
+<title> {% trans "Banner" %} - {{ service.project_name }} </title>
+{% endblock %}
+
+{% block head_style %}
+    {{ block.super }}
+    <style>
+        #admin-content section {border-top: 1px solid #eee; clear: both}
+        #admin-content section:first-of-type {border-top: none}
+        #admin-content section h3 {font-size: 16px}
+        #admin-content section h3 a {color: #1c699d; font-weight: 400}
+        #admin-content .empty {padding: 0 15px}
+    </style>
+{% endblock %}
+
+{% block selection_actions %}
+    <div class="actions">
+        <i class="action glyphicon glyphicon-trash trash" title="{% trans "Delete selected" %}"></i>
+    </div>
+{% endblock %}
+
+{% block breadcrumb_location %}
+    <li>{% trans "Homepage" %}</li>
+{% endblock %}
+
+{% block admin_content %}
+    <div id="admin-content" class="no-edge-panel-right">
+        <div class="container-fluid">
+            <section>
+                <h3 class="col-xs-12" style="margin-top: 0">{% trans "Homepage slideshow" %} <a href="#" target="_blank">{% trans "View example" %}</a></h3>
+                <ul class="tiles object-list">
+                {% for slide in slide_list %}
+                    <li class="ik-li category" id="{{ slide.id }}" data-id="{{ slide.id }}">
+                        <div class="content">
+                            <div class="subtle-shade select">
+                                <i class="glyphicon glyphicon-ok"></i>
+                            </div>
+                            {% url 'web:change_smart_object' 'banner' slide.id as change_slide_url %}
+                            {% if slide.image and slide.image.name %}
+                                <a href="{{ change_slide_url }}" class="image" style="background-image: url({{ slide.image.small_url }})"></a>
+                            {% else %}
+                                <a href="{{ change_slide_url }}" class="image" style="background-image: url({% static 'ikwen/img/no_photo.png' %})"></a>
+                            {% endif %}
+                            <div class="info">
+                                <a href="{{ change_slide_url }}" class="full_name">{{ slide.title }}</a>
+                                <p class="about">&nbsp;</p>
+                            </div>
+                            <div class="actions">
+                                {% if slide.is_active %}
+                                    <i class="action glyphicon glyphicon-ok toggle active off" title="{% trans "Deactivate" %}"></i>
+                                {% else %}
+                                    <i class="action glyphicon glyphicon-ok toggle active on" title="{% trans "Activate" %}"></i>
+                                {% endif %}
+                                <a href="{{ change_slide_url }}" class="glyphicon glyphicon-edit" title="{% trans "Edit item" %}"></a>
+                                <i class="glyphicon glyphicon-trash trash" title="{% trans "Delete item" %}"></i>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </li>
+                {% empty %}
+                    <div class="empty">
+                        <p class="text-muted">{% trans "No Slide" %}</p>
+                    </div>
+                {% endfor %}
+                </ul>
+                <div class="add-new-tile">
+                    <p>
+                        <span class="search-text"></span>
+                        <a href="{% url 'web:change_smart_object' 'banner' %}"
+                           class="btn btn-sm btn-success" style="margin-left: 6px; min-width: 90px">{% trans "Add" %}</a>
+                    </p>
+                </div>
+            </section>
+            <section>
+                <h3 class="col-xs-12">{% trans "Homepage Section" %} <a href="#" target="_blank">{% trans "View example" %}</a></h3>
+                <ul class="tiles object-list" data-model-name="commarketing.HomepageSection" style="padding: 20px 0 0 0">
+                {% for section in homepage_section_list %}
+                    <li class="ik-li category" id="{{ section.id }}" data-id="{{ section.id }}">
+                        <div class="content">
+                            <div class="subtle-shade select">
+                                <i class="glyphicon glyphicon-ok"></i>
+                            </div>
+                            {% url 'web:change_homepage_section' section.id as change_section_url %}
+                            {% if section.image and section.image.name %}
+                                <a href="{{ change_section_url }}" class="image" style="background-image: url({{ section.image.small_url }})"></a>
+                            {% else %}
+                                <a href="{{ change_section_url }}" class="image" style="background-image: url({% static 'ikwen/img/no_photo.png' %})"></a>
+                            {% endif %}
+                            <div class="info">
+                                <a href="{{ change_section_url }}" class="full_name">{{ section.title }}</a>
+                                <p class="about">&nbsp;</p>
+                            </div>
+                            <div class="actions">
+                                {% if section.is_active %}
+                                    <i class="action glyphicon glyphicon-ok toggle active off" title="{% trans "Deactivate" %}"></i>
+                                {% else %}
+                                    <i class="action glyphicon glyphicon-ok toggle active on" title="{% trans "Activate" %}"></i>
+                                {% endif %}
+                                <a href="{{ change_section_url }}" class="glyphicon glyphicon-edit" title="{% trans "Edit item" %}"></a>
+                                <i class="glyphicon glyphicon-trash trash" title="{% trans "Delete item" %}"></i>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </li>
+                {% empty %}
+                    <div class="empty">
+                        <p class="text-muted">{% trans "No Homepage Section" %}</p>
+                    </div>
+                {% endfor %}
+                </ul>
+                <div class="add-new-tile">
+                    <p>
+                        <span class="search-text"></span>
+                        <a href="{% url 'web:change_homepage_section' %}"
+                           class="btn btn-sm btn-success" style="margin-left: 6px; min-width: 90px">{% trans "Add" %}</a>
+                    </p>
+                </div>
+            </section>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function() {
+            $('div#admin-nav .homepage').addClass('active');
+            ikwen.deleteEndpoint = '{% url 'web:delete_smart_object' %}';
+        })();
+    </script>
+    {% include 'web/snippets/sort_and_actions.html' %}
+{% endblock %}

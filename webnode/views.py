@@ -1,4 +1,6 @@
+import json
 import datetime
+from django.http import HttpResponse
 from django.views.generic import TemplateView
 from ikwen.accesscontrol.models import Member
 from ikwen.billing.models import CloudBillingPlan, IkwenInvoiceItem, InvoiceEntry
@@ -18,9 +20,8 @@ from django.utils.http import urlquote
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 
-from ikwen_webnode.commarketing.models import Banner, SmartCategory, SLIDE, HomepageSection
-from ikwen_kakocase.kako.models import Product
-from ikwen_kakocase.kakocase.models import ProductCategory
+from ikwen_webnode.web.models import Banner, SmartCategory, SLIDE, HomepageSection
+from ikwen_webnode.items.models import ItemCategory, Item
 import random
 
 
@@ -36,7 +37,7 @@ POST_PER_PAGE = 5
 class TemplateSelector(object):
     def get_template_names(self):
         s = get_service_instance()
-        since = datetime.datetime(2018, 1, 1, 0, 0, 0)
+        since = datetime.datetime(2016, 1, 1, 0, 0, 0)
         try:
             improve_service = Service.objects.get(project_name_slug='improve')
         except Service.DoesNotExist:
@@ -56,6 +57,7 @@ class Home(TemplateSelector, TemplateView):
         context = super(Home, self).get_context_data(**kwargs)
         context['slideshow'] = Banner.objects.filter(display=SLIDE, is_active=True).order_by('order_of_appearance')
         context['homepage_section_list'] = HomepageSection.objects.filter(is_active=True).order_by('order_of_appearance')
+        context['flat_pages'] = FlatPage.objects.all()
 
         return context
 
@@ -64,31 +66,33 @@ class AdminHome(TemplateView):
     template_name = 'admin_home.html'
 
 
-class ProductDetails(TemplateSelector, TemplateView):
+class ItemDetails(TemplateSelector, TemplateView):
     template_name = 'webnode/detail.html'
 
     def get_context_data(self, **kwargs):
-        context = super(ProductDetails, self).get_context_data(**kwargs)
+        context = super(ItemDetails, self).get_context_data(**kwargs)
         slug = kwargs['slug']
-        product = Product.objects.get(slug=slug)
-        tags = product.tags
+        category_slug = kwargs['category_slug']
+        category = ItemCategory.objects.get(slug=category_slug, is_active=True)
+        page_item = Item.objects.get(slug=slug, category=category, visible=True)
+        tags = page_item.tags
         tag_list = tags.split(' ')
         blog_suggestions = []
         for tag in tag_list:
             posts = Post.objects.filter(title__icontains=tag, is_active=True)
             for post in posts:
                 blog_suggestions.append(post)
-        category = product.category
-        items_qs = Product.objects.filter(category=category)
+        items_qs = Item.objects.filter(category=category, visible=True)
         suggestions =[]
         for item in items_qs:
-            if item != product:
+            if item != page_item:
                 suggestions.append(item)
 
         random.shuffle(suggestions)
-        context['product'] = product
+        context['item'] = page_item
         context['suggestions'] = suggestions[:4]
-        context['blog_suggestions'] = blog_suggestions
+        context['blog_suggestions'] = blog_suggestions[:4]
+        context['flat_pages'] = FlatPage.objects.all()
         return context
 
 
@@ -99,11 +103,11 @@ class Portfolio(TemplateSelector, TemplateView):
     #     context = super(Portfolio, self).get_context_data(**kwargs)
     #     category_list = []
     #     smart_portfolio = SmartCategory.objects.get(pk=settings.PORTFOLIO_ID)
-    #     smartPortfolio = grab_product_list_from_porfolio(smart_portfolio, None)
+    #     smartPortfolio = grab_item_list_from_porfolio(smart_portfolio, None)
     #     context['smart_portfolio'] = smartPortfolio
     #     for category_id in smart_portfolio.items_fk_list:
-    #         category = ProductCategory.objects.get(pk=category_id)
-    #         items_Count = Product.objects.filter(category=category).count()
+    #         category = ItemCategory.objects.get(pk=category_id)
+    #         items_Count = Item.objects.filter(category=category).count()
     #         if items_Count > 0:
     #             category_list.append(category)
     #     context['category_list'] = category_list
@@ -119,8 +123,8 @@ class ItemList(TemplateSelector, TemplateView):
         smart_category = SmartCategory.objects.get(slug=slug)
         item_list = []
         for category_id in smart_category.items_fk_list:
-            category = ProductCategory.objects.get(pk=category_id)
-            item_qs = Product.objects.filter(category=category)
+            category = get_object_or_404(ItemCategory, pk=category_id)
+            item_qs = Item.objects.filter(category=category)
             if item_qs.count() > 0:
                 item = {'category': category, 'items':item_qs}
                 item_list.append(item)
@@ -130,6 +134,7 @@ class ItemList(TemplateSelector, TemplateView):
         context['item_list'] = item_list
         context['smart_category'] = smart_category
         context['activate_block_title'] = activate_block_title
+        context['flat_pages'] = FlatPage.objects.all()
         return context
 
 
@@ -142,79 +147,79 @@ class FlatPageView(TemplateSelector, TemplateView):
         return context
 
 
-def grab_product_list_from_smart_category(smart_category, page):
-    product_list = []
+def grab_item_list_from_smart_category(smart_category, page):
+    item_list = []
     i = 0
     if page == HOME:
-        for product_id in smart_category.items_fk_list:
+        for item_id in smart_category.items_fk_list:
             try:
-                product = Product.objects.get(pk=product_id)
-            except Product.DoesNotExist:
+                item = Item.objects.get(pk=item_id)
+            except Item.DoesNotExist:
                 pass
             else:
-                product_list.append(product)
+                item_list.append(item)
                 i += 1
                 if i == 4:
                     break
-            smart_category.product_list = product_list
+            smart_category.item_list = item_list
     else:
-        for product_id in smart_category.items_fk_list:
-            product = Product.objects.get(pk=product_id)
-            product_list.append(product)
-        smart_category.product_list = product_list
+        for item_id in smart_category.items_fk_list:
+            item = Item.objects.get(pk=item_id)
+            item_list.append(item)
+        smart_category.item_list = item_list
     return smart_category
 
 
 def grab_items_list_from_smart_category(smart_category, page):
-    product_list = []
+    item_list = []
     i = 0
     if page == HOME:
         for category_id in smart_category.items_fk_list:
             try:
-                category = ProductCategory.objects.get(pk=category_id)
-            except ProductCategory.DoesNotExist:
+                category = ItemCategory.objects.get(pk=category_id)
+            except ItemCategory.DoesNotExist:
                 pass
             else:
-                item_qs = Product.objects.filter(category=category)
+                item_qs = Item.objects.filter(category=category)
                 if item_qs.count() > 0:
                     item = {'category': category, 'items': item_qs}
-                    product_list.append(item)
+                    item_list.append(item)
                 i += 1
                 if i == 4:
                     break
-            smart_category.product_list = product_list
+            smart_category.item_list = item_list
     else:
-        for product_id in smart_category.items_fk_list:
-            product = Product.objects.get(pk=product_id)
-            product_list.append(product)
-        smart_category.product_list = product_list
+        for item_id in smart_category.items_fk_list:
+            item = Item.objects.get(pk=item_id)
+            item_list.append(item)
+        smart_category.item_list = item_list
     return smart_category
 
 
-def grab_product_list_from_porfolio(smart_category, page):
-    product_list = []
-    final_product_list = []
+def grab_item_list_from_porfolio(smart_category, page):
+    item_list = []
+    final_item_list = []
     if page == HOME:
         for category_id in smart_category.items_fk_list:
-            category = ProductCategory.objects.get(pk=category_id)
-            products = Product.objects.filter(category=category)
-            for product in products:
-                product_list.append(product)
-        random.shuffle(product_list)
-        if len(product_list) < 4:
-            product_list = []
-        elif 4 <= len(product_list) < 8:
-            product_list = product_list[:4]
+            category = ItemCategory.objects.get(pk=category_id)
+            items = Item.objects.filter(category=category)
+            for item in items:
+                item_list.append(item)
+        random.shuffle(item_list)
+        if len(item_list) < 4:
+            item_list = []
+        elif 4 <= len(item_list) < 8:
+            item_list = item_list[:4]
         else:
-            product_list = product_list[:8]
+            item_list = item_list[:8]
     else:
         for category_id in smart_category.items_fk_list:
-            category = ProductCategory.objects.get(pk=category_id)
-            product = Product.objects.filter(category=category)
-            for product in product:
-                product_list.append(product)
-        random.shuffle(product_list)
-    return product_list
+            category = ItemCategory.objects.get(pk=category_id)
+            item = Item.objects.filter(category=category)
+            for item in item:
+                item_list.append(item)
+        random.shuffle(item_list)
+    return item_list
 
 
 def get_menus_context():
@@ -344,3 +349,53 @@ class DeployCloud(TemplateView):
             context = self.get_context_data(**kwargs)
             context['form'] = form
             return render(request, 'core/cloud_setup/deploy.html', context)
+
+
+def rename_webnode_dbs_collections(*args, **kwargs):
+    import pymongo
+
+    app = Application.objects.using('umbrella').get(slug='webnode')
+    services = Service.objects.using('umbrella').filter(app=app)
+    db_connect = pymongo.MongoClient('localhost', 27017)
+    dbs = []
+    for service in services:
+        dbs.append(service.database)
+
+    for db in dbs:
+        if db:
+            database = db_connect[db]
+            try:
+                category = database['kakocase_productcategory']
+                category.rename('items_itemcategory')
+            except:
+                pass
+            try:
+                photo = database['kako_photo']
+                photo.rename('items_photo')
+            except:
+                pass
+
+            try:
+                items = database['kako_product']
+                items.rename('items_item')
+            except:
+                pass
+            try:
+                banner = database['commarketing_banner']
+                banner.rename('web_banner')
+            except:
+                pass
+            try:
+                homepagesection = database['commarketing_homepagesection']
+                homepagesection.rename('web_homepagesection')
+            except:
+                pass
+            try:
+                smarcategory = database['commarketing_smartcategory']
+                smarcategory.rename('web_smartcategory')
+            except:
+                pass
+        else:
+            pass
+
+    return HttpResponse(json.dumps({'Success': True}), 'content-type: text/json')

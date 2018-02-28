@@ -8,6 +8,11 @@ from ikwen.core.models import AbstractConfig
 from ikwen.core.utils import to_dict
 
 
+PROVIDER_ADDED_ITEMS_EVENT = 'ProviderAddedProductsEvent'
+PROVIDER_REMOVED_ITEM_EVENT = 'ProviderRemovedProductEvent'
+PROVIDER_PUSHED_ITEM_EVENT = 'ProviderPushedProductEvent'
+
+
 class OperatorProfile(AbstractConfig):
     max_objects = models.IntegerField(default=100,
                                       help_text="Max number of products this provider may have.")

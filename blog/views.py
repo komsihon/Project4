@@ -10,6 +10,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.admin import helpers
 from django.contrib import messages
 from django.utils.translation import gettext as _
+from ikwen.core.models import Module, Model
 
 # Create your views here.
 import random
@@ -22,7 +23,7 @@ from django.views.generic import TemplateView
 from ikwen.accesscontrol.templatetags.auth_tokens import append_auth_tokens
 
 from ikwen.core.utils import get_model_admin_instance, DefaultUploadBackend
-from ikwen_kakocase.commarketing.models import SmartCategory
+from ikwen_webnode.web.models import SmartCategory
 from ikwen_webnode.blog.admin import PostAdmin, PostCategoryAdmin
 from ikwen_webnode.blog.models import Post, Comments, PostCategory, PostLikes, Photo
 from django.http import HttpResponse
@@ -51,7 +52,7 @@ class BlogBaseView(TemplateSelector, TemplateView):
         return context
 
 
-class PostsList(BlogBaseView):
+class PostsList(TemplateSelector, TemplateView):
     template_name = 'blog/home.html'
 
     def get_context_data(self, **kwargs):
@@ -68,7 +69,7 @@ class PostsList(BlogBaseView):
         return context
 
 
-class Search(BlogBaseView):
+class Search(TemplateSelector, TemplateView):
     template_name = 'blog/search.html'
 
     def get_context_data(self, **kwargs):
@@ -85,7 +86,7 @@ class Search(BlogBaseView):
         return context
 
 
-class PostPerCategory(BlogBaseView):
+class PostPerCategory(TemplateSelector, TemplateView):
     template_name = 'blog/search.html'
 
     def get_context_data(self, **kwargs):
@@ -102,8 +103,8 @@ class PostPerCategory(BlogBaseView):
         return context
 
 
-class PostDetails(BlogBaseView):
-    template_name = 'blog/blog-item.html'
+class PostDetails(TemplateSelector, TemplateView):
+    template_name = 'blog/post_detail.html'
 
     def get_context_data(self, **kwargs):
         context = super(PostDetails, self).get_context_data(**kwargs)
@@ -326,7 +327,7 @@ class ChangePost(TemplateView):
 
 class PostPhotoUploadBackend(DefaultUploadBackend):
     """
-    Ajax upload handler for :class:`kako.models.Product` photos
+    Ajax upload handler for :class:`items.models.Product` photos
     """
 
     def upload_complete(self, request, filename, *args, **kwargs):
@@ -381,12 +382,13 @@ def delete_photo(request, *args, **kwargs):
 
 
 def load_posts_for_homepage(request, *args, **kwargs):
-    entries = Post.objects.filter(is_active=True)
+    entries = Post.objects.filter(is_active=True, appear_on_home_page=True)
+    module = Module.objects.get(slug="module_blog")
     # entries = posts.order_by('-pub_date')
     for entry in entries:
         comment_count = Comments.objects.filter(post=entry).count()
         entry.comment_count = comment_count
-    context = {'entries': entries}
+    context = {'entries': entries, 'module': module}
     return render(request, 'webnode/snippets/homepage_section_blog.html', context)
 
 

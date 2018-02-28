@@ -30,23 +30,22 @@ from ikwen.core.models import Service
 
 from ikwen.accesscontrol.utils import get_members_having_permission
 
-from ikwen_kakocase.commarketing.models import SmartCategory, Banner
+from ikwen_webnode.web.models import SmartCategory, Banner
 from ikwen.accesscontrol.templatetags.auth_tokens import append_auth_tokens
 
 from ikwen.accesscontrol.backends import UMBRELLA
 from ikwen.core.utils import add_database_to_settings, DefaultUploadBackend, get_service_instance, add_event, \
     get_mail_content, get_model_admin_instance
 from ikwen.core.views import HybridListView
-from ikwen_kakocase.kako.admin import ProductAdmin, RecurringPaymentServiceAdmin
-from ikwen_kakocase.kako.models import Product, RecurringPaymentService, Photo
-from ikwen_kakocase.kako.utils import create_category, mark_duplicates, get_product_from_url
-from ikwen_kakocase.kakocase.models import OperatorProfile, BusinessCategory, ProductCategory, PROVIDER_REMOVED_PRODUCT_EVENT, \
+from ikwen_webnode.items.admin import ItemAdmin, RecurringPaymentServiceAdmin, ItemCategoryAdmin
+from ikwen_webnode.items.models import Item, RecurringPaymentService, Photo, ItemCategory
+from ikwen_webnode.items.utils import create_category, mark_duplicates, get_item_from_url
+from ikwen_kakocase.kakocase.models import OperatorProfile, BusinessCategory, PROVIDER_REMOVED_PRODUCT_EVENT, \
     PRODUCTS_LIMIT_ALMOST_REACHED_EVENT, PRODUCTS_LIMIT_REACHED_EVENT
-from ikwen_kakocase.kakocase.admin import ProductCategoryAdmin
 
 
 class ProviderList(HybridListView):
-    template_name = 'kako/retailer/provider_list.html'
+    template_name = 'items/retailer/provider_list.html'
     queryset = OperatorProfile.objects.using(UMBRELLA).filter(business_type=OperatorProfile.PROVIDER, is_active=True)
 
     # 'Auto' comes before 'Manual' in lexicographical order so ordering by
@@ -83,47 +82,47 @@ class ProviderList(HybridListView):
             return super(ProviderList, self).render_to_response(context, **response_kwargs)
 
 
-class ProviderProductList(TemplateView):
-    template_name = 'kako/retailer/provider_product_list.html'
+class ProviderItemList(TemplateView):
+    template_name = 'items/retailer/provider_item_list.html'
 
     def get_context_data(self, **kwargs):
-        context = super(ProviderProductList, self).get_context_data(**kwargs)
+        context = super(ProviderItemList, self).get_context_data(**kwargs)
         provider_id = kwargs['provider_id']
         service = OperatorProfile.objects.using(UMBRELLA).get(pk=provider_id).service
         add_database_to_settings(service.database)
-        context['categories'] = ProductCategory.objects.using(service.database).filter(items_count__gt=0)
+        context['categories'] = ItemCategory.objects.using(service.database).filter(items_count__gt=0)
         context['provider_database'] = service.database
         return context
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         provider_database = context['provider_database']
-        products = Product.objects.using(provider_database)\
+        items = Item.objects.using(provider_database)\
                        .filter(visible=True, in_trash=False).order_by('-updated_on', '-total_units_sold')[:24]
-        context['products'] = products
+        context['items'] = items
         return self.render_to_response(context)
 
     def render_to_response(self, context, **response_kwargs):
         provider_database = context['provider_database']
         if self.request.GET.get('format') == 'json':
-            products_qs = Product.objects.using(provider_database).filter(visible=True, in_trash=False)
+            items_qs = Item.objects.using(provider_database).filter(visible=True, in_trash=False)
             if self.request.GET.get('category_slug'):
                 category_slug = self.request.GET.get('category_slug')
-                category = ProductCategory.objects.get(slug=category_slug)
-                products_qs = products_qs.filter(category=category)
+                category = ItemCategory.objects.get(slug=category_slug)
+                items_qs = items_qs.filter(category=category)
             start = int(self.request.GET.get('start'))
             length = int(self.request.GET.get('length'))
             limit = start + length
-            products_qs = self.get_search_results(products_qs)
-            products_qs = products_qs.order_by('-updated_on', '-total_units_sold')[start:limit]
-            response = [product.to_dict() for product in products_qs]
+            items_qs = self.get_search_results(items_qs)
+            items_qs = items_qs.order_by('-updated_on', '-total_units_sold')[start:limit]
+            response = [item.to_dict() for item in items_qs]
             return HttpResponse(
                 json.dumps(response),
                 'content-type: text/json',
                 **response_kwargs
             )
         else:
-            return super(ProviderProductList, self).render_to_response(context, **response_kwargs)
+            return super(ProviderItemList, self).render_to_response(context, **response_kwargs)
 
     def get_search_results(self, queryset):
         search_term = self.request.GET.get('q')
@@ -138,23 +137,23 @@ class ProviderProductList(TemplateView):
         return queryset
 
 
-class ProviderProductDetail(TemplateView):
-    template_name = 'kako/product_detail.html'
+class ProviderItemDetail(TemplateView):
+    template_name = 'items/item_detail.html'
 
     def get_context_data(self, **kwargs):
-        context = super(ProviderProductDetail, self).get_context_data(**kwargs)
+        context = super(ProviderItemDetail, self).get_context_data(**kwargs)
         provider_id = kwargs['provider_id']
         service = OperatorProfile.objects.using(UMBRELLA).get(pk=provider_id).service
         add_database_to_settings(service.database)
-        product_id = kwargs['product_id']
-        context['categories'] = ProductCategory.objects.using(service.database).filter(items_count__gt=0)
-        context['product'] = Product.objects.using(service.database).get(pk=product_id)
+        item_id = kwargs['item_id']
+        context['categories'] = ItemCategory.objects.using(service.database).filter(items_count__gt=0)
+        context['item'] = Item.objects.using(service.database).get(pk=item_id)
         return context
 
 
 class CategoryList(HybridListView):
-    template_name = 'kako/category_list.html'
-    model = ProductCategory
+    template_name = 'items/category_list.html'
+    model = ItemCategory
     ordering = ('-appear_in_menu', 'order_of_appearance', '-id',)
     search_field = 'slug'
     context_object_name = 'category_list'
@@ -176,7 +175,7 @@ class CategoryList(HybridListView):
             for token in sorted_keys.split(','):
                 category_id, order_of_appearance = token.split(':')
                 try:
-                    ProductCategory.objects.filter(pk=category_id).update(order_of_appearance=order_of_appearance)
+                    ItemCategory.objects.filter(pk=category_id).update(order_of_appearance=order_of_appearance)
                 except:
                     continue
             return HttpResponse(json.dumps({'success': True}), 'content-type: text/json')
@@ -184,7 +183,7 @@ class CategoryList(HybridListView):
 
 
 class ChangeCategory(TemplateView):
-    template_name = 'kako/change_category.html'
+    template_name = 'items/change_category.html'
 
     def get_context_data(self, **kwargs):
         context = super(ChangeCategory, self).get_context_data(**kwargs)
@@ -192,11 +191,11 @@ class ChangeCategory(TemplateView):
         category_id = self.request.GET.get('category_id', category_id)
         category = None
         if category_id:
-            category = get_object_or_404(ProductCategory, pk=category_id)
-            category.items_count = category.product_set.all().count()
+            category = get_object_or_404(ItemCategory, pk=category_id)
+            category.items_count = category.item_set.all().count()
             category.save()
-        category_admin = get_model_admin_instance(ProductCategory, ProductCategoryAdmin)
-        ModelForm = modelform_factory(ProductCategory, fields=('name', 'description', 'badge_text',
+        category_admin = get_model_admin_instance(ItemCategory, ItemCategoryAdmin)
+        ModelForm = modelform_factory(ItemCategory, fields=('name', 'description', 'badge_text',
                                                                'appear_in_menu', 'is_active'))
         form = ModelForm(instance=category)
         category_form = helpers.AdminForm(form, list(category_admin.get_fieldsets(self.request)),
@@ -213,8 +212,8 @@ class ChangeCategory(TemplateView):
         category_id = self.request.POST.get('category_id')
         category = None
         if category_id:
-            category = get_object_or_404(ProductCategory, pk=category_id)
-        category_admin = get_model_admin_instance(ProductCategory, ProductCategoryAdmin)
+            category = get_object_or_404(ItemCategory, pk=category_id)
+        category_admin = get_model_admin_instance(ItemCategory, ItemCategoryAdmin)
         ModelForm = category_admin.get_form(self.request)
         form = ModelForm(request.POST, instance=category)
         if form.is_valid():
@@ -227,7 +226,7 @@ class ChangeCategory(TemplateView):
             else:
                 category.name = name
                 category.slug = slugify(name)
-                category.items_count = category.product_set.all().count()
+                category.items_count = category.item_set.all().count()
             category.description = description
             category.badge_text = badge_text
             if image_url:
@@ -239,7 +238,7 @@ class ChangeCategory(TemplateView):
                     try:
                         with open(media_root + image_url, 'r') as f:
                             content = File(f)
-                            destination = media_root + ProductCategory.UPLOAD_TO + "/" + filename
+                            destination = media_root + ItemCategory.UPLOAD_TO + "/" + filename
                             category.image.save(destination, content)
                         os.unlink(media_root + image_url)
                     except IOError as e:
@@ -256,12 +255,12 @@ class ChangeCategory(TemplateView):
                 except:
                     pass
             if category_id:
-                next_url = reverse('kako:change_category', args=(category_id, ))
+                next_url = reverse('items:change_category', args=(category_id, ))
                 messages.success(request, _("Category %s successfully updated." % category.name))
             else:
                 next_url = self.request.REQUEST.get('next')
                 if not next_url:
-                    next_url = reverse('kako:category_list')
+                    next_url = reverse('items:category_list')
                 messages.success(request, _("Category %s successfully created." % category.name))
             return HttpResponseRedirect(next_url)
         else:
@@ -275,7 +274,7 @@ def toggle_category_attribute(request, *args, **kwargs):
     category_id = request.GET['category_id']
     attr = request.GET['attr']
     val = request.GET['val']
-    category = ProductCategory.objects.get(pk=category_id)
+    category = ItemCategory.objects.get(pk=category_id)
     if val.lower() == 'true':
         category.__dict__[attr] = True
     else:
@@ -291,7 +290,7 @@ class CategoryListFilter(object):
 
     def lookups(self):
         choices = []
-        for category in ProductCategory.objects.all():
+        for category in ItemCategory.objects.all():
             choice = (category.slug, category.name)
             choices.append(choice)
         return choices
@@ -299,7 +298,7 @@ class CategoryListFilter(object):
     def queryset(self, request, queryset):
         value = request.GET.get(self.parameter_name)
         if value:
-            category = ProductCategory.objects.get(slug=value)
+            category = ItemCategory.objects.get(slug=value)
             return queryset.filter(category=category)
         return queryset
 
@@ -325,29 +324,29 @@ class MerchantListFilter(object):
         return queryset
 
 
-class ProductList(HybridListView):
-    template_name = 'kako/product_list.html'
-    html_results_template_name = 'kako/snippets/product_list_results.html'
-    queryset = Product.objects.filter(in_trash=False)
+class ItemList(HybridListView):
+    template_name = 'items/item_list.html'
+    html_results_template_name = 'items/snippets/item_list_results.html'
+    queryset = Item.objects.filter(in_trash=False)
     ordering = ('-updated_on', '-total_units_sold')
     search_field = 'name'
-    context_object_name = 'product_list'
+    context_object_name = 'item_list'
     list_filter = (MerchantListFilter, ) if getattr(settings, 'IS_BANK', False) else (CategoryListFilter, )
 
     def get_queryset(self):
-        queryset = super(ProductList, self).get_queryset()
+        queryset = super(ItemList, self).get_queryset()
         collection_id = self.request.GET.get('collection_id')
         if collection_id:
             try:
                 collection = SmartCategory.objects.get(pk=collection_id)
-                queryset = collection.get_product_queryset()
+                queryset = collection.get_item_queryset()
             except SmartCategory.DoesNotExist:
-                collection = get_object_or_404(ProductCategory, pk=collection_id)
-                queryset = collection.product_set.all()
+                collection = get_object_or_404(ItemCategory, pk=collection_id)
+                queryset = collection.item_set.all()
         return queryset
 
     def get_context_data(self, **kwargs):
-        context = super(ProductList, self).get_context_data(**kwargs)
+        context = super(ItemList, self).get_context_data(**kwargs)
         if self.request.GET.get('smart_link'):
             smart_object_id = self.request.GET['smart_object_id']
             try:
@@ -366,21 +365,21 @@ class ProductList(HybridListView):
         return queryset
 
 
-@permission_required('kako.ik_manage_product')
-def do_import_products(request, *args, **kwargs):
+@permission_required('items.ik_manage_item')
+def do_import_items(request, *args, **kwargs):
     """
-    Import a list of :class:`kako.models.Product` chosen by :class:`people.models.Retailer`
+    Import a list of :class:`items.models.Items` chosen by :class:`people.models.Retailer`
     to his database from the :class:`people.models.Provider` database
     """
     provider_id = request.GET['provider_id']
-    product_ids = request.GET['product_ids']
-    product_ids = product_ids.strip(',').split(',')
-    if len(product_ids) == 0:
+    item_ids = request.GET['item_ids']
+    item_ids = item_ids.strip(',').split(',')
+    if len(item_ids) == 0:
         return
     provider_profile = OperatorProfile.objects.using(UMBRELLA).get(pk=provider_id)
     provider_service = provider_profile.service
     provider_member = provider_service.member
-    provider_member.save(using='default')  # Save provider to local database to make product.provider not raise NotFoundError
+    provider_member.save(using='default')  # Save provider to local database to make item.provider not raise NotFoundError
     provider_service.save(using='default')
     provider_database = provider_service.database
     add_database_to_settings(provider_database)
@@ -395,13 +394,13 @@ def do_import_products(request, *args, **kwargs):
         provider_profile.turnover_history = []
         provider_profile.earnings_history = []
         provider_profile.orders_count_history = []
-        provider_profile.broken_products_history = []
+        provider_profile.broken_items_history = []
         provider_profile.late_deliveries_history = []
         provider_profile.total_items_traded = 0
         provider_profile.total_turnover = 0
         provider_profile.total_earnings = 0
         provider_profile.total_orders_count = 0
-        provider_profile.total_broken_products = 0
+        provider_profile.total_broken_items = 0
         provider_profile.total_late_deliveries = 0
         provider_profile.save(using='default')
 
@@ -418,29 +417,29 @@ def do_import_products(request, *args, **kwargs):
         retailer_profile.turnover_history = []
         retailer_profile.earnings_history = []
         retailer_profile.orders_count_history = []
-        retailer_profile.broken_products_history = []
+        retailer_profile.broken_items_history = []
         retailer_profile.late_deliveries_history = []
         retailer_profile.total_items_traded = 0
         retailer_profile.total_turnover = 0
         retailer_profile.total_earnings = 0
         retailer_profile.total_orders_count = 0
-        retailer_profile.total_broken_products = 0
+        retailer_profile.total_broken_items = 0
         retailer_profile.total_late_deliveries = 0
         retailer_profile.save(using=provider_database)
 
-    for product_id in product_ids:
+    for item_id in item_ids:
         try:
-            product = Product.objects.using(provider_database).get(pk=product_id)
-            if product.retail_price:
-                product.retail_price_is_modifiable = False
+            item = Item.objects.using(provider_database).get(pk=item_id)
+            if item.retail_price:
+                item.retail_price_is_modifiable = False
             else:
-                product.retail_price_is_modifiable = True
-            product.save(using='default')
-            product.is_retailed = True
-            product.save(using=provider_database)
-        except Product.DoesNotExist:
+                item.retail_price_is_modifiable = True
+            item.save(using='default')
+            item.is_retailed = True
+            item.save(using=provider_database)
+        except Item.DoesNotExist:
             try:
-                service = RecurringPaymentService.objects.using(provider_database).get(pk=product_id)
+                service = RecurringPaymentService.objects.using(provider_database).get(pk=item_id)
                 if service.retail_price:
                     service.retail_price_is_modifiable = False
                 else:
@@ -454,57 +453,57 @@ def do_import_products(request, *args, **kwargs):
     return HttpResponse(json.dumps(response), 'content-type: text/json')
 
 
-@permission_required('kako.ik_manage_product')
-def update_product_retail_price(request, *args, **kwargs):
+@permission_required('items.ik_manage_item')
+def update_item_retail_price(request, *args, **kwargs):
     """
-    Update price :class:`kako.models.Product` in the actual :class:`ikwen_kakocase.models.OperatorProfile` database.
+    Update price :class:`items.models.Items` in the actual :class:`ikwen_kakocase.models.OperatorProfile` database.
     """
-    product_id = request.GET['product_id']
+    item_id = request.GET['item_id']
     price = float(request.GET['price'])
     try:
-        product = Product.objects.get(pk=product_id)
-        if product.retail_price_is_modifiable:
-            product.retail_price = price if price < product.max_price else product.max_price
-            product.save()
-    except Product.DoesNotExist:
-        response = {'error': "Product not found."}
+        item = Item.objects.get(pk=item_id)
+        if item.retail_price_is_modifiable:
+            item.retail_price = price if price < item.max_price else item.max_price
+            item.save()
+    except Item.DoesNotExist:
+        response = {'error': "Items not found."}
     else:
         response = {'success': True}
     return HttpResponse(json.dumps(response), 'content-type: text/json')
 
 
-@permission_required('kako.ik_manage_product')
-def update_product_stock(request, *args, **kwargs):
+@permission_required('items.ik_manage_item')
+def update_item_stock(request, *args, **kwargs):
     """
-    Update stock :class:`kako.models.Product` in the actual :class:`ikwen.ikwen_kakocase.models.OperatorProfile` database.
-    This method assumes only provider can update stock. So the Product.save() is called only with the default database
+    Update stock :class:`items.models.Items` in the actual :class:`ikwen.ikwen_kakocase.models.OperatorProfile` database.
+    This method assumes only provider can update stock. So the Items.save() is called only with the default database
     """
-    product_id = request.GET['product_id']
+    item_id = request.GET['item_id']
     stock = float(request.GET['stock'])
     try:
-        product = Product.objects.get(pk=product_id)
-        product.stock = stock
-        product.save()
+        item = Item.objects.get(pk=item_id)
+        item.stock = stock
+        item.save()
         if stock == 0:
-            mark_duplicates(product)
+            mark_duplicates(item)
         operator_profile_umbrella = get_service_instance(UMBRELLA).config
         operator_profile_umbrella.stock_updated_on = timezone.now()
         operator_profile_umbrella.last_stock_update_method = OperatorProfile.MANUAL_UPDATE
         operator_profile_umbrella.save(using=UMBRELLA)
-    except Product.DoesNotExist:
-        response = {'error': "Product not found."}
+    except Item.DoesNotExist:
+        response = {'error': "Items not found."}
     else:
         response = {'success': True}
     return HttpResponse(json.dumps(response), 'content-type: text/json')
 
 
-@permission_required('kako.ik_manage_product')
+@permission_required('items.ik_manage_item')
 def add_category(request, *args, **kwargs):
     """
-    Adds a new :class:`ikwen.ikwen_kakocase.models.ProductCategory` in the actual
+    Adds a new :class:`ikwen.ikwen_kakocase.models.ItemCategory` in the actual
     :class:`ikwen.ikwen_kakocase.models.OperatorProfile` database.
     We start by searching the category with the given name in UMBRELLA database.
-    If not found there, it is created and appended in the list of product_categories
+    If not found there, it is created and appended in the list of item_categories
     for the actual Operator business_category
     """
     name = request.GET['name']
@@ -512,20 +511,20 @@ def add_category(request, *args, **kwargs):
     return HttpResponse(json.dumps(category.to_dict()), 'content-type: text/json')
 
 
-@permission_required('kako.ik_manage_product')
+@permission_required('items.ik_manage_item')
 def delete_category(request, *args, **kwargs):
     selection = request.GET['selection'].split(',')
     deleted = []
     for category_id in selection:
         try:
-            category = ProductCategory.objects.get(pk=category_id)
-            count = Product.objects.filter(category=category, in_trash=False).count()
+            category = ItemCategory.objects.get(pk=category_id)
+            count = Item.objects.filter(category=category, in_trash=False).count()
             if count > 0:
                 message = "Category %s contains %d item(s). Delete them first." % (category.name, count)
                 break
             category.delete()
             deleted.append(category_id)
-        except ProductCategory.DoesNotExist:
+        except ItemCategory.DoesNotExist:
             message = "Category '%s' was not found." % category_id
             break
     else:
@@ -534,9 +533,9 @@ def delete_category(request, *args, **kwargs):
     return HttpResponse(json.dumps(response), 'content-type: text/json')
 
 
-class ProductPhotoUploadBackend(DefaultUploadBackend):
+class ItemPhotoUploadBackend(DefaultUploadBackend):
     """
-    Ajax upload handler for :class:`kako.models.Product` photos
+    Ajax upload handler for :class:`items.models.Items` photos
     """
     def upload_complete(self, request, filename, *args, **kwargs):
         path = self.UPLOAD_DIR + "/" + filename
@@ -548,12 +547,12 @@ class ProductPhotoUploadBackend(DefaultUploadBackend):
                 destination = media_root + Photo.UPLOAD_TO + "/" + filename
                 photo = Photo()
                 photo.image.save(destination, content)
-                product_id = request.GET.get('product_id')
-                if product_id:
+                item_id = request.GET.get('item_id')
+                if item_id:
                     try:
-                        product = Product.objects.get(pk=product_id)
-                        product.photos.append(photo)
-                        product.save()
+                        item = Item.objects.get(pk=item_id)
+                        item.photos.append(photo)
+                        item.save()
                     except:
                         pass
 
@@ -568,19 +567,19 @@ class ProductPhotoUploadBackend(DefaultUploadBackend):
             return {'error': 'File failed to upload. May be invalid or corrupted image file'}
 
 
-product_photo_uploader = AjaxFileUploader(ProductPhotoUploadBackend)
+item_photo_uploader = AjaxFileUploader(ItemPhotoUploadBackend)
 
 
-class ChangeProduct(TemplateView):
-    template_name = 'kako/change_product.html'
+class ChangeItem(TemplateView):
+    template_name = 'items/change_item.html'
 
-    def get_product_admin(self):
+    def get_item_admin(self):
         default_site = AdminSite()
-        product_admin = ProductAdmin(Product, default_site)
-        return product_admin
+        item_admin = ItemAdmin(Item, default_site)
+        return item_admin
 
     def get_context_data(self, **kwargs):
-        context = super(ChangeProduct, self).get_context_data(**kwargs)
+        context = super(ChangeItem, self).get_context_data(**kwargs)
         collection_id = self.request.GET.get('collection_id')
         if collection_id:
             try:
@@ -588,33 +587,33 @@ class ChangeProduct(TemplateView):
                 context['is_smart_category'] = True
             except SmartCategory.DoesNotExist:
                 pass
-        product_id = kwargs.get('product_id', self.request.GET.get('product_id'))
-        product = None
-        if product_id:
-            product = get_object_or_404(Product, pk=product_id)
+        item_id = kwargs.get('item_id', self.request.GET.get('item_id'))
+        item = None
+        if item_id:
+            item = get_object_or_404(Item, pk=item_id)
             if self.request.GET.get('duplicate'):
-                product.id = ''
-        product_admin = self.get_product_admin()
-        ModelForm = product_admin.get_form(self.request, obj=product)
-        form = ModelForm(instance=product)
+                item.id = ''
+        item_admin = self.get_item_admin()
+        ModelForm = item_admin.get_form(self.request, obj=item)
+        form = ModelForm(instance=item)
 
-        product_form = helpers.AdminForm(form, list(product_admin.get_fieldsets(self.request)),
-                                         product_admin.get_prepopulated_fields(self.request),
-                                         product_admin.get_readonly_fields(self.request, obj=product))
-        context['product'] = product
-        context['model_admin_form'] = product_form
+        item_form = helpers.AdminForm(form, list(item_admin.get_fieldsets(self.request)),
+                                         item_admin.get_prepopulated_fields(self.request),
+                                         item_admin.get_readonly_fields(self.request, obj=item))
+        context['item'] = item
+        context['model_admin_form'] = item_form
         return context
 
     @method_decorator(csrf_protect)
     def post(self, request, *args, **kwargs):
         service = get_service_instance()
         config = service.config
-        product_id = kwargs.get('product_id', request.POST.get('product_id'))
-        product_admin = self.get_product_admin()
-        ModelForm = product_admin.get_form(request)
-        if product_id:
-            product = get_object_or_404(Product, pk=product_id)
-            form = ModelForm(request.POST, instance=product)
+        item_id = kwargs.get('item_id', request.POST.get('item_id'))
+        item_admin = self.get_item_admin()
+        ModelForm = item_admin.get_form(request)
+        if item_id:
+            item = get_object_or_404(Item, pk=item_id)
+            form = ModelForm(request.POST, instance=item)
         else:
             form = ModelForm(request.POST)
         if form.is_valid():
@@ -642,112 +641,112 @@ class ChangeProduct(TemplateView):
             visible = request.POST.get('visible')
             photos_ids = request.POST.get('photos_ids')
             photos_ids_list = photos_ids.strip(',').split(',') if photos_ids else []
-            category = ProductCategory.objects.get(pk=category_id)
+            category = ItemCategory.objects.get(pk=category_id)
             if retail_price and retail_price < wholesale_price:
                 error = _("Retail price cannot be smaller than wholesale price.")
                 context = self.get_context_data(**kwargs)
                 context['error'] = error
                 return render(request, self.template_name, context)
-            if product_id:
-                product = get_object_or_404(Product, pk=product_id)
+            if item_id:
+                item = get_object_or_404(Item, pk=item_id)
                 if getattr(settings, 'IS_PROVIDER', False):
-                    if product.is_retailed:
-                        error = _("Product already imported by some retailers. Delete and start again.")
+                    if item.is_retailed:
+                        error = _("Items already imported by some retailers. Delete and start again.")
                         context = self.get_context_data(**kwargs)
                         context['error'] = error
                         return render(request, self.template_name, context)
 
-                if product.retail_price_is_modifiable and retail_price < product.retail_price:
-                    product.previous_price = product.retail_price
-                    product.on_sale = True
+                if item.retail_price_is_modifiable and retail_price < item.retail_price:
+                    item.previous_price = item.retail_price
+                    item.on_sale = True
                 else:
-                    product.on_sale = False
-                if product.category != category:
-                    product.category.items_count -= 1
-                    product.category.save()
+                    item.on_sale = False
+                if item.category != category:
+                    item.category.items_count -= 1
+                    item.category.save()
             else:
-                if not config.is_pro_version and config.max_products == Product.objects.filter(in_trash=False).count():
-                    error = _("Product cannot be added because the limit of %d products is reached." % config.max_products)
+                if not config.is_pro_version and config.max_products == Item.objects.filter(in_trash=False).count():
+                    error = _("Items cannot be added because the limit of %d items is reached." % config.max_products)
                     context = self.get_context_data(**kwargs)
                     context['error'] = error
                     return render(request, self.template_name, context)
-                category.items_count = category.product_set.all().count() + 1
-                product = Product(units_sold_history=[0])
-            # if product.id is not None and product.provider != operator:
+                category.items_count = category.item_set.all().count() + 1
+                item = Item(units_sold_history=[0])
+            # if item.id is not None and item.provider != operator:
             #     return HttpResponseForbidden("You don't have permission to access this resource.")
-            product.name = name
-            product.slug = slugify(name)
-            product.brand = brand.strip()
-            product.summary = summary
-            product.description = description
-            product.badge_text = badge_text
-            product.category = category
-            product.reference = reference
-            product.original_id = original_id
-            product.size = size
-            product.weight = weight
-            product.min_order = min_order
-            product.unit_of_measurement = unit_of_measurement
-            product.tags = product.slug.replace('-', ' ')
+            item.name = name
+            item.slug = slugify(name)
+            item.brand = brand.strip()
+            item.summary = summary
+            item.description = description
+            item.badge_text = badge_text
+            item.category = category
+            item.reference = reference
+            item.original_id = original_id
+            item.size = size
+            item.weight = weight
+            item.min_order = min_order
+            item.unit_of_measurement = unit_of_measurement
+            item.tags = item.slug.replace('-', ' ')
             try:
-                product.stock = int(stock.strip())
+                item.stock = int(stock.strip())
             except:
-                product.stock = 0
+                item.stock = 0
             if getattr(settings, 'IS_PROVIDER', False):
-                product.wholesale_price = wholesale_price
+                item.wholesale_price = wholesale_price
                 if max_price:
-                    product.max_price = float(max_price.strip())
-                product.retail_price_is_modifiable = True if request.POST.get('retail_price_is_modifiable') else False
+                    item.max_price = float(max_price.strip())
+                item.retail_price_is_modifiable = True if request.POST.get('retail_price_is_modifiable') else False
             else:
-                product.retail_price_is_modifiable = True
-            product.photos = []
+                item.retail_price_is_modifiable = True
+            item.photos = []
             if len(photos_ids_list) == 0:
-                product.visible = False  # Product without photo are hidden
+                item.visible = False  # Items without photo are hidden
             else:
-                product.visible = True if visible else False  # Product with photo has visibility chosen by user
+                item.visible = True if visible else False  # Items with photo has visibility chosen by user
                 for photo_id in photos_ids_list:
                     if photo_id:
                         try:
                             photo = Photo.objects.get(pk=photo_id)
-                            product.photos.append(photo)
+                            item.photos.append(photo)
                         except:
                             pass
             if retail_price:
-                product.retail_price = retail_price
-            product.provider = service
-            product.save()
+                item.retail_price = retail_price
+            item.provider = service
+            item.save()
             category.save()
             if not config.is_pro_version:
-                total_products_count = Product.objects.filter(in_trash=False).count()
-                if config.max_products == (total_products_count - 10):
-                    product_manager_list = get_members_having_permission(Product, 'ik_manage_product')
-                    for m in product_manager_list:
+                total_items_count = Item.objects.filter(in_trash=False).count()
+                if config.max_products == (total_items_count - 10):
+                    item_manager_list = get_members_having_permission(Item, 'ik_manage_item')
+                    for m in item_manager_list:
                         add_event(service, PRODUCTS_LIMIT_ALMOST_REACHED_EVENT, m)
-                if config.max_products == total_products_count - 10:
-                    product_manager_list = get_members_having_permission(Product, 'ik_manage_product')
-                    for m in product_manager_list:
+                if config.max_products == total_items_count - 10:
+                    item_manager_list = get_members_having_permission(Item, 'ik_manage_item')
+                    for m in item_manager_list:
                         add_event(service, PRODUCTS_LIMIT_REACHED_EVENT, m)
-            if product_id:
-                next_url = reverse('kako:change_product', args=(product_id, ))
-                messages.success(request, _("Product %s successfully updated." % product.name))
+            if item_id:
+                next_url = reverse('items:change_item', args=(item_id, ))
+                messages.success(request, _("Items %s successfully updated." % item.name))
             else:
-                next_url = reverse('kako:product_list')
-                messages.success(request, _("Product %s successfully created." % product.name))
-            mark_duplicates(product)
+                next_url = reverse('items:item_list')
+                messages.success(request, _("Items %s successfully created." % item.name))
+            mark_duplicates(item)
             next_url = append_auth_tokens(next_url, request)
             return HttpResponseRedirect(next_url)
         else:
             context = self.get_context_data(**kwargs)
-            admin_form = helpers.AdminForm(form, list(product_admin.get_fieldsets(self.request)),
-                                           product_admin.get_prepopulated_fields(self.request),
-                                           product_admin.get_readonly_fields(self.request))
+            admin_form = helpers.AdminForm(form, list(item_admin.get_fieldsets(self.request)),
+                                           item_admin.get_prepopulated_fields(self.request),
+                                           item_admin.get_readonly_fields(self.request))
             context['model_admin_form'] = admin_form
-            messages.error(request, _("Product was not created. One ore more fields were invalid."))
+            messages.error(request, _("Items was not created. One ore more fields were invalid."))
             return render(request, self.template_name, context)
 
 
 class ChangeRecurringPaymentServiceView(TemplateView):
-    template_name = 'kako/change_product.html'
+    template_name = 'items/change_item.html'
 
     def get_recurring_payment_service_admin(self):
         default_site = AdminSite()
@@ -756,28 +755,28 @@ class ChangeRecurringPaymentServiceView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ChangeRecurringPaymentServiceView, self).get_context_data(**kwargs)
-        product_id = self.request.GET.get('product_id')
-        if product_id:
-            product = get_object_or_404(RecurringPaymentService, pk=product_id)
-            product_admin = self.get_recurring_payment_service_admin()
-            ModelForm = product_admin.get_form(self.request)
-            form = ModelForm(instance=product)
+        item_id = self.request.GET.get('item_id')
+        if item_id:
+            item = get_object_or_404(RecurringPaymentService, pk=item_id)
+            item_admin = self.get_recurring_payment_service_admin()
+            ModelForm = item_admin.get_form(self.request)
+            form = ModelForm(instance=item)
 
-            product_form = helpers.AdminForm(form, list(product_admin.get_fieldsets(self.request)),
-                                             product_admin.get_prepopulated_fields(self.request))
-            context['product'] = product
-            context['product_form'] = product_form
+            item_form = helpers.AdminForm(form, list(item_admin.get_fieldsets(self.request)),
+                                             item_admin.get_prepopulated_fields(self.request))
+            context['item'] = item
+            context['item_form'] = item_form
         return context
 
     @method_decorator(csrf_protect)
     def post(self, request, *args, **kwargs):
         """
-        Submit information of a product for save. Products without
+        Submit information of a item for save. Items without
         photo are made invisible so that they don't appear on the e-shop.
-        If the operation is a product update, it won't work on a product that
+        If the operation is a item update, it won't work on a item that
         has already been imported on a retailer's site.
         """
-        product_id = request.POST.get('product_id')
+        item_id = request.POST.get('item_id')
         name = request.POST.get('name')
         category_id = request.POST.get('category')
         reference = request.POST.get('reference')
@@ -794,22 +793,22 @@ class ChangeRecurringPaymentServiceView(TemplateView):
         photos_ids_list = photos_ids.strip(',').split(',') if photos_ids else []
         referrer = request.META['HTTP_REFERER']
 
-        category = ProductCategory.objects.get(pk=category_id)
-        if product_id:
-            product = get_object_or_404(RecurringPaymentService, pk=product_id)
+        category = ItemCategory.objects.get(pk=category_id)
+        if item_id:
+            item = get_object_or_404(RecurringPaymentService, pk=item_id)
             if getattr(settings, 'IS_PROVIDER', False):
-                if product.is_retailed:
-                    error = _("Product already imported by some retailers. Delete and register a new one.")
-                    context = ChangeProduct(request=request).get_context_data(product_id=product_id)
+                if item.is_retailed:
+                    error = _("Items already imported by some retailers. Delete and register a new one.")
+                    context = ChangeItem(request=request).get_context_data(item_id=item_id)
                     context['error'] = error
-                    return render(request, 'kako/change_product.html', context)
+                    return render(request, 'items/change_item.html', context)
         else:
-            category.items_count = category.product_set.all().count() + 1
-            product = RecurringPaymentService()
-        product.duration = duration
-        product.duration_text = duration_text
+            category.items_count = category.item_set.all().count() + 1
+            item = RecurringPaymentService()
+        item.duration = duration
+        item.duration_text = duration_text
 
-        product.name = name
+        item.name = name
         slug = slugify(name)
         pname = slug
         i = 1
@@ -818,58 +817,58 @@ class ChangeRecurringPaymentServiceView(TemplateView):
                 RecurringPaymentService.objects.get(category=category, slug=pname)
                 i += 1
                 pname = "%s-%d" % (slug, i)
-            except Product.DoesNotExist:
+            except Item.DoesNotExist:
                 slug = pname
                 break
-        product.slug = slug
-        product.description = description
-        product.category = category
-        product.reference = reference
-        product.original_id = original_id
-        product.tags = product.slug.replace('-', ' ')
-        # product.stock = stock
+        item.slug = slug
+        item.description = description
+        item.category = category
+        item.reference = reference
+        item.original_id = original_id
+        item.tags = item.slug.replace('-', ' ')
+        # item.stock = stock
         if retail_price:
-            product.retail_price = retail_price
+            item.retail_price = retail_price
         if getattr(settings, 'IS_PROVIDER', False):
-            product.wholesale_price = wholesale_price
+            item.wholesale_price = wholesale_price
             if max_price:
-                product.max_price = float(max_price)
-            product.retail_price_is_modifiable = True if request.POST.get('retail_price_is_modifiable') else False
+                item.max_price = float(max_price)
+            item.retail_price_is_modifiable = True if request.POST.get('retail_price_is_modifiable') else False
         else:
-            # product.wholesale_price = 0
-            product.retail_price_is_modifiable = True
-        product.photos = []
+            # item.wholesale_price = 0
+            item.retail_price_is_modifiable = True
+        item.photos = []
         if len(photos_ids_list) == 0:
-            product.visible = False  # Product without photo are hidden
+            item.visible = False  # Items without photo are hidden
         else:
-            product.visible = True if visible else False  # Product with photo has visibility chosen by user
+            item.visible = True if visible else False  # Items with photo has visibility chosen by user
             for photo_id in photos_ids_list:
                 if photo_id:
                     try:
                         photo = Photo.objects.get(pk=photo_id)
-                        product.photos.append(photo)
+                        item.photos.append(photo)
                     except:
                         pass
-        product.provider = get_service_instance()
-        product.save()
+        item.provider = get_service_instance()
+        item.save()
         category.save()
-        if product_id:
-            next_url = reverse('kako:change_product', args=(product_id, )) + '?success=yes'
+        if item_id:
+            next_url = reverse('items:change_item', args=(item_id, )) + '?success=yes'
         else:
-            next_url = reverse('kako:change_product') + '?success=yes'
+            next_url = reverse('item:change_item') + '?success=yes'
         next_url = append_auth_tokens(next_url, request)
         return HttpResponseRedirect(next_url)
 
 
 def delete_photo(request, *args, **kwargs):
-    product_id = request.GET.get('product_id')
+    item_id = request.GET.get('item_id')
     photo_id = request.GET['photo_id']
     photo = Photo(id=photo_id)
-    if product_id:
-        product = Product.objects.get(pk=product_id)
-        if photo in product.photos:
-            product.photos.remove(photo)
-            product.save()
+    if item_id:
+        item = Item.objects.get(pk=item_id)
+        if photo in item.photos:
+            item.photos.remove(photo)
+            item.save()
     try:
         Photo.objects.get(pk=photo_id).delete()
     except:
@@ -880,19 +879,19 @@ def delete_photo(request, *args, **kwargs):
     )
 
 
-@permission_required('kako.ik_manage_product')
-def put_product_in_trash(request, *args, **kwargs):
+@permission_required('items.ik_manage_item')
+def put_item_in_trash(request, *args, **kwargs):
     # TODO: Implement Trash view itself so that people can view and restore the content of the trash
     config = get_service_instance().config
     selection = request.GET['selection'].split(',')
     deleted = []
-    for product_id in selection:
+    for item_id in selection:
         try:
-            product = Product.objects.get(pk=product_id)
-            product.in_trash = True
-            product.visible = False
-            product.save()
-            deleted.append(product_id)
+            item = Item.objects.get(pk=item_id)
+            item.in_trash = True
+            item.visible = False
+            item.save()
+            deleted.append(item_id)
             if getattr(settings, 'IS_PROVIDER', False):
                 connection = mail.get_connection()
                 try:
@@ -905,20 +904,20 @@ def put_product_in_trash(request, *args, **kwargs):
                     service = retailer_profile.service
                     db = service.database
                     add_database_to_settings(db)
-                    Product.objects.using(db).get(pk=product_id).delete()
-                    ProductCategory.objects.using(db).filter(pk=product.category.id).update(items_count=F('items_count')-1)
-                    if product.is_retailed:
-                        add_event(service, PROVIDER_REMOVED_PRODUCT_EVENT, member=member, object_id=product_id)
+                    Item.objects.using(db).get(pk=item_id).delete()
+                    ItemCategory.objects.using(db).filter(pk=item.category.id).update(items_count=F('items_count')-1)
+                    if item.is_retailed:
+                        add_event(service, PROVIDER_REMOVED_PRODUCT_EVENT, member=member, object_id=item_id)
                         if connection_opened:
                             # TODO: Verify what mail looks like after tests once UIs are implemented
-                            subject = _("Product taken out by %s" % config.company_name)
-                            message = _("Hi %(member_name)s,<br/> The product below was"
+                            subject = _("Items taken out by %s" % config.company_name)
+                            message = _("Hi %(member_name)s,<br/> The item below was"
                                         "removed by <strong>%(company_name)s.</strong> "
                                         "It won't appear on your website anymore." % {'member_name': member.first_name,
                                                                                       'company_name': config.company_name})
                             html_content = get_mail_content(subject, message,
-                                                            template_name='kako/retailer/mails/product_removed.html',
-                                                            extra_context={'product': product, 'service': service,
+                                                            template_name='items/retailer/mails/item_removed.html',
+                                                            extra_context={'item': item, 'service': service,
                                                                            'provider_id': config.id})
                             sender = '%s <no-reply@%s.com>' % (service.project_name, service.project_name_slug)
                             msg = EmailMessage(subject, html_content, sender, [member.email])
@@ -929,69 +928,69 @@ def put_product_in_trash(request, *args, **kwargs):
                     connection.close()
                 except:
                     pass
-        except Product.DoesNotExist:
-            message = "Product %s was not found."
+        except Item.DoesNotExist:
+            message = "Items %s was not found."
             break
     else:
-        message = "%d product(s) moved to trash." % len(selection)
+        message = "%d item(s) moved to trash." % len(selection)
     response = {'message': message, 'deleted': deleted}
     return HttpResponse(json.dumps(response), 'content-type: text/json')
 
 
-def render_product_event(event, request):
+def render_item_event(event, request):
     try:
-        product = Product.objects.get(pk=event.object_id)
-    except Product.DoesNotExist:
+        item = Item.objects.get(pk=event.object_id)
+    except Item.DoesNotExist:
         return ''
-    html_template = get_template('kako/events/product_notice.html')
-    c = Context({'event': event, 'product': product})
+    html_template = get_template('items/events/item_notice.html')
+    c = Context({'event': event, 'item': item})
     return html_template.render(c)
 
 
-@permission_required('kako.ik_manage_product')
-def load_product_from_url(request, *args, **kwargs):
+@permission_required('items.ik_manage_item')
+def load_item_from_url(request, *args, **kwargs):
     try:
         url = request.GET['url']
-        product, merchant = get_product_from_url(url)
+        item, merchant = get_item_from_url(url)
     except Exception as e:
         response = {'error': e.message}
     else:
         try:
             Service.objects.get(pk=merchant.id)
-            image_url = from_provider(product.image, merchant)
-            obj = product.to_dict()
+            image_url = from_provider(item.image, merchant)
+            obj = item.to_dict()
             del(obj['photos'])
             obj['image'] = image_url
             obj['provider'] = merchant.project_name
-            response = {'product': obj}
+            response = {'item': obj}
         except:
-            response = {'error': _("You must add %s as a Partner Merchant to import his products." % merchant.config.company_name)}
+            response = {'error': _("You must add %s as a Partner Merchant to import his items." % merchant.config.company_name)}
     return HttpResponse(json.dumps(response), 'content-type: text/json')
 
 
-@permission_required('kako.ik_manage_product')
-def save_product_from_url(request, *args, **kwargs):
+@permission_required('items.ik_manage_item')
+def save_item_from_url(request, *args, **kwargs):
     try:
         url = request.GET['url']
-        product, merchant = get_product_from_url(url)
+        item, merchant = get_item_from_url(url)
     except Exception as e:
         messages.error(request, e.message)
     else:
         try:
-            Product.objects.get(pk=product.id)
-        except Product.DoesNotExist:
-            product.save(using='default')
-        messages.success(request, _("%s successfully added" % product.name))
-    return HttpResponseRedirect(reverse('kako:product_list'))
+            Item.objects.get(pk=item.id)
+        except Item.DoesNotExist:
+            item.save(using='default')
+        messages.success(request, _("%s successfully added" % item.name))
+    return HttpResponseRedirect(reverse('items:item_list'))
 
 
-# def render_product_pushed_event(event):
+# def render_item_pushed_event(event):
 #     try:
-#         product = Product.objects.get(pk=event.object_id)
-#     except Product.DoesNotExist:
+#         item = Items.objects.get(pk=event.object_id)
+#     except Items.DoesNotExist:
 #         return ''
-#     html_template = get_template('kako/events/product_notice.html')
-#     message = _("Provider removed this product. It won't appear on your website anymore.")
-#     c = Context({'title': _(event.title), 'product': product, 'message': message})
+#     html_template = get_template('items/events/item_notice.html')
+#     message = _("Provider removed this item. It won't appear on your website anymore.")
+#     c = Context({'title': _(event.title), 'item': item, 'message': message})
 #     return html_template.render(c)
 

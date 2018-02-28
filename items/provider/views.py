@@ -13,14 +13,15 @@ from ikwen.core.models import Service
 
 from ikwen.accesscontrol.backends import UMBRELLA
 from ikwen.core.utils import DefaultUploadBackend, get_service_instance, add_database_to_settings
-from ikwen_kakocase.kako.admin import ProductResource
-from ikwen_kakocase.kako.models import Product, BatchUpload
-from ikwen_kakocase.kakocase.models import OperatorProfile, PROVIDER_ADDED_PRODUCTS_EVENT
+from ikwen_webnode.items.admin import ItemResource
+from ikwen_kakocase.kakocase.models import OperatorProfile
+from ikwen_webnode.items.models import Item, BatchUpload
+from ikwen_webnode.webnode.models import PROVIDER_ADDED_ITEMS_EVENT
 
 
-class ProductSpreadsheetUploadBackend(DefaultUploadBackend):
+class ItemSpreadsheetUploadBackend(DefaultUploadBackend):
     """
-    Ajax spreadsheet upload handler for :class:`kako.models.BatchUpload`
+    Ajax spreadsheet upload handler for :class:`items.models.BatchUpload`
     """
     def upload_complete(self, request, filename, *args, **kwargs):
         path = self.UPLOAD_DIR + "/" + filename
@@ -33,15 +34,15 @@ class ProductSpreadsheetUploadBackend(DefaultUploadBackend):
                 batch_upload = BatchUpload()
                 batch_upload.spreadsheet.save(destination, content)
                 service = get_service_instance()
-                product_resource = ProductResource()
-                product_resource.provider = service
-                product_resource.retail_price_is_modifiable = True if request.GET.get('retail_price_is_modifiable') else False
+                item_resource = ItemResource()
+                item_resource.provider = service
+                item_resource.retail_price_is_modifiable = True if request.GET.get('retail_price_is_modifiable') else False
                 dataset = tablib.Dataset()
                 dataset.xls = open(destination).read()
                 col_id = ['' for i in range(dataset.height)]
                 dataset.insert_col(0, col_id, header='id')
                 try:
-                    result = product_resource.import_data(dataset, dry_run=True)
+                    result = item_resource.import_data(dataset, dry_run=True)
                     result.has_errors()
                 except Exception as e:
                     return {
@@ -58,24 +59,24 @@ class ProductSpreadsheetUploadBackend(DefaultUploadBackend):
             return {'error': 'File failed to upload. May be invalid or corrupted image file'}
 
 
-product_batch_uploader = AjaxFileUploader(ProductSpreadsheetUploadBackend)
+item_batch_uploader = AjaxFileUploader(ItemSpreadsheetUploadBackend)
 
 
-@permission_required('kako.manage_product')
-def do_import_products_from_spreadsheet(request, *args, **kwargs):
+@permission_required('items.manage_item')
+def do_import_items_from_spreadsheet(request, *args, **kwargs):
     upload_id = request.GET['upload_id']
     upload = BatchUpload.objects.get(pk=upload_id)
 
     service = get_service_instance()
-    product_resource = ProductResource()
-    product_resource.provider = service
-    product_resource.batch_upload = upload
-    product_resource.retail_price_is_modifiable = True if request.GET.get('retail_price_is_modifiable') else False
+    item_resource = ItemResource()
+    item_resource.provider = service
+    item_resource.batch_upload = upload
+    item_resource.retail_price_is_modifiable = True if request.GET.get('retail_price_is_modifiable') else False
     dataset = tablib.Dataset()
     dataset.xls = open(upload.spreadsheet.path).read()
     col_id = ['' for i in range(dataset.height)]
     dataset.insert_col(0, col_id, header='id')
-    product_resource.import_data(dataset, dry_run=False)
+    item_resource.import_data(dataset, dry_run=False)
 
     # TODO: Think more on this event as it may appear on retailer's console without images being uploaded
     # if getattr(settings, 'IS_PROVIDER', False):
@@ -83,7 +84,7 @@ def do_import_products_from_spreadsheet(request, *args, **kwargs):
     #         member = retailer.service.member
     #         db = retailer.service.database
     #         add_database_to_settings(db)
-    #         add_event(retailer.service, member, PROVIDER_ADDED_PRODUCTS_EVENT, upload_id)
+    #         add_event(retailer.service, member, PROVIDER_ADDED_ITEMS_EVENT, upload_id)
     response = {'success': True}
     return HttpResponse(json.dumps(response), 'content-type: text/json')
 
@@ -97,20 +98,20 @@ def set_stock(request, api_signature, ref, units, *args, **kwargs):
         response = {'error': "Invalide API Signature."}
         return HttpResponse(json.dumps(response), 'content-type: text/json')
     try:
-        product = Product.objects.get(reference=ref)
-    except Product.DoesNotExist:
+        item = Item.objects.get(reference=ref)
+    except Item.DoesNotExist:
         try:
-            product = Product.objects.get(pk=ref)
-        except Product.DoesNotExist:
-            response = {'error': "No product found with reference '%s'." % ref}
+            item = Item.objects.get(pk=ref)
+        except Item.DoesNotExist:
+            response = {'error': "No item found with reference '%s'." % ref}
             return HttpResponse(json.dumps(response), 'content-type: text/json')
     warning = None
-    product.stock = units
-    product.save()
+    item.stock = units
+    item.save()
     for retailer in OperatorProfile.objects.filter(business_type=OperatorProfile.RETAILER):
         db = retailer.service.database
         add_database_to_settings(db)
-        Product.objects.using(db).filter(pk=product.id).update(stock=units)
+        Item.objects.using(db).filter(pk=item.id).update(stock=units)
 
     OperatorProfile.objects.using(UMBRELLA).filter(pk=config.id).update(stock_updated_on=datetime.now(),
                                                                         last_stock_update_method=update_method)
@@ -118,8 +119,8 @@ def set_stock(request, api_signature, ref, units, *args, **kwargs):
     response = {
         'success': True,
         'details': {
-            'kcid': product.id,
-            'stock': product.stock
+            'kcid': item.id,
+            'stock': item.stock
         }
     }
     if warning:

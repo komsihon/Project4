@@ -112,23 +112,23 @@
             $('#results').on('click', '.category .active.on', function() {
                 var categoryId = $(this).parents('.category').data('id');
                 $(this).toggleClass('on off');
-                $.getJSON('{% url 'kako:toggle_category_attribute' %}', {'category_id': categoryId, 'attr': 'is_active', 'val': true})
+                $.getJSON('{% url 'items:toggle_category_attribute' %}', {'category_id': categoryId, 'attr': 'is_active', 'val': true})
             }).on('click', '.category .active.off', function() {
                 var categoryId = $(this).parents('.category').data('id');
                 $(this).toggleClass('on off');
-                $.getJSON('{% url 'kako:toggle_category_attribute' %}', {'category_id': categoryId, 'attr': 'is_active', 'val': false})
+                $.getJSON('{% url 'items:toggle_category_attribute' %}', {'category_id': categoryId, 'attr': 'is_active', 'val': false})
             }).on('click', '.category .main-menu.on', function() {
                 var $category = $(this).parents('.category'),
                     categoryId = $category.data('id');
                 $(this).toggleClass('on off');
                 $category.insertAfter('.category.appear-in-menu:last').addClass('appear-in-menu');
-                $.getJSON('{% url 'kako:toggle_category_attribute' %}', {'category_id': categoryId, 'attr': 'appear_in_menu', 'val': true})
+                $.getJSON('{% url 'items:toggle_category_attribute' %}', {'category_id': categoryId, 'attr': 'appear_in_menu', 'val': true})
             }).on('click', '.category .main-menu.off', function() {
                 var $category = $(this).parents('.category'),
                     categoryId = $category.data('id');
                 $(this).toggleClass('on off');
                 $category.removeClass('appear-in-menu');
-                $.getJSON('{% url 'kako:toggle_category_attribute' %}', {'category_id': categoryId, 'attr': 'appear_in_menu', 'val': false})
+                $.getJSON('{% url 'items:toggle_category_attribute' %}', {'category_id': categoryId, 'attr': 'appear_in_menu', 'val': false})
             });
             {% if messages %}
                 {% for msg in messages %}

@@ -53,10 +53,10 @@
                             {% for item in  product.items %}
                             <div class="col-lg-3 col-sm-4 col-xs-12 wow item fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
                                 <div class="feature-wrap subtle-shade">
-                                    <a href="{% url 'webnode:product_details' item.slug %}">
+                                    <a href="{% url 'webnode:product_details'  item.category.slug item.slug %}">
                                         <img src="{{ item.get_photos_url_list.0.small }}" class="img-responsive">
                                     </a>
-                                    <a href="{% url 'webnode:product_details' item.slug %}"> <h2>{{ item.name }}</h2></a>
+                                    <a href="{% url 'webnode:product_details' item.category.slug item.slug  %}"> <h2>{{ item.name }}</h2></a>
                                     <h3>{{ item.summary | safe }}</h3>
                                 </div>
                             </div><!--/.col-md-4-->

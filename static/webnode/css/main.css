@@ -1420,20 +1420,6 @@ ul.social_icons li  a i{
   padding: 0;
 }
 
-.get-started {
-  background: none repeat scroll 0 0 #F3F3F3;
-  border-radius: 3px;
-  padding-bottom: 30px;
-  position: relative;
-  margin-bottom: 18px;
-  margin-top: 60px;
-}
-
-.get-started h2 {
-  padding-top: 30px;
-  margin-bottom: 20px;
-}
-
 .request {
   bottom: -15px;
   left: 50%;

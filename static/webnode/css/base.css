@@ -20,6 +20,13 @@
 #blog .features .feature-wrap a {height: 130px; padding-left: 0}
 #blog .features .feature-wrap a img  {max-height: 100%; height: inherit;}
 
+.blog-item {font-size: 20px; line-height: 35px; margin-bottom: 10px}
+.blog-suggestions {float: left; text-align: center; padding: 12px 0; width: 100%}
+.blog-suggestions strong {font-size: 20px; float: left}
+.blog-suggestions a {color: #4e4e4e; float: left; font-size: 18px; text-align: left;}
+.blog-suggestions .suggestions {float: left; clear: both; margin-top: 30px}
+.post_reply {clear: both}
+
 .feature-wrap img {height: 38%}
 .feature-wrap h2 {height: 10%}
 .feature-wrap h3 { overflow: hidden}
@@ -27,6 +34,43 @@
 
 .post_reply ul li a i {border: none}
 .single_comments.item_details div.details div {float: left}
+
+
+
+.top-bar {display: none}
+.navbar.main {position: absolute; background: none; width: 100%; z-index: 10}
+.slide-cta {margin-top: 200px; text-align: center}
+section.home-section.bg-img-false .cta {color: #4e4e4e}
+section.home-section {background: no-repeat center; background-size: cover}
+section.home-section.text-center .description {float: none; margin: auto}
+.home-section-cta {margin-top: 80px}
+section.home-section .title {padding-top: 10px}
+section.home-section.bg-img-true,  section.home-section.bg-img-true .title {color: #fff}
+section.home-section .img {overflow: hidden}
+section.home-section .description {font-size: 1.3em}
+.home-section-text-left .description {float: left; text-align: left}
+.home-section-text-left .img {float: right}
+.home-section-text-right .description {float: right; text-align: right}
+.home-section-text-right .img {float: left}
+.home-section-text-center .img {display: none}
+@media (max-width: 767px) {
+    .navbar-collapse {background: #000; margin-left: -15px}
+    .slide-title {font-size: 2em; line-height: 1.3em; margin-top: 160px;}
+    .slide-cta {margin-top: 70px}
+    .cta {font-size: 18px; padding: 6px 20px}
+    section.home-section.bg-img-true {min-height: 500px}
+    section.home-section.bg-img-false .cta {color: #4e4e4e}
+    section.home-section .img {padding-left: 0; margin-bottom: 20px}
+    .home-section-text-left .description, .home-section-text-right .description {float: none; text-align: center}
+    .home-section-text-left .img {float: left}
+    .home-section-text-center .img {display: block}
+    .home-section-cta {margin-top: 30px}
+}
+@media (min-width: 768px) {
+    section.home-section {min-height: 730px}
+}
+
+
 
 @media (max-width: 767px) {
     .navbar-brand img {width: 55%}

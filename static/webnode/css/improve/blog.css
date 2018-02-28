@@ -758,7 +758,8 @@ shortcodes page css
   margin-top: 0;
   margin-bottom: 20px;
 }
-.row.blog-content {margin-top: 0px;}
+.navbar-inverse .navbar-nav > li > a {color: #2e2e2e}
+.row.blog-content {margin-top: 90px;}
 .widget.categories > div {margin-left: 20px;}
 #main-contact-form {margin-top: 75px}
 #nav-xs li a {color: #fff}

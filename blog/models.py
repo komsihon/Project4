@@ -9,7 +9,7 @@ from django.utils import translation
 from django.conf import settings
 from djangotoolbox.fields import ListField, EmbeddedModelField
 from ikwen.core.fields import MultiImageField
-from ikwen.core.models import Application,Model, AbstractConfig
+from ikwen.core.models import Model
 from ikwen.core.utils import to_dict, add_database_to_settings
 from ikwen.accesscontrol.models import Member
 

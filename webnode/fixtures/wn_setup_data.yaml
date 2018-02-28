@@ -16,6 +16,16 @@
     iso2: NG
     iso3: NGR
 
+#- model: currencies.currency
+#  fields:
+#    name: Central African Franc
+#    code: XAF
+#    symbol: XAF
+#    precision: 0
+#    is_base: Yes
+#    is_active: Yes
+#    is_default: Yes
+
 - model: core.application
   pk: 56eb6d04b37b3379b531a001
   fields:
@@ -98,6 +108,22 @@
     status: Active
     expiry: 2035-01-01T00:00:00.120Z
 
+- model: core.service
+  pk: 56eb6d04b37b3379b531b107
+  fields:
+    member: 56eb6d04b37b3379b531e017
+    app: 56eb6d04b37b3379b531a001
+    project_name: AFIC CASHFLEX
+    project_name_slug: aficcashflex
+    domain: aficcashflex.ikwen.com
+    url: http://aficcashflex.ikwen.com
+    database: test_kc_afic
+    api_signature: api-signature7
+    monthly_cost: 6000
+    version: Full
+    status: Active
+    expiry: 2035-01-01T00:00:00.120Z
+
 - model: kakocase.deliveryoption
   pk: 55d1feb9b37b301e070604d1
   fields:
@@ -127,6 +153,16 @@
     slug: eyeblink
     cost: 3000
     max_delay: 2
+
+- model: kakocase.deliveryoption
+  pk: 55d1feb9b37b301e070604d4
+  fields:
+    company: 56eb6d04b37b3379b531b101
+    type: HomeDelivery
+    name: Eyeblink
+    slug: eyeblink
+    cost: 3000
+    max_delay: 6
 
 - model: core.consoleeventtype
   fields:
@@ -227,12 +263,32 @@
 - model: billing.paymentmean
   pk: 5880870e4fc0c229da8da3d2
   fields:
-    name: Mobile Money
-    slug: jumbopay-momo
-    credentials: '{"api_key":"c18c884c0a3fcc756f81e0b28d636208"}'
+    name: MTN Mobile Money
+    slug: mtn-momo
+    credentials: '{"merchant_email":"merchant@ikwen.com"}'
     action_url_name: billing:momo_set_checkout
     logo: logo.png
     watermark: watermark.png
+
+- model: billing.paymentmean
+  pk: 5880870e4fc0c229da8da3d3
+  fields:
+    name: CashFlex
+    slug: cashflex
+    action_url_name: shopping:choose_deal
+    logo: logo.png
+    watermark: watermark.png
+    is_cashflex: Yes
+
+- model: billing.paymentmean
+  pk: 5880870e4fc0c229da8da3d4
+  fields:
+    name: AFIC
+    slug: aficcashflex
+    action_url_name: shopping:choose_deal
+    logo: logo.png
+    watermark: watermark.png
+    is_cashflex: Yes
 
 - model: billing.cloudbillingplan
   pk: 55e7b9b531a003371b6d0cb1

@@ -1,4 +1,4 @@
-- model: kakocase.productcategory
+- model: items.itemcategory
   pk: 569228a9b37b3301e0706b51
   fields:
     name: Phones and Tablets
@@ -8,7 +8,7 @@
     earnings_history: [4150, 1900, 36608, 3040, 9175]
     orders_count_history: [11, 4, 41, 15, 27]
 
-- model: kakocase.productcategory
+- model: items.itemcategory
   pk: 569228a9b37b3301e0706b52
   fields:
     name: Food
@@ -18,7 +18,7 @@
     earnings_history: [4150, 3040, 9175, 1900, 36608]
     orders_count_history: [11, 4, 27, 41, 15]
 
-- model: kakocase.productcategory
+- model: items.itemcategory
   pk: 569228a9b37b3301e0706b53
   fields:
     name: Fashion
@@ -28,7 +28,7 @@
     earnings_history: [4150, 1900, 36608, 3040, 9175]
     orders_count_history: [11, 4, 41, 15, 27]
 
-- model: kakocase.productcategory
+- model: items.itemcategory
   pk: 569228a9b37b3301e0706b54
   fields:
     name: Physical goods

@@ -85,7 +85,7 @@
                 $('#new-post').attr('href', endpoint);
             }
             ikwen.setupSearch('#context-search input', '#results', searchDescriptor, beforeSearch, afterSearch);
-            ikwen.deleteEndpoint = '{% url 'kako:put_product_in_trash' %}';
+            ikwen.deleteEndpoint = '{% url 'items:put_item_in_trash' %}';
             {% if request.GET.success %}
                 ikwen.showFloatingNotice("{% trans "Post successfully saved." %}", '', 6);
                 localStorage.removeItem('post');

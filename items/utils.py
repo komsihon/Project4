@@ -6,41 +6,40 @@ from ikwen.core.models import Service
 
 from ikwen.accesscontrol.backends import UMBRELLA
 from ikwen.core.utils import get_service_instance, add_database
-from ikwen_kakocase.kako.admin import ProductResource
-from ikwen_kakocase.kako.models import Product
-from ikwen_kakocase.kakocase.models import ProductCategory
+from ikwen_webnode.items.admin import ItemResource
+from ikwen_webnode.items.models import Item, ItemCategory
 
 
-def import_products(filename):
+def import_items(filename):
     """
-    Import products contained in an xls or xlsx spreadsheet file.
+    Import items contained in an xls or xlsx spreadsheet file.
     :param filename: xls or xlsx file path
     :return: True if error occured, False otherwise
     """
     import tablib
-    product_resource = ProductResource()
+    item_resource = ItemResource()
     dataset = tablib.Dataset()  # We need a dataset object
     if filename[-3:] == 'xls':
         dataset.xls = open(filename).read()
     else:
         dataset.xlsx = open(filename).read()
-    result = product_resource.import_data(dataset, dry_run=False)
+    result = item_resource.import_data(dataset, dry_run=False)
     return result.has_errors()
 
 
 def create_category(name):
     slug = slugify(name)
     try:
-        category = ProductCategory.objects.get(slug=slug)
-    except ProductCategory.DoesNotExist:
-        category = ProductCategory.objects.create(name=name, slug=slug, earnings_history=[0],
+        category = ItemCategory.objects.get(slug=slug)
+    except ItemCategory.DoesNotExist:
+        category = ItemCategory.objects.create(name=name, slug=slug, earnings_history=[0],
                                                   orders_count_history=[0], items_traded_history=[0], turnover_history=[0])
     return category
 
 
-def mark_duplicates(product):
-    queryset = Product.objects.filter(category=product.category, slug=product.slug,
-                                      brand=product.brand).order_by('-stock', '-updated_on')
+def mark_duplicates(item):
+    queryset = Item.objects.filter(category=item.category, slug=item.slug,
+                                      brand=item.brand).order_by('-stock', '-updated_on')
     if queryset.count() >= 1:
         queryset.update(is_duplicate=True)
         original = queryset[0]
@@ -48,7 +47,7 @@ def mark_duplicates(product):
         original.save()
 
 
-def get_product_from_url(url):
+def get_item_from_url(url):
     tokens = urlparse(url.strip())
     domain = tokens.netloc
     if domain.startswith('www.'):
@@ -62,5 +61,5 @@ def get_product_from_url(url):
         merchant = Service.objects.using(UMBRELLA).get(domain=domain)
     merchant_db = merchant.database
     add_database(merchant_db)
-    product = Product.objects.using(merchant_db).get(slug=slug, is_duplicate=False)
-    return product, merchant
+    item = Item.objects.using(merchant_db).get(slug=slug, is_duplicate=False)
+    return item, merchant

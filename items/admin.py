@@ -4,26 +4,27 @@ from ikwen.core.admin import CustomBaseAdmin
 from import_export import resources
 
 from ikwen.core.utils import get_service_instance
-from ikwen_kakocase.kakocase.models import ProductCategory
-from ikwen_kakocase.kako.models import Product, RecurringPaymentService
+from ikwen_webnode.items.models import Item, RecurringPaymentService, ItemCategory
 from django.contrib import admin
 
 from ikwen_kakocase.kakocase.models import IS_PROVIDER, IS_RETAILER
 
+from conf import settings
 
-class ProductResource(resources.ModelResource):
+
+class ItemResource(resources.ModelResource):
 
     def import_field(self, field, obj, data):
         if field.column_name == 'category':
             slug = slugify(data['category'])
             try:
-                category = ProductCategory.objects.get(slug=slug)
-            except ProductCategory.DoesNotExist:
+                category = ItemCategory.objects.get(slug=slug)
+            except ItemCategory.DoesNotExist:
                 name = data['category']
-                from kako.utils import create_category
+                from items.utils import create_category
                 category = create_category(name)
             data['category'] = category.id
-        super(ProductResource, self).import_field(field, obj, data)
+        super(ItemResource, self).import_field(field, obj, data)
 
     def before_save_instance(self, instance, dry_run):
         slug = slugify(instance.name)
@@ -37,19 +38,19 @@ class ProductResource(resources.ModelResource):
     def skip_row(self, instance, original):
         try:
             if instance.reference:
-                Product.objects.get(reference=instance.reference)
+                Item.objects.get(reference=instance.reference)
                 return True
             return False
-        except Product.DoesNotExist:
+        except Item.DoesNotExist:
             return False
 
     class Meta:
-        model = Product
+        model = Item
         skip_unchanged = True
         # fields = ('category', 'name', 'reference', 'wholesale_price', 'retail_price', 'max_price')
 
 
-class ProductAdmin(admin.ModelAdmin):
+class ItemAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('provider', 'category', 'name', 'brand', 'wholesale_price', 'retail_price', 'max_price', 'size', 'color', 'weight', 'badge_text', 'stock', 'visible', 'summary', 'description', ) if IS_RETAILER
         else ('category', 'name', 'brand', 'wholesale_price', 'retail_price', 'max_price', 'retail_price_is_modifiable',
@@ -68,3 +69,14 @@ class ProductAdmin(admin.ModelAdmin):
 
 class RecurringPaymentServiceAdmin(CustomBaseAdmin):
     readonly_fields = ('provider', )
+
+
+class ItemCategoryAdmin(admin.ModelAdmin):
+    if getattr(settings, 'IS_IKWEN', False):
+        list_display = ('name', 'description', 'total_items_traded', 'total_orders_count',)
+        fields = ('name', 'description', 'total_items_traded', 'total_orders_count',)
+        readonly_fields = ('total_items_traded', 'total_orders_count',)
+    else:
+        fields = ('name', 'description', 'badge_text', 'is_active',)
+        if getattr(settings, 'IS_RETAILER', False):
+            readonly_fields = ('name', 'description',)

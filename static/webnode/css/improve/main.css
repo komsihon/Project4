@@ -109,7 +109,7 @@ a:focus {
 }
 
 body > section {
-  padding: 40px 0;
+  padding: 125px 0;
 }
 
 .center {
@@ -1417,20 +1417,6 @@ ul.social_icons li  a i{
 
 .services {
   padding: 0;
-}
-
-.get-started {
-  background: none repeat scroll 0 0 #F3F3F3;
-  border-radius: 3px;
-  padding-bottom: 30px;
-  position: relative;
-  margin-bottom: 18px;
-  margin-top: 60px;
-}
-
-.get-started h2 {
-  padding-top: 30px;
-  margin-bottom: 20px;
 }
 
 .request {
