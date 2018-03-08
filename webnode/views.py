@@ -87,14 +87,13 @@ class ItemDetails(TemplateSelector, TemplateView):
         random.shuffle(suggestions)
         context['item'] = page_item
         context['page_suggestions'] = suggestions[:4]
-        context['blog_suggestions'] = blog_suggestions[:4]
+        context['blog_suggestions'] = blog_suggestions[:3]
         context['flat_pages'] = FlatPage.objects.all()
         return context
 
 
 class ItemList(TemplateSelector, TemplateView):
     template_name = 'webnode/item_list.html'
-    # template_name = 'webnode/dreamer/item_list.html'
 
     def get_context_data(self, **kwargs):
         context = super(ItemList, self).get_context_data(**kwargs)

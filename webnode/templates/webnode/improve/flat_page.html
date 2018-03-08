@@ -3,6 +3,13 @@
 
 {% block page_title %}<title>{{ service.project_name }} - {{ page.title }}</title>{% endblock %}
 
+{% block head_style %}
+    {{ block.super }}
+    <style>
+        .navbar-inverse .navbar-nav > li > a {color: #2e2e2e;}
+    </style>
+{% endblock %}
+
 {% block page_content %}
     <section id="about-us">
         <div class="container">

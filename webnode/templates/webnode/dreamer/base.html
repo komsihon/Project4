@@ -243,12 +243,12 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                         <div class="col-sm-6 col-md-4 footer-grid hidden-sm">
                             <h4>{% trans "Blog" %}</h4>
                             <ul>
-                                {% for category in quick_access_categories %}
-                                    <li>
-                                        {% url 'shopping:product_list' category.slug as product_list_url %}
-                                        <a href="{{ product_list_url }}">{{ category.name }}</a>
-                                    </li>
-                                {% endfor %}
+{#                                {% for category in quick_access_categories %}#}
+{#                                    <li>#}
+{#                                        {% url 'shopping:product_list' category.slug as product_list_url %}#}
+{#                                        <a href="{{ product_list_url }}">{{ category.name }}</a>#}
+{#                                    </li>#}
+{#                                {% endfor %}#}
                             </ul>
                         </div>
                         <div class="clearfix"> </div>

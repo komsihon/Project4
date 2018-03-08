@@ -109,7 +109,7 @@
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="widget">
-                            <h3>{% trans 'Company' %}</h3>
+                            <h3>{{ service.project_name }}</h3>
                             <ul>
                                 {% for page in flat_pages %}
                                     <li><a href="{% url 'flatpage' page.url %}">{{ page.title }}</a></li>

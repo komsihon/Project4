@@ -8,6 +8,14 @@
 {% endblock %}
 {% block page_title %} <title>{{ service.project_name }} - {{ item.name }}</title> {% endblock %}
 
+
+{% block head_style %}
+    {{ block.super }}
+    <style>
+        .navbar-inverse .navbar-nav > li > a {color: #2e2e2e;}
+    </style>
+{% endblock %}
+
 {% block blog_content %}
     {% include 'snippets/fb_sdk.html' %}
     <div class="blog-item">
@@ -26,9 +34,11 @@
             <strong>{% trans 'Related posts' %}:</strong>
             <div class="suggestions">
                 {% for post in blog_suggestions %}
-                    <div class="col-sm-4 suggestion">
-                        <a href="{% url 'blog:details'  post.slug %}"><img  src="{{ post.image.url }}" class="img-responsive" alt=""/></a>
-                        <a href="{% url 'blog:details'  post.slug %}" >{{ post.title }}</a>
+                    <div class="col-sm-4 suggess">
+                        <div class="subtle-shade suggestion" >
+                            <a href="{% url 'blog:details'  post.slug %}" style="background-image:url({{ post.image.url }})"></a>
+                            <a href="{% url 'blog:details'  post.slug %}" >{{ post.title }}</a>
+                        </div>
                     </div>
                 {% endfor %}
             </div>

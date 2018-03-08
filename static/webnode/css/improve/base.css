@@ -45,10 +45,12 @@
 .blog-suggestions {float: left; text-align: center; padding: 12px 0; width: 100%}
 .blog-suggestions strong {font-size: 20px; float: left}
 .blog-suggestions a {color: #4e4e4e; float: left; font-size: 18px; text-align: left;}
-.blog-suggestions .suggestions {float: left; clear: both;}
-.blog-suggestions .suggestion {margin-top: 30px}
+.blog-suggestions .suggestions {float: left; clear: both; width: 100%;}
+.blog-suggestions .suggestions .suggess:first-child {padding-left: 0}
+.blog-suggestions .suggestion {border: solid 1px #DDD;float: left; height: 230px; margin-top: 30px; overflow: hidden; padding: 5px}
 .blog-suggestions .suggestion img {max-height: 130px}
 .blog-suggestions .suggestion a {text-align: center; margin-top: 15px}
+.blog-suggestions .suggestion a:first-child {background-size: cover; height: 130px; margin-top: 0; width: 100%;}
 .post_reply {clear: both}
 
 .slide .cta:hover, .cta:hover {color: #f4a135}

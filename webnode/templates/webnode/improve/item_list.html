@@ -1,5 +1,12 @@
 {% extends 'webnode/improve/base.html' %}
 {% load static auth_tokens %}
+{% block head_style %}
+    {{ block.super }}
+    <style>
+        .navbar-inverse .navbar-nav > li > a {color: #2e2e2e;}
+    </style>
+{% endblock %}
+
 {% block page_content %}
 <section id="feature" class="transparent-bg">
     <div class="container">

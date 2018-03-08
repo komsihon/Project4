@@ -68,7 +68,7 @@ div.item-list-img {background-size: cover; background-position: center; height: 
 a:hover, a:focus {color: #c52d2f; text-decoration: none; outline: none;}
 .dropdown-menu {margin-top: -1px; min-width: 180px;}
 .center h2{font-size: 36px; margin-top: 0; margin-bottom: 20px;}
-body > section {background-size: cover; padding: 70px 0; min-height: 600px; width: 100%}
+body > section {background-size: cover; padding: 70px 0; min-height: 745px; width: 100%}
 .center {text-align: center; padding-bottom: 55px;}
 .lead{font-size: 16px; line-height: 24px; font-weight: 400;}
 .transparent-bg {background-color: transparent !important; margin-bottom: 0;}
@@ -93,7 +93,7 @@ div.top-right{float: right}
 .banner .cta {clear: both; margin:auto; max-width: 300px;}
 .banner .cta a {background: #e74c3c; border-radius: 50px;color: #fff;float: left; font-size: 22px; font-weight: 300; margin-top: 150px; padding: 25px; text-align: center; width: 100%}
 .home-section-cta .cta {background: #e74c3c; border-radius: 50px;color: #fff; font-size: 22px; font-weight: 300; margin-top: 50px; padding: 25px 50px; text-align: center}
-.item-list {padding: 5px}
+.item-list {height: 440px; padding: 5px}
 .item-list .item-list-img {background-size: cover; background-position: center; height: 200px; width: 100%}
 .item-list h2 {text-align: center}
 .item-list h3 {text-align: justify}
@@ -275,6 +275,11 @@ section.home-section .description {font-size: 1.3em}
     .social-icon a:first-child {padding-left: 0;}
     .social-icon a i {font-size: 35px; color: #cb0009}
     #side-nav .panel-top .cover .company .name {float: right}
+    body > section {min-height: 400px}
+    .open>.dropdown-menu {margin-left: 20px}
+    body > section .swiper-slide .slide {height: 500px}
+    body > section .swiper-slide .slide h1 {line-height: 57px; margin-top: 84px;}
+    .banner .cta a {margin-top: 85px;}
 }
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) {

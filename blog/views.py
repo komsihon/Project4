@@ -114,7 +114,12 @@ class PostDetails(TemplateSelector, TemplateView):
         entry = get_object_or_404(Post, slug=slug)
         context['comments'] = Comments.objects.filter(post=entry, is_active=True).order_by('id')
         context['blog'] = entry
-        context['blog_uri'] = self.request.META['HTTP_REFERER']
+        try:
+            self.request.META['HTTP_REFERER']
+        except:
+            pass
+        else:
+            context['blog_uri'] = self.request.META['HTTP_REFERER']
 
         return context
 
