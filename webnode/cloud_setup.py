@@ -254,12 +254,6 @@ def deploy(app, member, project_name, billing_plan, theme, monthly_cost,
     InvoicingConfig.objects.using(database).create()
     logger.debug("Configuration successfully added for service: %s" % pname)
 
-    # Copy samples to local database
-    for product in Product.objects.using(database).all():
-        product.provider = service
-        product.save(using=database)
-    logger.debug("Sample items successfully copied to database %s" % database)
-
     # Apache Server cloud_setup
     if getattr(settings, 'LOCAL_DEV', False):
         apache_tpl = get_template('webnode/cloud_setup/apache.conf.local.html')

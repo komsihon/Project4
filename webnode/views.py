@@ -36,18 +36,14 @@ POST_PER_PAGE = 5
 
 class TemplateSelector(object):
     def get_template_names(self):
-        s = get_service_instance()
-        since = datetime.datetime(2016, 1, 1, 0, 0, 0)
-        try:
-            improve_service = Service.objects.get(project_name_slug='improve')
-        except Service.DoesNotExist:
-            pass
-        else:
-            since = improve_service.since
-        tokens = self.template_name.split('/')
-        if s.project_name_slug == 'improve' or s.since >= since:
-            tokens.insert(1, 'improve')
-        return ['/'.join(tokens)]
+        config = get_service_instance().config
+        if config.theme and config.theme.template.slug != "":
+            if config.theme.template.slug == 'optimum':
+                config.theme.template.slug = "improve"
+            tokens = self.template_name.split('/')
+            tokens.insert(1, config.theme.template.slug)
+            return ['/'.join(tokens)]
+        return [self.template_name]
 
 
 class Home(TemplateSelector, TemplateView):
@@ -62,7 +58,7 @@ class Home(TemplateSelector, TemplateView):
         return context
 
 
-class AdminHome(TemplateView):
+class AdminHome(TemplateSelector, TemplateView):
     template_name = 'admin_home.html'
 
 
@@ -73,7 +69,7 @@ class ItemDetails(TemplateSelector, TemplateView):
         context = super(ItemDetails, self).get_context_data(**kwargs)
         slug = kwargs['slug']
         category_slug = kwargs['category_slug']
-        category = ItemCategory.objects.get(slug=category_slug, is_active=True)
+        category = ItemCategory.objects.get(slug=category_slug)
         page_item = Item.objects.get(slug=slug, category=category, visible=True)
         tags = page_item.tags
         tag_list = tags.split(' ')
@@ -90,32 +86,15 @@ class ItemDetails(TemplateSelector, TemplateView):
 
         random.shuffle(suggestions)
         context['item'] = page_item
-        context['suggestions'] = suggestions[:4]
+        context['page_suggestions'] = suggestions[:4]
         context['blog_suggestions'] = blog_suggestions[:4]
         context['flat_pages'] = FlatPage.objects.all()
         return context
 
 
-class Portfolio(TemplateSelector, TemplateView):
-    template_name = 'webnode/portfolio.html'
-    #
-    # def get_context_data(self, **kwargs):
-    #     context = super(Portfolio, self).get_context_data(**kwargs)
-    #     category_list = []
-    #     smart_portfolio = SmartCategory.objects.get(pk=settings.PORTFOLIO_ID)
-    #     smartPortfolio = grab_item_list_from_porfolio(smart_portfolio, None)
-    #     context['smart_portfolio'] = smartPortfolio
-    #     for category_id in smart_portfolio.items_fk_list:
-    #         category = ItemCategory.objects.get(pk=category_id)
-    #         items_Count = Item.objects.filter(category=category).count()
-    #         if items_Count > 0:
-    #             category_list.append(category)
-    #     context['category_list'] = category_list
-    #     return context
-
-
 class ItemList(TemplateSelector, TemplateView):
     template_name = 'webnode/item_list.html'
+    # template_name = 'webnode/dreamer/item_list.html'
 
     def get_context_data(self, **kwargs):
         context = super(ItemList, self).get_context_data(**kwargs)
@@ -139,12 +118,20 @@ class ItemList(TemplateSelector, TemplateView):
 
 
 class FlatPageView(TemplateSelector, TemplateView):
-    template_name = 'webnode/about.html'
+    template_name = 'webnode/flat_page.html'
 
     def get_context_data(self, **kwargs):
         context = super(FlatPageView, self).get_context_data(**kwargs)
         context['page'] = get_object_or_404(FlatPage, url=kwargs['url'])
         return context
+
+
+class Registration(TemplateSelector, TemplateView):
+    template_name = 'webnode/registration.html'
+
+
+class appSignIn(TemplateSelector, TemplateView):
+    template_name = 'webnode/app_login.html'
 
 
 def grab_item_list_from_smart_category(smart_category, page):

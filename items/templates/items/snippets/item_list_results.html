@@ -1,4 +1,4 @@
-{% load i18n staticfiles humanize media_from_provider %}
+{% load i18n staticfiles humanize %}
     <ul class="object-list">
     {% for item in objects_page.object_list %}
         <li class="ik-li img-lg item" id="{{ item.id }}" data-id="{{ item.id }}"
@@ -6,7 +6,7 @@
             {% if item.retail_price %}data-retail_price="{{ item.retail_price }}{% endif %}">
             {% url 'items:change_item' item.id as item_url %}
             {% if item.image.name %}
-                <a {% if not request.GET.smart_link %}href="{{ item_url }}"{% endif %} class="image" style="background-image: url({{ item.image.small_url|from_provider:item.provider }})"></a>
+                <a {% if not request.GET.smart_link %}href="{{ item_url }}"{% endif %} class="image" style="background-image: url({{ item.image.small_url}})"></a>
             {% else %}
                 <a {% if not request.GET.smart_link %}href="{{ item_url }}"{% endif %} class="image" style="background-image: url({% static 'ikwen/img/no_photo.jpg' %})"></a>
             {% endif %}

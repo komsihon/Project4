@@ -221,98 +221,6 @@ class KakoViewsTestCase(unittest.TestCase):
         self.assertEqual(items[0]['name'], 'Mutzig')
 
     @override_settings(IKWEN_SERVICE_ID='56eb6d04b37b3379b531b103')
-    def test_do_import_items(self):
-        """
-        Importing items merely copies a list of items from the provider database to the retailer database.
-        Retailer profile and Member object are copied to the provider's database and vice versa.
-        Every imported item must have the field is_retailed=True.
-        """
-        call_command('loaddata', 'wn_members.yaml', database=UMBRELLA)
-        copy_service_and_config_to_default_db()
-        service = Service.objects.using(UMBRELLA).get(pk='56eb6d04b37b3379b531b102')
-        add_database_to_settings(service.database)
-        Item.objects.using(service.database).all().delete()
-        call_command('loaddata', 'wn_profiles.yaml', database=service.database)
-        call_command('loaddata', 'items.yaml', database=service.database)
-        self.client.login(username='member3', password='admin')
-        response = self.client.get(reverse('items:do_import_items'),
-                                   {'provider_slug': 'les-brasseries-du-cameroun',
-                                    'provider_id': '56922874b37b33706b51f002',
-                                    'item_ids': '55d1fa8feb60008099bd4152,55d1fa8feb60008099bd4153'})
-        self.assertEqual(response.status_code, 200)
-        response = json.loads(response.content)
-        self.assertTrue(response['success'])
-        self.assertEqual(Item.objects.using('default').all().count(), 2)
-        Member.objects.using(service.database).get(username='member3')  # Member must be in Provider's database
-        OperatorProfile.objects.using(service.database).get(pk='56922874b37b33706b51f003')  # Retailer must be in Provider's database
-        Service.objects.using(service.database).get(pk='56eb6d04b37b3379b531b103')  # Service must be in Provider's database
-        for item in Item.objects.using(service.database).filter(pk__in=['55d1fa8feb60008099bd4152', '55d1fa8feb60008099bd4153']):
-            self.assertTrue(item.is_retailed)
-        from pymongo import Connection
-        cnx = Connection()
-        cnx.drop_database(service.database)
-
-    @override_settings(IKWEN_SERVICE_ID='56eb6d04b37b3379b531b103')
-    def test_do_import_items_with_unauthorized_member(self):
-        """
-        Unauthorized member cannot import item
-        """
-        copy_service_and_config_to_default_db()
-        response = self.client.get(reverse('items:do_import_items'))
-        self.assertEqual(response.status_code, 302)
-
-    @override_settings(IKWEN_SERVICE_ID='56eb6d04b37b3379b531b103')
-    def test_update_item_retail_price_with_modification_allowed(self):
-        """
-        Updating retail price works only when modification is allowed
-        """
-        copy_service_and_config_to_default_db()
-        call_command('loaddata', 'wn_members.yaml', database=UMBRELLA)
-        call_command('loaddata', 'items.yaml')
-        self.client.login(username='member3', password='admin')
-        response = self.client.get(reverse('items:update_item_retail_price'),
-                                   {'item_id': '55d1fa8feb60008099bd4152', 'price': '500'})
-        self.assertEqual(response.status_code, 200)
-        response = json.loads(response.content)
-        self.assertTrue(response['success'])
-        self.assertEqual(Item.objects.get(pk='55d1fa8feb60008099bd4152').retail_price, 500)
-
-    @override_settings(IKWEN_SERVICE_ID='56eb6d04b37b3379b531b103')
-    def test_update_item_retail_price_with_new_price_bigger_than_max_price(self):
-        """
-        Retail price is set to max_price if new price is bigger than the max_price set by provider.
-        """
-        copy_service_and_config_to_default_db()
-        call_command('loaddata', 'wn_members.yaml', database=UMBRELLA)
-        call_command('loaddata', 'items.yaml')
-        self.client.login(username='member3', password='admin')
-        response = self.client.get(reverse('items:update_item_retail_price'),
-                                   {'item_id': '55d1fa8feb60008099bd4152', 'price': '600'})
-        self.assertEqual(response.status_code, 200)
-        response = json.loads(response.content)
-        self.assertTrue(response['success'])
-        self.assertEqual(Item.objects.get(pk='55d1fa8feb60008099bd4152').retail_price, 500)
-
-    @override_settings(IKWEN_SERVICE_ID='56eb6d04b37b3379b531b103')
-    def test_update_item_retail_price_with_modification_not_allowed(self):
-        """
-        Updating retail price works only when modification is allowed
-        """
-        copy_service_and_config_to_default_db()
-        call_command('loaddata', 'items.yaml')
-        item = Item.objects.get(pk='55d1fa8feb60008099bd4152')
-        item.retail_price_is_modifiable = False
-        item.save()
-        self.client.login(username='member3', password='admin')
-        response = self.client.get(reverse('items:update_item_retail_price'),
-                                   {'item_id': '55d1fa8feb60008099bd4152', 'price': '500'})
-        self.assertEqual(response.status_code, 200)
-        response = json.loads(response.content)
-        self.assertTrue(response['success'])
-        self.assertEqual(item.retail_price, 450)
-
-
-    @override_settings(IKWEN_SERVICE_ID='56eb6d04b37b3379b531b103')
     def test_AddItemView(self):
         """
         AddItemView must return HTTP 200 with or without a item, and return HTTP 302 if user unauthorized
@@ -387,30 +295,6 @@ class KakoViewsTestCase(unittest.TestCase):
         self.assertEqual(item.summary, 'Some summary')
         self.assertEqual(item.description, 'Some description')
 
-    @override_settings(IKWEN_SERVICE_ID='56eb6d04b37b3379b531b102',
-                       IS_PROVIDER=True)
-    def test_submit_item_with_existing_item_being_retailed(self):
-        """
-        submit_item view redirects to the add_view page without actually updating item information
-        if a provider attemps to update information of a item being retailed.
-        """
-        call_command('loaddata', 'wn_members.yaml', database=UMBRELLA)
-        copy_service_and_config_to_default_db()
-        service = Service.objects.using(UMBRELLA).get(pk='56eb6d04b37b3379b531b102')
-        add_database_to_settings(service.database)
-        call_command('loaddata', 'items.yaml')
-        self.client.login(username='member2', password='admin')
-        item = Item.objects.get(pk='55d1fa8feb60008099bd4152')
-        item.is_retailed = True
-        item.save()
-        p_dict = item.__dict__
-        p_dict['category'] = p_dict['category_id']
-        p_dict['retail_price'] = 500
-        response = self.client.post(reverse('items:change_item', args=('55d1fa8feb60008099bd4152', )), p_dict)
-        self.assertIsNotNone(response.context['error'])
-        item = Item.objects.get(pk='55d1fa8feb60008099bd4152')
-        self.assertEqual(item.retail_price, 450)
-
     @override_settings(IKWEN_SERVICE_ID='56eb6d04b37b3379b531b103')
     def test_submit_item_with_new_service(self):
         """
@@ -481,7 +365,7 @@ class KakoViewsTestCase(unittest.TestCase):
         call_command('loaddata', 'wn_operators_configs.yaml')
         call_command('loaddata', 'categories.yaml')
         call_command('loaddata', 'items.yaml')
-        call_command('loaddata', 'smart_objects.yaml')
+        call_command('loaddata', 'wn_smart_objects.yaml')
         obj = SmartCategory.objects.get(pk='56a9b37b3301e0706b549224')
         obj.items_count = 1
         obj.items_fk_list.append('55d1fa8feb60008099bd4152')
@@ -504,7 +388,7 @@ class KakoViewsTestCase(unittest.TestCase):
         call_command('loaddata', 'wn_setup_data.yaml')
         call_command('loaddata', 'wn_operators_configs.yaml')
         call_command('loaddata', 'categories.yaml')
-        call_command('loaddata', 'smart_objects.yaml')
+        call_command('loaddata', 'wn_smart_objects.yaml')
         obj = SmartCategory.objects.get(pk='56a9b37b3301e0706b549223')
         obj.items_count = 1
         obj.items_fk_list.append('569228a9b37b3301e0706b52')
@@ -515,34 +399,6 @@ class KakoViewsTestCase(unittest.TestCase):
         smart_category = SmartCategory.objects.get(pk='56a9b37b3301e0706b549223')
         self.assertEqual(smart_category.items_count, 0)
         self.assertListEqual(smart_category.items_fk_list, [])
-
-    @override_settings(IKWEN_SERVICE_ID='56eb6d04b37b3379b531b103')
-    def test_do_import_items_from_spreadsheet_with_unauthorized_member(self):
-        """
-        Unauthorized member cannot import item
-        """
-        copy_service_and_config_to_default_db()
-        response = self.client.get(reverse('items:do_import_items_from_spreadsheet'))
-        self.assertEqual(response.status_code, 302)
-
-    @override_settings(IKWEN_SERVICE_ID='56eb6d04b37b3379b531b103',
-                       MEDIA_ROOT='')
-    def test_do_import_items_from_spreadsheet(self):
-        """
-        Importing items merely pulls a list of items from an Excel file into the database
-        """
-        media_root = getattr(settings, 'BASE_DIR') + '/'
-        setattr(settings, 'MEDIA_ROOT', media_root)
-        call_command('loaddata', 'wn_members.yaml', database=UMBRELLA)
-        call_command('loaddata', 'items.yaml')
-        copy_service_and_config_to_default_db()
-        Item.objects.all().delete()
-        self.client.login(username='member3', password='admin')
-        response = self.client.get(reverse('items:do_import_items_from_spreadsheet'), {'upload_id': '56eb6d779b33b531e09104b1'})
-        response = json.loads(response.content)
-        self.assertTrue(response['success'])
-        self.assertEqual(Item.objects.all().count(), 2)
-
 
     @override_settings(IKWEN_SERVICE_ID='56eb6d04b37b3379b531b102',
                        IS_PROVIDER=True, IS_RETAILER=False,
@@ -571,64 +427,3 @@ class KakoViewsTestCase(unittest.TestCase):
         member3 = Member.objects.using(UMBRELLA).get(username='member3')
         self.assertEqual(member3.personal_notices, 1)
         self.assertEqual(ConsoleEvent.objects.using(UMBRELLA).filter(member=member3).count(), 1)
-
-    @override_settings(IKWEN_SERVICE_ID='56eb6d04b37b3379b531b107', IS_BANK=True, LOCAL_DEV=False,
-                       EMAIL_BACKEND='django.core.mail.backends.filebased.EmailBackend',
-                       EMAIL_FILE_PATH='test_emails/items/')
-    def test_load_item_from_url_with_unregistered_partner(self):
-        """
-        Items from unregistered partner cannot be loaded.
-        """
-        for alias in ('default', 'test_kc_tecnomobile'):
-            call_command('loaddata', 'wn_setup_data.yaml', database=alias)
-            call_command('loaddata', 'wn_operators_configs.yaml', database=alias)
-        call_command('loaddata', 'categories.yaml', database='test_kc_tecnomobile')
-        call_command('loaddata', 'items.yaml', database='test_kc_tecnomobile')
-        Service.objects.filter(project_name='tecnomobile').delete()
-        OperatorProfile.objects.filter(company_name='Tecno Mobile Telecom').delete()
-
-        url = 'http://tecnomobile.ikwen.com/phones-and-tablets/samsung-galaxy-s7'
-        self.client.login(username='member7', password='admin')
-        response = self.client.get(reverse('items:load_item_from_url'), {'url': url})
-        response = json.loads(response.content)
-        self.assertEqual(response['error'], 'You must add Tecno Mobile Telecom as a Partner Merchant to import his items.')
-
-    @override_settings(IKWEN_SERVICE_ID='56eb6d04b37b3379b531b107', IS_BANK=True, LOCAL_DEV=False,
-                       EMAIL_BACKEND='django.core.mail.backends.filebased.EmailBackend',
-                       EMAIL_FILE_PATH='test_emails/items/')
-    def test_load_item_from_url_with_registered_partner(self):
-        """
-        Retrieves item an merchant based on URL of item
-        """
-        for alias in ('default', 'test_kc_tecnomobile'):
-            call_command('loaddata', 'wn_setup_data.yaml', database=alias)
-            call_command('loaddata', 'wn_operators_configs.yaml', database=alias)
-        call_command('loaddata', 'categories.yaml', database='test_kc_tecnomobile')
-        call_command('loaddata', 'items.yaml', database='test_kc_tecnomobile')
-        url = 'http://tecnomobile.ikwen.com/phones-and-tablets/samsung-galaxy-s7'
-        self.client.login(username='member7', password='admin')
-        response = self.client.get(reverse('items:load_item_from_url'), {'url': url})
-        response = json.loads(response.content)
-        self.assertEqual(response['item']['slug'], 'samsung-galaxy-s7')  # Item has been correctly retrieved
-
-    @override_settings(IKWEN_SERVICE_ID='56eb6d04b37b3379b531b107', IS_BANK=True, LOCAL_DEV=False,
-                       EMAIL_BACKEND='django.core.mail.backends.filebased.EmailBackend',
-                       EMAIL_FILE_PATH='test_emails/items/')
-    def test_save_item_from_url_with_registered_partner(self):
-        """
-        Retrieves item an merchant based on URL of item
-        """
-        for alias in ('umbrella', 'test_kc_tecnomobile'):
-            call_command('loaddata', 'wn_members.yaml', database=alias)
-        for alias in ('default', 'test_kc_tecnomobile'):
-            call_command('loaddata', 'wn_setup_data.yaml', database=alias)
-            call_command('loaddata', 'wn_operators_configs.yaml', database=alias)
-        call_command('loaddata', 'categories.yaml', database='test_kc_tecnomobile')
-        call_command('loaddata', 'items.yaml', database='test_kc_tecnomobile')
-        Item.objects.all().delete()
-
-        url = 'http://tecnomobile.ikwen.com/phones-and-tablets/samsung-galaxy-s7'
-        self.client.login(username='member7', password='admin')
-        response = self.client.get(reverse('items:save_item_from_url'), {'url': url})
-        self.assertEqual(response.status_code, 302)
-        Item.objects.get(slug='samsung-galaxy-s7')  # Item has been correctly saved locally

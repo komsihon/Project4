@@ -25,6 +25,8 @@
 .blog-suggestions strong {font-size: 20px; float: left}
 .blog-suggestions a {color: #4e4e4e; float: left; font-size: 18px; text-align: left;}
 .blog-suggestions .suggestions {float: left; clear: both; margin-top: 30px}
+.blog-suggestions .suggestion img {max-height: 130px}
+.blog-suggestions .suggestion a {text-align: center; margin-top: 15px}
 .post_reply {clear: both}
 
 .feature-wrap img {height: 38%}

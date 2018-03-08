@@ -70,7 +70,7 @@ class ChangeSmartObject(TemplateView):
         else:
             model = SmartCategory
             model_admin = SmartCategoryAdmin
-            fields = ("title", "content_type")
+            fields = ("title", "content_type", "target_url")
         if smart_object_id:
             smart_object = get_object_or_404(model, pk=smart_object_id)
             smart_object.content = [ItemCategory.objects.get(pk=pk) for pk in smart_object.items_fk_list]
@@ -114,6 +114,7 @@ class ChangeSmartObject(TemplateView):
             order = form.cleaned_data.get('order_of_appearance')
             display = form.cleaned_data.get('display')
             image_url = request.POST.get('image_url')
+            target_url = request.POST.get('target_url')
             cta = request.POST.get('cta')
             if not smart_object:
                 smart_object = model()
@@ -130,7 +131,21 @@ class ChangeSmartObject(TemplateView):
                 smart_object.display = display
             if cta:
                 smart_object.cta = cta
+            if target_url:
+                smart_object.target_url = target_url
             smart_object.save()
+            if object_type == BANNER:
+                pass
+            else:
+                try:
+                    ItemCategory.objects.get(slug=slug)
+                except ItemCategory.DoesNotExist:
+                    item_category = ItemCategory(name=title, slug=slug)
+                    item_category.save()
+                    smart_object.items_fk_list.append(item_category.id)
+                    smart_object.save()
+                else:
+                    pass
 
             if image_url:
                 if not smart_object.image.name or image_url != smart_object.image.url:
@@ -287,7 +302,10 @@ def delete_smart_object(request, *args, **kwargs):
         except Banner.DoesNotExist:
             try:
                 menu = SmartCategory.objects.get(pk=pk)
-                ItemCategory.objects.get(slug=menu.slug).delete()
+                try:
+                    ItemCategory.objects.get(slug=menu.slug).delete()
+                except ItemCategory.DoesNotExist:
+                    pass
                 menu.delete()
                 deleted.append(pk)
             except SmartCategory.DoesNotExist:

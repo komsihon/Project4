@@ -24,7 +24,7 @@
 
 
 .cta {border: 2px solid; color: #fff; font-size: 24px; padding: 8px 30px}
-.home-section-cta .cta {border-color: #ccc;color: #aaa}
+.home-section-cta .cta {border-color: #0e0e0e;color: #0e0e0e}
 .home-section-cta .cta:hover {border-color: #f4a135; color: #f4a135;}
 
 .veil {background: rgba(0, 0, 0, .6); height: 100%; position: absolute; width: 100%}
@@ -47,6 +47,8 @@
 .blog-suggestions a {color: #4e4e4e; float: left; font-size: 18px; text-align: left;}
 .blog-suggestions .suggestions {float: left; clear: both;}
 .blog-suggestions .suggestion {margin-top: 30px}
+.blog-suggestions .suggestion img {max-height: 130px}
+.blog-suggestions .suggestion a {text-align: center; margin-top: 15px}
 .post_reply {clear: both}
 
 .slide .cta:hover, .cta:hover {color: #f4a135}
@@ -54,6 +56,7 @@
 #main-slider .carousel-indicators .active:after {background: #f4a135; border: #f4a135}
 #bottom {border-bottom: 5px solid #f4a135;}
 
+div.item-list-img {background-size: cover; background-position: center; height: 180px; width: 100%}
 
 
         .top-bar {display: none}
@@ -113,7 +116,7 @@
     .features .col-md-3 {float: left; width: 50%}
 }
 
-.feature .item-list {height:350px; overflow: hidden}
+.feature .item-list {height:450px; overflow: hidden}
 
 .navbar-inverse .navbar-nav > li > a {color: #b9b9b9}
 .navbar-inverse .navbar-nav > li > a:hover{background: none; color: #aaa}

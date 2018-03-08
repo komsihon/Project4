@@ -184,7 +184,7 @@ class SmartCategory(SmartObject):
     UPLOAD_TO = 'web/smart_categories'
 
     content_type = models.CharField(max_length=15, choices=SMART_CATEGORY_TYPE_CHOICES,
-                                    help_text=_("Whether this menu points to a page or a list of items."))
+                                    help_text=_("Whether this menu points to a page, a list of items."))
     image = MultiImageField(upload_to=UPLOAD_TO, blank=True, null=True, max_size=500)
     description = models.TextField(blank=True,
                                    help_text=_("Description of the category."))
@@ -193,6 +193,7 @@ class SmartCategory(SmartObject):
                                               "<strong>E.g.:</strong> -20%, -30%, New, etc."))
     appear_in_menu = models.BooleanField(default=False,
                                          help_text=_("Smart Category will appear in main menu if checked."))
+    target_url = models.URLField(blank=True)
 
     def _get_module(self):
         try:

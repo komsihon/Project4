@@ -26,9 +26,9 @@
             <strong>{% trans 'Related posts' %}:</strong>
             <div class="suggestions">
                 {% for post in blog_suggestions %}
-                    <div class="col-sm-6 suggestion">
-                        <a href="{% url 'blog:details'  post.slug %}"  class="col-sm-4"><img  src="{{ post.image.url }}" class="img-responsive" alt=""/></a>
-                        <a href="{% url 'blog:details'  post.slug %}"  class="col-sm-8">{{ post.title }}</a>
+                    <div class="col-sm-4 suggestion">
+                        <a href="{% url 'blog:details'  post.slug %}"><img  src="{{ post.image.url }}" class="img-responsive" alt=""/></a>
+                        <a href="{% url 'blog:details'  post.slug %}" >{{ post.title }}</a>
                     </div>
                 {% endfor %}
             </div>

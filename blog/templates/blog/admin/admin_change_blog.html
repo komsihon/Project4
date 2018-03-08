@@ -7,7 +7,24 @@
 
 {% block head_style %}
     {{ block.super }}
+    <link href="{% static 'ikwen/ajaxuploader/css/fileuploader.css' %}" media="screen" rel="stylesheet" type="text/css" />
     <style>
+        .tpl {display: none}
+        #image-list {background: #EEE; border: dashed 1px #AAA; border-radius: 15px; margin-top: 35px; height: 350px; padding: 15px; overflow-y: auto; width: 1040px}
+        #image-list .media-ctnr {border: solid 1px #ccc; border-radius: 12px; float: left; height: 160px; margin: 10px;padding: 5px; width: 130px}
+        #image-list .media-ctnr:hover {box-shadow: 8px 8px 12px #aaa;}
+        div#image-list .image {background-position: center; background-size: cover; float: left; height: 130px; width: 130px}
+        #image-list .media-ctnr img {border-radius: 10px;max-height: 160px; width: 100%}
+        #image-list .media-ctnr .delete-media {cursor: pointer; font-size: 14px;float: left;padding: 2px 0; text-align: center; width: 100%}
+        #image-list .media-ctnr .delete-media:hover {color: #7a1e31}
+        .qq-upload-button {background:#00aac9; border: 1px solid #37B7CC;border-radius: 2px; color: #fff; padding: 15px 25px; float: left; clear: both; margin-top: 20px;}
+        .qq-upload-success {display: none}
+        #upload-container1 {float: left; clear: both; margin-top: 20px;}
+        #upload-container1 .frame {height: 50px}
+        .qq-upload-button {margin-top: -10px}
+        #image-cntr {float: left; clear: both;}
+        .form-row.form-group {float: left; clear: both}
+
         .verify {border: 1px solid #e74c3c}  {# Highlights form errors (Check performed by javascript) #}
         div#upload-container { float: left; margin-top: 3px; width: 74% }
         div#upload-container .image {background: url('{% static 'ikwen/img/no_photo.png' %}') no-repeat center; background-size: 100%; border: solid 1px #DBE6FF; height: 225px; float: left; margin: 5px; overflow: hidden; width: 280px}
@@ -20,6 +37,20 @@
         .qq-upload-button-hover {box-shadow: none; color: #fff}
         .qq-upload-list {display: none}
     </style>
+    <section id="image-cntr" class="hidden-xs">
+        <div id="image-list" class="">
+            <div class="loading"></div>
+            <div class="media-ctnr frame draggable tpl" draggable="true">
+                <img class="image" />
+                <span class="delete-media">Delete</span>
+            </div>
+        </div>
+        <div id="upload-container1" class="images-uploader">
+            <span class="progress"></span>
+            <div class="frame uploader1"></div>
+        </div>
+    </section>
+
     <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 {#    <script src="{% static 'tinymce/js/tinymce/tinymce.min.js' %}"></script>#}
@@ -100,112 +131,185 @@
             $('.form-row').addClass('form-group');
             $('.form-row input, .form-row select, .form-row textarea').addClass('form-control input-sm');
             $('.form-row textarea').addClass('form-control input-sm');
-                {% if request.GET.name %}
-                    $('#id_title').val("{{ request.GET.name }}");
-                {% endif %}
-                {% if error %}
-                    ikwen.showFloatingNotice("{{ error }}", '', 6);
-                {% endif %}
+            {% if request.GET.name %}
+                $('#id_title').val("{{ request.GET.name }}");
+            {% endif %}
+            {% if error %}
+                ikwen.showFloatingNotice("{{ error }}", '', 6);
+            {% endif %}
 
-                $('form#submit-post').on('change', 'input, textarea', function() {
-                    var post = getLocalPost();
-                    localStorage.setItem('post', JSON.stringify(post));
-                }).submit(function() {
-                    return checkInput();
-                });
-                var pageLoading = true,
-                    post;
-                function getLocalPost() {
-                    post = localStorage.getItem('post') ? JSON.parse(localStorage.getItem('post')):{};
-                    if (pageLoading) {
-                        // Do not override locally saved post with form data upon page loading
-                        pageLoading = false;
-                        return post
-                    }
-                    var photos = [];
-                    if (post != {} && post.photos) photos = post.photos; //Keep a copy of photos objects
-                    var postAsArray = $('form#submit-post').serialize().split('&');
-                    for (var i=0; i<postAsArray.length; i++) {
-                        var elt = postAsArray[i].split('=');
-                        post[elt[0]] = decodeURIComponent(elt[1]).replace(/\+/g, ' ');
-                    }
-                    post.photos = photos; //Then restore the photos objects on the update serialized form
+            $('form#submit-post').on('change', 'input, textarea', function() {
+                var post = getLocalPost();
+                localStorage.setItem('post', JSON.stringify(post));
+            }).submit(function() {
+                return checkInput();
+            });
+            var pageLoading = true,
+                post;
+            function getLocalPost() {
+                post = localStorage.getItem('post') ? JSON.parse(localStorage.getItem('post')):{};
+                if (pageLoading) {
+                    // Do not override locally saved post with form data upon page loading
+                    pageLoading = false;
                     return post
                 }
-                function checkInput() {
-                    var check = true;
-                    $('input.required').each(function() {
-                        if (!(this).val()) {
-                            ikwen.showFloatingNotice("{% trans "Missing information. Please check." %}", '', 6);
-                            $(this).addClass('verify');
-                            check = false;
-                        }
-                    });
-
-                    return check;
+                var photos = [];
+                if (post != {} && post.photos) photos = post.photos; //Keep a copy of photos objects
+                var postAsArray = $('form#submit-post').serialize().split('&');
+                for (var i=0; i<postAsArray.length; i++) {
+                    var elt = postAsArray[i].split('=');
+                    post[elt[0]] = decodeURIComponent(elt[1]).replace(/\+/g, ' ');
                 }
-                var uploader = new qq.FileUploader({
-                    action: "{% url 'blog:post_photo_uploader' %}",
-                    element: $('div#upload-container .uploader')[0],
-                    buttonText: "{% trans "Upload cover" %}",
-                    multiple: false,
-                    onProgress: function(id, fileName, loaded, total) {
-                        var ratio = loaded / total,
-                            percent = ratio * 100;
-                        $('div#upload-container .image .progress').animate({width: percent + '%'});
-                        if (ratio == 1) $('div#upload-container .image .spinner').show()
-                    },
-                    onComplete: function(id, fileName, responseJSON) {
-                        if(responseJSON.success) {
-                            var imageUrl = responseJSON.url,
-                                img = new Image(),
-                                post = getLocalPost();
-                            img.onload = function() {
-                                $('div#upload-container .image').css('background-color', "#fff")  // Causes the placeholder image to disappear
-                                        .css('background-image', "url('" + imageUrl +"')")
-                                        .find('.progress, .spinner').hide();
-                            };
-                            img.src = imageUrl;
-                            post.image_url = imageUrl;
-                            $('#image_url').val(imageUrl);
-                            localStorage.setItem('post', JSON.stringify(post));
-                        } else {
-                            alert("upload failed!");
-                        }
-                    },
-                    params: {
-                        'csrf_token': '{{ csrf_token }}',
-                        'csrf_name': 'csrfmiddlewaretoken',
-                        'csrf_xname': 'X-CSRFToken'
+                post.photos = photos; //Then restore the photos objects on the update serialized form
+                return post
+            }
+            function checkInput() {
+                var check = true;
+                $('input.required').each(function() {
+                    if (!(this).val()) {
+                        ikwen.showFloatingNotice("{% trans "Missing information. Please check." %}", '', 6);
+                        $(this).addClass('verify');
+                        check = false;
                     }
                 });
 
-
-                {% if post %}
-                    $('#image_url').val("{{ post.get_image_url }}");
-                {% else %}
-                    post = getLocalPost();  // Post from an unterminated submit
-                    if (post) {
-                        $('#id_category').val(post.category_id);
-                        $('#id_name').val(post.title);
-                        $('#id_summary').val(post.summary);
-                        $('#image_url').val(post.image_url);
-                        $('#id_entry').val(post.entry);
-                        $('#id_media_link').val(post.id_media_link);
-                        $('#id_tags').val(post.id_tags);
-                        $('#id_publish').prop('checked', post.publish);
-
+                return check;
+            }
+            var uploader = new qq.FileUploader({
+                action: "{% url 'blog:post_photo_uploader' %}",
+                element: $('div#upload-container .uploader')[0],
+                buttonText: "{% trans "Upload cover" %}",
+                multiple: false,
+                onProgress: function(id, fileName, loaded, total) {
+                    var ratio = loaded / total,
+                        percent = ratio * 100;
+                    $('div#upload-container .image .progress').animate({width: percent + '%'});
+                    if (ratio == 1) $('div#upload-container .image .spinner').show()
+                },
+                onComplete: function(id, fileName, responseJSON) {
+                    if(responseJSON.success) {
+                        var imageUrl = responseJSON.url,
+                            img = new Image(),
+                            post = getLocalPost();
+                        img.onload = function() {
+                            $('div#upload-container .image').css('background-color', "#fff")  // Causes the placeholder image to disappear
+                                    .css('background-image', "url('" + imageUrl +"')")
+                                    .find('.progress, .spinner').hide();
+                        };
+                        img.src = imageUrl;
+                        post.image_url = imageUrl;
+                        $('#image_url').val(imageUrl);
+                        localStorage.setItem('post', JSON.stringify(post));
+                    } else {
+                        alert("upload failed!");
                     }
-                {% endif %}
-{##}
-{#                var $new = $('<option value="new">{% trans "New" %} ...</option>');#}
-{#                $new.appendTo('#id_category');#}
-{#                $('#id_category').on('change', function() {#}
-{#                    var val = $(this).val();#}
-{#                    if (val === 'new') {#}
-{#                        window.location = "{% url 'kako:change_category' %}"#}
-{#                    }#}
-{#                });#}
+                },
+                params: {
+                    'csrf_token': '{{ csrf_token }}',
+                    'csrf_name': 'csrfmiddlewaretoken',
+                    'csrf_xname': 'X-CSRFToken'
+                }
+            });
+
+
+            {% if post %}
+                $('#image_url').val("{{ post.get_image_url }}");
+            {% else %}
+                post = getLocalPost();  // Post from an unterminated submit
+                if (post) {
+                    $('#id_category').val(post.category_id);
+                    $('#id_name').val(post.title);
+                    $('#id_summary').val(post.summary);
+                    $('#image_url').val(post.image_url);
+                    $('#id_entry').val(post.entry);
+                    $('#id_media_link').val(post.id_media_link);
+                    $('#id_tags').val(post.id_tags);
+                    $('#id_publish').prop('checked', post.publish);
+
+                }
+            {% endif %}
+
+
+            $('.qq-upload-drop-area').remove()
+            $('textarea').addClass('dropper')
+            var endpoint = "{% url 'blog:get_media' %}";
+            $.getJSON(endpoint, function(data) {
+                $('body, button.confirm').css('cursor','default');
+                if (data.error) {
+                    $('div#top-notice-ctnr span').html(data.error).addClass('failure');
+                    $('#top-notice-ctnr').fadeIn().delay(5000).fadeOut();
+                } else {
+                    populateMedia(data.media_list)
+                    $('#image-cntr').insertAfter('textarea')
+                }
+                return false
+                });
+            function populateMedia(media) {
+                if (media.length <= 0) {
+                    var $emptyRow = $('<div class="empty-grid" colspan="10">No data found</div>')
+                    $emptyRow.insertBefore('.media-ctnr.tpl')
+                    return
+                }
+                var $list = $('<div></div>')
+                for (var i = 0; i < media.length; i++) {
+                    var $newRow = $('#image-list .media-ctnr.tpl').clone().removeClass('tpl')
+                    $newRow = applyMediaTemplate($newRow, media[i]).show()
+                    $list.append($newRow)
+                }
+                $list.children().insertBefore('#image-list .media-ctnr.tpl')
+
+            }
+            function applyMediaTemplate($tpl, media){
+                $tpl.attr('filename', media);
+                $tpl.find('.image').attr('src', media);
+                return $tpl
+            }
+            var uploader1 = new qq.FileUploader({
+                action: "{% url 'ikwen:upload_image' %}",
+                element: $('div#upload-container1 .uploader1')[0],
+                buttonText: "Upload image",
+                multiple: false,
+                onSubmit: function(id, fileName) {
+                    var uploadId = 'u' + id;
+                },
+                onProgress: function() {
+                    $('div#image-list .loading').show();
+                },
+                onComplete: function(id, fileName, responseJSON) {
+                    if(responseJSON.success) {
+                        var photo = {id: responseJSON.id, url: responseJSON.path},
+                            img = new Image();
+                        img.onload = function() {
+                            var $newRow = $('#image-list .media-ctnr.tpl').clone().removeClass('tpl')
+                            $newRow.find('.image').attr('src', photo.url);
+                            $('div#image-list .loading').hide();
+                            $newRow.insertBefore('#image-list .media-ctnr.tpl').show()
+                        };
+                        img.src = photo.url;
+                    } else {
+                        alert("upload failed!");
+                    }
+                },
+                params: {
+                    'csrf_token': '{{ csrf_token }}',
+                    'is_tiny_mce': 'yes',
+                    'csrf_name': 'csrfmiddlewaretoken',
+                    'csrf_xname': 'X-CSRFToken',
+                }
+            });
+
+            $('body').on('click', '#image-list .media-ctnr .delete-media', function() {
+                var response = confirm("Do you realy want to delete this image ?");
+                if (response !== true) return
+                else {
+                    var filename = $(this).parent('.media-ctnr').find('img').attr('src');
+                    $.getJSON('{% url 'blog:delete_tinymce_photo' %}', {filename: filename});
+                    $(this).fadeOut('normal', function() {
+                        $(this).parent().remove()
+                    });
+                }
+            });
+            $('.qq-upload-drop-area').remove()
         })()
     </script>
 {% endblock %}

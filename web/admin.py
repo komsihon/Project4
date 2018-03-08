@@ -7,7 +7,7 @@ class BannerAdmin(admin.ModelAdmin):
 
 
 class SmartCategoryAdmin(admin.ModelAdmin):
-    fields = ('title', 'content_type',)
+    fields = ('title', 'content_type', 'target_url', )
 
 
 class HomepageSectionAdmin(admin.ModelAdmin):

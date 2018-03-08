@@ -57,6 +57,12 @@
                         </select>
                     </div>
                 </div>
+{#                <div class="form-row field-link form-group{% if smart_object.content_type == 'Link' %} ok{% endif %}">#}
+{#                    <div>#}
+{#                        <label class="required" for="id_flatpage">Page URL:</label>#}
+{#                        <input type="url" id="id_pageurl" name="page_url" class="form-control input-sm">#}
+{#                    </div>#}
+{#                </div>#}
                 <section class="photos" style="width: 100%">
                     <label class="required" style="float: left; width: 100%">{% trans "Cover image" %}</label>
                     <div id="upload-container">
@@ -94,6 +100,10 @@
                 if (val === 'FlatPage') {
                     $('.field-page').show();
                 } else $('.field-page').hide();
+
+                if (val === 'Link') {
+                    $('.field-target_url').show();
+                } else $('.field-target_url').hide();
             });
             {% for msg in messages %}
                 {% if msg.tags == 'success' %}

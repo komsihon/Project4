@@ -10,6 +10,7 @@
     <link href="{% static 'ikwen/css/uploader-single.css' %}" media="screen" rel="stylesheet" type="text/css" />
     <style>
         section.details {float: left; margin-top: 15px}
+        .field-cta {clear: both}
         {% if smart_object %}
             {% if smart_object.content_type == 'Flat' %}
                 .field-menu {display: none}
@@ -48,6 +49,7 @@
             summaryProperties['toolbar'] = 'undo redo | bold italic underline | bullist numlist outdent indent';
 
             descriptionProperties['selector'] = '#id_description';
+            descriptionProperties['fontsize_formats'] = "8pt 10pt 12pt 14pt 18pt 24pt 36pt 48pt 72pt 80pt";
             descriptionProperties['height'] = 300;
             descriptionProperties['toolbar'] = 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image';
             if ($(window).width() >= 768) {

@@ -29,8 +29,8 @@
 - model: core.application
   pk: 56eb6d04b37b3379b531a001
   fields:
-    name: Kakocase
-    slug: kakocase
+    name: WebNode
+    slug: webnode
     logo: app_logos/kakocase_logo.png
     url: ''
     base_monthly_cost: 5000

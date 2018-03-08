@@ -1,12 +1,12 @@
-{% extends "blog/base.html" %}
+{% extends "blog/dreamer/base.html" %}
 {% load i18n %}
 {% load staticfiles  auth_tokens %}
 {% block meta %}
     <meta name="abstract" content="ikwen blog "/>
 {% endblock %}
-{% block page_title %} <title>{% trans "Search" %}</title> {% endblock %}
+{% block page_title %} <title>{% trans "Search" %} | {{ radix }}</title> {% endblock %}
 {% block custom_head %}
-    <meta property="og:image" content="{{ fb_share_item.media.url }}"/>
+    <meta property="og:image" content="{{ fb_share_item.image.url }}"/>
     <style>
         .alert {border: 1px solid transparent; border-radius: 4px; margin-bottom: 20px; padding: 15px; width: 760px;}
         .alert-danger {color: #b94a48; background-color: #f2dede; border-color: #ebccd1}
@@ -18,12 +18,10 @@
 {% endblock %}
 
 {% block page_header %}
-<div class="center"><p class="lead">Results found for <b>"{{ radix }}"</b></p></div>
+    <div class="center search-title"><p class="lead">Results found for <b>{{ radix }}</b></p></div>
 {% endblock %}
 {% block blog_content %}
     {% include 'snippets/fb_sdk.html' %}
-
-
     {% if entries %}
         {% for entry in items_paginated %}
             <div class="blog-item">

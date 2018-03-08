@@ -1,0 +1,51 @@
+{% extends 'webnode/dreamer/details_base.html' %}
+{% load i18n static auth_tokens %}
+{% block meta %}
+    <meta name="abstract" content="{{ item.name }} "/>
+    <meta property="og:title" content="{{ item.name }} {% trans "sur" %} "/>
+    <meta property="og:description" content="{{ item.description }}"/>
+    <meta property="og:image" content="{{ item.get_photos_url_list.0 }}"/>
+{% endblock %}
+{% block page_title %} <title>{{ service.project_name }} - {{ item.name }}</title> {% endblock %}
+
+{% block banner %}
+    {% if  item.image %}
+        <div class="page-banner" style="background-image: url({{ item.get_photos_url_list.0.original }})"></div>
+    {% endif %}
+{% endblock %}
+{% block content %}
+    {% include 'snippets/fb_sdk.html' %}
+    <div class="container item-detail">
+        <div class="blog-item">
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 page-content">
+                    <h1>{{ item.name  }}</h1>
+                    <div>{{ item.description | safe }}</div>
+                </div>
+            </div>
+        </div><!--/.blog-item-->
+        {% if blog_suggestions %}
+            <div class="blog-suggestions">
+                <strong>{% trans 'Related posts' %}:</strong>
+                <div class="suggestions">
+                    {% for post in blog_suggestions %}
+                        <div class="col-sm-4 suggestion">
+                            <a href="{% url 'blog:details'  post.slug %}"><img  src="{{ post.image.url }}" class="img-responsive" alt=""/></a>
+                            <a href="{% url 'blog:details'  post.slug %}" >{{ post.title }}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        <div class="pull-left share text-center">
+            <h2 style="text-align: left">{% trans "Share" %}</h2>
+            <ul>
+                <li><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"><i class="fa fa-facebook"></i></a></li>
+                <li><a target="_blank" href="https://twitter.com/share?url={{ request.build_absolute_uri }}"><i class="fa fa-twitter"></i></a></li>
+                <li><a target="_blank" href="https://plus.google.com/share?url={{ request.build_absolute_uri }}"><i class="fa fa-google-plus"></i> </a></li>
+            </ul>
+        </div>
+    </div>
+
+
+{% endblock %}

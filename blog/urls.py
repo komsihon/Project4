@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import permission_required
 
 from ikwen_webnode.blog.views import PostDetails, Search, PostPerCategory, PostsList, save_comment, AdminPostHome, \
     save_post_likes, post_photo_uploader, delete_photo, ListCategory, ChangeCategory, load_posts_for_homepage, \
-    ChangePost, CommentList, delete_comment_object, toggle_object_attribute
+    ChangePost, CommentList, delete_comment_object, toggle_object_attribute, get_media, delete_tinyMCE_photo
 from ikwen_webnode.webnode.views import AdminHome
 
 
@@ -38,5 +38,6 @@ urlpatterns = patterns(
     url(r'^save_post_likes$', save_post_likes, name='save_post_likes'),
     url(r'^delete_promo_object$', delete_comment_object, name='delete_promo_object'),
     url(r'^toggle_object_attribute$', toggle_object_attribute, name='toggle_object_attribute'),
-
+    url(r'^get_media$', get_media, name='get_media'),
+    url(r'^delete_tinymce_photo', delete_tinyMCE_photo, name='delete_tinymce_photo'),
 )

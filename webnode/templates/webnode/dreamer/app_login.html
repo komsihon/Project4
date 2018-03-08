@@ -1,0 +1,56 @@
+{% extends 'webnode/dreamer/base.html' %}
+{% load i18n static user_agents humanize auth_tokens %}
+
+{% block page_title %}<title>{{ service.project_name }} - {% trans "Home" %}</title>{% endblock %}
+
+{% block head_style %}
+    {{ block.super }}
+    <style>
+        section.form-bg {background-image: url("{% static 'webnode/img/ipad-605439_1920.jpg' %}"); background-position: center; background-size: cover; padding-top: 125px; width: 100%}
+        form {border: thin solid #ccc; border-radius: 4px; padding: 20px; padding-left: 40px;background: #fbfbfb;}
+        fieldset {border-radius: 4px; padding: 20px; padding-left: 40px;background: #fbfbfb;}
+        legend {color: #678;}
+        .form-control {width: 95%;}
+        label small {color: #678 !important;}
+        span.req {color:maroon; font-size: 112%;}
+        h1 {color: #cb0009; text-align: center}
+    </style>
+{% endblock %}
+{% block content %}
+    <section class="form-bg">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    <h1>Login</h1>
+                    <form action="" method="post" id="fileForm" role="form">
+                        <fieldset><legend class="text-center">Valid information is required to register. <span class="req"><small> required *</small></span></legend>
+                            <div class="form-group">
+                                <label for="username"><span class="req">* </span> Login:  <small>This will be your login user name</small> </label>
+                                    <input class="form-control" type="text" name="username" id = "txt" onkeyup = "Validate(this)" placeholder="minimum 6 letters" required />
+                                        <div id="errLast"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password"><span class="req">* </span> Password: </label>
+                                    <input required name="password" type="password" class="form-control inputpass" minlength="4" maxlength="16"  id="pass1" /> </p>
+                            </div>
+                            <div class="form-group">
+                                <input class="btn btn-danger" type="submit" name="submit_reg" value="Submit">
+                            </div>
+                        </fieldset>
+                    </form><!-- ends register form -->
+
+                </div><!-- ends col-6 -->
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function() {
+
+        })()
+    </script>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends 'webnode/dreamer/base.html' %}
+{% load i18n static user_agents humanize auth_tokens %}
+
+{% block page_title %}<title>{{ service.project_name }} - {% trans "Home" %}</title>{% endblock %}
+
+{% block head_style %}
+    {{ block.super }}
+    <style>
+    </style>
+{% endblock %}
+{% block banner %}
+    <section class="fw-section banner">
+        <div class="slideshows">
+            <div class="swiper-container">
+                <!-- Additional required wrapper -->
+                <div class="swiper-wrapper">
+                    <!-- Slides -->
+                    {% for slide in slideshow %}
+                        <div class="swiper-slide">
+                        {% if slide.image.name %}
+                            <div class="">
+                                {% if request|is_mobile %}
+                                    <div class="slide mobile" style="background-image: url({% get_media_prefix %}{{ slide.image.name }})">
+                                        {% if slide.title %}
+                                            <h1 class="text-has-shade">{{ slide.title }}</h1>
+                                        {% endif %}
+                                        {% if slide.cta %}
+                                            <div class="cta">
+                                                <a href="{{ slide.target_url }}" class="button1 has-shade">{{ slide.cta }}</a>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <div class="slide" style="background-image: url({% get_media_prefix %}{{ slide.image.name }})">
+                                        {% if slide.title %}
+                                            <h1 class="text-has-shade">{{ slide.title }}</h1>
+                                        {% endif %}
+                                        {% if slide.cta %}
+                                            <div class="cta">
+                                                <a href="{{ slide.target_url }}" class="button1 has-shade">{{ slide.cta }}</a>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <!-- If we need pagination -->
+                <div class="swiper-pagination"></div>
+
+                <!-- If we need navigation buttons -->
+                <div class="swiper-button-prev hidden-xs"></div>
+                <div class="swiper-button-next hidden-xs"></div>
+
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block content %}
+    {% for section in homepage_section_list %}
+        {{ section.render|safe }}
+    {% endfor %}
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function() {
+            var mySwiper = new Swiper ('.swiper-container', {
+                // Optional parameters
+                direction: 'horizontal',
+                loop: false,
+
+                // If we need pagination
+                pagination: {
+                el: '.swiper-pagination',
+                },
+
+                // Navigation arrows
+                navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+                },
+                autoplay: 5000
+            })
+
+            $('.swiper-container').on('mouseenter', function(e){
+                console.log('stop autoplay');
+                mySwiper.stopAutoplay();
+            })
+             $('.swiper-container').on('mouseleave', function(e){
+                console.log('start autoplay');
+                mySwiper.startAutoplay();
+            })
+        })()
+    </script>
+{% endblock %}

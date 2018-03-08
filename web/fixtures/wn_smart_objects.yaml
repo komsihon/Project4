@@ -5,7 +5,8 @@
     slug: new-trendy
     display: Slide
     image: web/banners/new-trendy.jpg
-    items_fk_list: []
+    target_url: http://ikwen.com
+    cta: go
 
 - model: web.banner
   pk: 56a9b37b3301e0706b549222
@@ -14,22 +15,31 @@
     slug: sales
     display: Slide
     image: web/banners/sales.jpg
-    items_fk_list: []
 
 - model: web.smartcategory
   pk: 56a9b37b3301e0706b549223
   fields:
-    title: New arrivals
-    slug: new-arrivals
-    content_type: Categories
+    title: Collections
+    slug: collections
+    content_type: Flat Page
     image: web/smart_categories/new-arrivals.jpg
     items_fk_list: []
 
 - model: web.smartcategory
   pk: 56a9b37b3301e0706b549224
   fields:
-    title: Trending Designs
-    slug: trending-designs
-    content_type: Products
+    title: Sevices
+    slug: services
+    content_type: Item List
     image: web/smart_categories/trending-designs.jpg
     items_fk_list: []
+
+- model: web.homepagesection
+  pk: 56a9b37b3301e0706b549485
+  fields:
+    title: First Sales
+    slug: first-sales
+    text_position: Center
+    image: web/banners/sales.jpg
+    content_type: flat
+    cta: go
