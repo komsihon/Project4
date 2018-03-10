@@ -53,7 +53,6 @@ class Home(TemplateSelector, TemplateView):
         context = super(Home, self).get_context_data(**kwargs)
         context['slideshow'] = Banner.objects.filter(display=SLIDE, is_active=True).order_by('order_of_appearance')
         context['homepage_section_list'] = HomepageSection.objects.filter(is_active=True).order_by('order_of_appearance')
-        context['flat_pages'] = FlatPage.objects.all()
 
         return context
 
@@ -88,7 +87,6 @@ class ItemDetails(TemplateSelector, TemplateView):
         context['item'] = page_item
         context['page_suggestions'] = suggestions[:4]
         context['blog_suggestions'] = blog_suggestions[:3]
-        context['flat_pages'] = FlatPage.objects.all()
         return context
 
 
@@ -112,7 +110,6 @@ class ItemList(TemplateSelector, TemplateView):
         context['item_list'] = item_list
         context['smart_category'] = smart_category
         context['activate_block_title'] = activate_block_title
-        context['flat_pages'] = FlatPage.objects.all()
         return context
 
 

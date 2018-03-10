@@ -110,6 +110,8 @@ class Banner(SmartObject):
     cta = models.CharField(verbose_name=_("Call To Action"), max_length=30, blank=True,
                            help_text=_('Action you want you visitors to undertake. '
                                        '<em><strong>E.g:</strong> "Buy Now"</em>'))
+    description = models.TextField(blank=True,
+                                   help_text=_("Description of the category."))
     target_url = models.URLField(blank=True)
 
     class Meta:

@@ -1,5 +1,18 @@
 {% extends 'webnode/dreamer/base.html' %}
 {% load static auth_tokens %}
+{% block meta %}
+    {{ block.super }}
+    {% include 'webnode/snippets/item_list_seo.html' %}
+{% endblock %}
+{% block page_title %}<title>{{ smart_category.title }} - {{ service.project_name }}</title>{% endblock %}
+
+{% block seo %}
+    <div class="hidden seo">
+        <h1>{{ smart_category.title }}</h1>
+        <p>{{ smart_category.description }}</p>
+    </div>
+{% endblock %}
+
 {% block content %}
 <section id="feature" class="transparent-bg">
     <div class="container">

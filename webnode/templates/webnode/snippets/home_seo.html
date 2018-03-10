@@ -1,0 +1,12 @@
+<meta name="abstract" content="{{ service.project_name }}"/>
+<meta name="description" content="{{ config.short_description }}"/>
+<meta property="og:title" content="{{ config.slogan}} - {{ service.project_name }}"/>
+<meta property="og:description" content="{{ config.short_description }}"/>
+<meta property="og:type" content="page" />
+{% if slideshow.0.image.name %}
+    <meta property="og:image" content="{{ slideshow.0.image.url }}"/>
+{% elif config.theme.logo.name %}
+    <meta property="og:image" content="{{ config.theme.logo.url }}"/>
+{% elif config.logo.name %}
+    <meta property="og:image" content="{{ config.logo.url }}"/>
+{% endif %}

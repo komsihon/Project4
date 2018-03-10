@@ -7,7 +7,7 @@ License: Creative Commons Attribution 3.0 Unported
 License URL: http://creativecommons.org/licenses/by/3.0/
 -->
 <!DOCTYPE HTML>
-<html lang="{{ lang }}">
+<html lang="{{ lang }}" xmlns:og="http://ogp.me/ns#">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -41,6 +41,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
         <script src="{% static 'ikwen/js/jquery-1.12.4.min.js' %}"></script>
     </head>
     <body>
+        {% block seo %}{% endblock %}
         {% block header %}
             <div class="header hidden-xs hidden-sm">
                 <div class="header-top">

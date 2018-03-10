@@ -1,12 +1,22 @@
 {% extends 'webnode/dreamer/base.html' %}
 {% load i18n static user_agents humanize auth_tokens %}
 
+{% block meta %}
+    {{ block.super }}
+    {% include 'webnode/snippets/home_seo.html' %}
+{% endblock %}
 {% block page_title %}<title>{{ service.project_name }} - {% trans "Home" %}</title>{% endblock %}
 
 {% block head_style %}
     {{ block.super }}
     <style>
     </style>
+{% endblock %}
+{% block seo %}
+    <div class="hidden seo">
+        <h1>{{ config.slogan}}</h1>
+        <p>{{ config.description }}</p>
+    </div>
 {% endblock %}
 {% block banner %}
     <section class="fw-section banner">

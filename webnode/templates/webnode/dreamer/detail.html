@@ -1,6 +1,7 @@
 {% extends 'webnode/dreamer/details_base.html' %}
 {% load i18n static auth_tokens %}
 {% block meta %}
+    {{ block.super }}
     <meta name="abstract" content="{{ item.name }} "/>
     <meta property="og:title" content="{{ item.name }} {% trans "sur" %} "/>
     <meta property="og:description" content="{{ item.description }}"/>

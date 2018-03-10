@@ -3,11 +3,11 @@ from django.utils.translation import gettext as _
 
 
 class BannerAdmin(admin.ModelAdmin):
-    fields = ('title', 'cta', 'target_url', )
+    fields = ('title', 'cta', 'target_url',  'description',)
 
 
 class SmartCategoryAdmin(admin.ModelAdmin):
-    fields = ('title', 'content_type', 'target_url', )
+    fields = ('title', 'content_type', 'target_url', 'description',)
 
 
 class HomepageSectionAdmin(admin.ModelAdmin):

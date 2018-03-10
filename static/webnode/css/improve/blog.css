@@ -747,7 +747,7 @@ shortcodes page css
   margin-left: 15px;
 }
 
-.single_comments {float: left; clear: both}
+.single_comments {float: left; clear: both; padding-left: 0}
 
 .center {text-align: center; padding-bottom: 55px; float: left; clear: both; width: 100%; margin-top: 150px}
 .center h2{

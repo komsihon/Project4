@@ -11,6 +11,7 @@ from django.contrib.admin import helpers
 from django.contrib import messages
 from django.utils.translation import gettext as _
 from ikwen.core.models import Module, Model
+from ikwen.flatpages.models import FlatPage
 
 # Create your views here.
 import random
@@ -37,21 +38,6 @@ from conf import settings
 POST_PER_PAGE = 5
 MEDIA_DIR = settings.MEDIA_ROOT + 'tiny_mce/'
 TINYMCE_MEDIA_URL = settings.MEDIA_URL + 'tiny_mce/'
-
-
-class BlogBaseView(TemplateSelector, TemplateView):
-    def get_context_data(self, **kwargs):
-        context = super(BlogBaseView, self).get_context_data(**kwargs)
-        rand = random.random()
-        suggestions = Post.objects.filter(is_active=True, rand__lte=rand)
-        categories = PostCategory.objects.all()
-        recent_posts = Post.objects.filter(is_active=True).order_by('created_on')[:5]
-        context['categories'] = categories
-        context['recent_posts'] = recent_posts
-        context['suggestions'] = suggestions[:4]
-        context['most_consulted'] = recent_posts[:4]
-        context['archives'] = recent_posts
-        return context
 
 
 class PostsList(TemplateSelector, TemplateView):

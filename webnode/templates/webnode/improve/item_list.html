@@ -1,5 +1,21 @@
 {% extends 'webnode/improve/base.html' %}
 {% load static auth_tokens %}
+{% block meta %}
+    {{ block.super }}
+    <meta name="abstract" content="{{ smart_category.title }} - {{ service.project_name }}"/>
+    <meta name="description" content="{{ smart_category.descriptiom }}"/>
+    <meta property="og:title" content="{{ smart_category.title }} - {{ service.project_name }}"/>
+    <meta property="og:description" content="{{ config.short_description }}"/>
+    <meta property="og:type" content="page" />
+    {% if item.items.0.get_photos_url_list.0.small %}
+        <meta property="og:image" content="{{ item.items.0.get_photos_url_list.0.small}}"/>
+    {% elif config.theme.logo.name %}
+        <meta property="og:image" content="{{ config.theme.logo.url }}"/>
+    {% elif config.logo.name %}
+        <meta property="og:image" content="{{ config.logo.url }}"/>
+    {% endif %}
+{% endblock %}
+{% block page_title %}<title>{{ smart_category.title }} - {{ service.project_name }}</title>{% endblock %}
 {% block head_style %}
     {{ block.super }}
     <style>
@@ -7,6 +23,12 @@
     </style>
 {% endblock %}
 
+{% block seo %}
+    <div class="hidden seo">
+        <h1>{{ smart_category.title }}</h1>
+        <p>{{ smart_category.description }}</p>
+    </div>
+{% endblock %}
 {% block page_content %}
 <section id="feature" class="transparent-bg">
     <div class="container">

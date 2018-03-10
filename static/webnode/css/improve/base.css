@@ -49,7 +49,9 @@
 .blog-suggestions .suggestions .suggess:first-child {padding-left: 0}
 .blog-suggestions .suggestion {border: solid 1px #DDD;float: left; height: 230px; margin-top: 30px; overflow: hidden; padding: 5px}
 .blog-suggestions .suggestion img {max-height: 130px}
-.blog-suggestions .suggestion a {text-align: center; margin-top: 15px}
+.blog-suggestions .suggestion a {text-align: center; margin-top: 15px;}
+.blog-suggestions .suggess .suggestion {width: 100%}
+.blog-suggestions .suggess .suggestion a {width: 100%}
 .blog-suggestions .suggestion a:first-child {background-size: cover; height: 130px; margin-top: 0; width: 100%;}
 .post_reply {clear: both}
 

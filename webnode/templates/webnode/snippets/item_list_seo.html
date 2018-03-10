@@ -1,0 +1,12 @@
+<meta name="abstract" content="{{ smart_category.title }} - {{ service.project_name }}"/>
+<meta name="description" content="{{ smart_category.descriptiom }}"/>
+<meta property="og:title" content="{{ smart_category.title }} - {{ service.project_name }}"/>
+<meta property="og:description" content="{{ config.short_description }}"/>
+<meta property="og:type" content="page" />
+{% if item_list.0.items.0.get_photos_url_list.0.small %}
+    <meta property="og:image" content="{{ item_list.0.items.0.get_photos_url_list.0.small }}"/>
+{% elif config.theme.logo.name %}
+    <meta property="og:image" content="{{ config.theme.logo.url }}"/>
+{% elif config.logo.name %}
+    <meta property="og:image" content="{{ config.logo.url }}"/>
+{% endif %}

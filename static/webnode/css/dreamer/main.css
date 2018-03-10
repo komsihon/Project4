@@ -224,6 +224,8 @@ section.home-section .description {font-size: 1.3em}
 .copy-section a:hover {color: #fff}
 .copy-section a {margin: 0 0.3em}
 
+.blog-suggestions .suggess .suggestion {width: 100%}
+.blog-suggestions .suggess .suggestion a {width: 100%}
 
 .copy-section{padding:2em 0;  text-align:center;  background: #0A0A0A;  }
 .copy-section p {font-size: 0.9em;color: #fff;font-weight: 400;}

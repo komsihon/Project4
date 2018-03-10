@@ -1,6 +1,9 @@
 {% extends 'webnode/improve/base.html' %}
 {% load i18n static auth_tokens %}
-
+{% block meta %}
+    {{ block.super }}
+    {% include 'webnode/snippets/home_seo.html' %}
+{% endblock %}
 {% block page_title %}<title>{{ service.project_name }} - {% trans "Home" %}</title>{% endblock %}
 
 {% block head_style %}

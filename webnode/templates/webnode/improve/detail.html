@@ -35,7 +35,7 @@
             <div class="suggestions">
                 {% for post in blog_suggestions %}
                     <div class="col-sm-4 suggess">
-                        <div class="subtle-shade suggestion" >
+                        <div class="suggestion" >
                             <a href="{% url 'blog:details'  post.slug %}" style="background-image:url({{ post.image.url }})"></a>
                             <a href="{% url 'blog:details'  post.slug %}" >{{ post.title }}</a>
                         </div>

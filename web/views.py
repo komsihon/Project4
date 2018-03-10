@@ -12,22 +12,20 @@ from django.http import HttpResponse
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.utils.decorators import method_decorator
-from django.utils.translation import gettext as _
 from django.utils.text import slugify
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import TemplateView
-from ikwen.flatpages.models import FlatPage
-
-from ikwen_webnode.web.admin import SmartCategoryAdmin, BannerAdmin, HomepageSectionAdmin
 from ikwen_kakocase.kakocase.views import SortableListMixin
+from ikwen_webnode.items.models import ItemCategory
+from ikwen_webnode.web.admin import SmartCategoryAdmin, BannerAdmin, HomepageSectionAdmin
+from ikwen_webnode.web.models import Banner, SmartCategory, HomepageSection, SLIDE, FLAT
 
 from ikwen.accesscontrol.templatetags.auth_tokens import append_auth_tokens
-
-from ikwen_webnode.web.models import Banner, SmartCategory, HomepageSection, SLIDE, FLAT
 from ikwen.core.utils import get_model_admin_instance
 from ikwen.core.views import HybridListView, ChangeObjectBase
-from ikwen_webnode.items.models import ItemCategory
+from ikwen.flatpages.models import FlatPage
 
 BANNER = 'banner'
 SMART_CATEGORY = 'smartcategory'
@@ -66,11 +64,11 @@ class ChangeSmartObject(TemplateView):
         if object_type == BANNER:
             model = Banner
             model_admin = BannerAdmin
-            fields = ("title", "cta", "target_url")
+            fields = ("title", "cta", "target_url",'description',)
         else:
             model = SmartCategory
             model_admin = SmartCategoryAdmin
-            fields = ("title", "content_type", "target_url")
+            fields = ("title", "content_type", "target_url",'description',)
         if smart_object_id:
             smart_object = get_object_or_404(model, pk=smart_object_id)
             smart_object.content = [ItemCategory.objects.get(pk=pk) for pk in smart_object.items_fk_list]
