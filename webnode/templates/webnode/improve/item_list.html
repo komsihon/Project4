@@ -42,17 +42,34 @@
             {% if activate_block_title %}
                 <h2 style="margin-left: 12px; padding-bottom: 15px">{{ item.category.name }}</h2>
             {% endif %}
-            {% for product in  item.items %}
-                <div class="col-md-3 col-sm-4 col-xs-12 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
-                    <div class="feature-wrap subtle-shade">
-                        <a href="{% url 'webnode:product_details' product.category.slug product.slug %}">
-                            <div class="item-list-img" style="background-image: url('{{ product.get_photos_url_list.0.small }}')"></div>
-{#                            <img src="{{ product.get_photos_url_list.0.small }}" class="img-responsive">#}
-                        </a>
-                        <a href="{% url 'webnode:product_details'  product.category.slug product.slug %}"><h2>{{ product.name }}</h2></a>
-                        <h3>{{ product.summary | safe }}</h3>
-                    </div>
-                </div><!--/.col-md-4-->
+            {% for row in  item.items %}
+                <div class="clear-row">
+                    {% for product in  row %}
+                        {% if config.theme.display == 'Comfortable' %}
+                            <div class="col-sm-6 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                                <div class="feature-wrap subtle-shade">
+                                    <a href="{% url 'webnode:product_details' product.category.slug product.slug %}">
+                                        <div class="item-list-img" style="background-image: url('{{ product.get_photos_url_list.0.small }}'); height: 380px"></div>
+                                    </a>
+                        {% elif config.theme.display == 'Cozy'  %}
+                            <div class="col-sm-4 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                                <div class="feature-wrap subtle-shade">
+                                    <a href="{% url 'webnode:product_details' product.category.slug product.slug %}">
+                                        <div class="item-list-img" style="background-image: url('{{ product.get_photos_url_list.0.small }}'); height: 240px"></div>
+                                    </a>
+                        {% else %}
+                            <div class="col-sm-3 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                                <div class="feature-wrap subtle-shade">
+                                    <a href="{% url 'webnode:product_details' product.category.slug product.slug %}">
+                                        <div class="item-list-img" style="background-image: url('{{ product.get_photos_url_list.0.small }}'); height: 200px"></div>
+                                    </a>
+                        {% endif %}
+                                <a href="{% url 'webnode:product_details'  product.category.slug product.slug %}"><h2>{{ product.name }}</h2></a>
+                                <h3>{{ product.summary | safe }}</h3>
+                            </div>
+                        </div><!--/.col-md-4-->
+                    {% endfor %}
+                </div>
             {% endfor %}
             </div><!--/.services-->
             {% endfor %}

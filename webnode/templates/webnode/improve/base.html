@@ -105,7 +105,7 @@
         </header><!--/header-->
         {% block page_content %}{% endblock %}
         <section id="bottom">
-            <div class="container wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+            <div class="container">
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="widget">
@@ -114,9 +114,6 @@
                                 {% for page in flat_pages %}
                                     <li><a href="{% url 'flatpage' page.url %}">{{ page.title }}</a></li>
                                 {% endfor %}
-{#                                <li><a href="#">Copyright</a></li>#}
-{#                                <li><a href="{% url 'flatpage' 'agreement' %}">{% trans 'Terms of use' %}</a></li>#}
-{#                                <li><a href="{% url 'flatpage' 'legal-mentions' %}">{% trans 'Legal mentions' %}</a></li>#}
                             </ul>
                         </div>
                     </div><!--/.col-md-3-->
@@ -124,7 +121,6 @@
                         <div class="widget">
                             <h3>{% trans 'Contact' %}</h3>
                             <ul>
-    {#                            {% if config.address %}<li><i class="fa fa-map-marker"></i> {{ config.address  }}</li>{% endif %}#}
                                 {% if config.contact_phone %}<li><i class="fa fa-phone-square"></i> {{ config.contact_phone  }}</li>{% endif %}
                                 {% if config.contact_email %}<li><i class="fa fa-envelope"></i> {{ config.contact_email  }}</li>{% endif %}
                                 {% if config.address %}<li><i class="fa fa-globe"></i> {{ config.address  }}</li>{% endif %}

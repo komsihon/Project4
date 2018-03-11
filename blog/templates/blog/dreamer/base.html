@@ -1,7 +1,13 @@
 {% extends 'webnode/dreamer/base.html' %}
 {% load staticfiles auth_tokens %}{% block head_style %}
     {{ block.super }}
-    <link href="{% static 'webnode/css/improve/blog.css' %}?version=1.0" rel="stylesheet">
+     {% if config.theme %}
+        {% with theme=config.theme %}
+            <link rel='stylesheet' href="{% static 'webnode/themes/' %}{{ theme.template.slug }}/blog.css" />
+        {% endwith %}
+     {% else %}
+        <link href="{% static 'webnode/css/improve/blog.css' %}?version=1.0" rel="stylesheet">
+    {% endif %}
 {% endblock %}
 {% block content %}
     {% block page_header %}
@@ -76,19 +82,14 @@
         <!-- /#page-content-wrapper -->
 {% endblock %}
 
-    <!-- jQuery -->
-{#    <script src="{% static 'js/jquery-1.12.4.min.js' %}"></script>#}
-
-    <!-- Bootstrap Core JavaScript -->
-{#    <script src="{% static 'js/bootstrap.min.js' %}"></script>#}
 
     {% block js %}
         {{ block.super }}
         <script type="text/javascript">
-        (function() {
-            $('form#search input.input-sm').attr('placeholder', 'Search ikwen')
-             $('ul.navbar-nav li').removeClass('active')
-            $('ul.navbar-nav li.blog').addClass('active')
-        })()
-    </script>
+            (function() {
+                $('form#search input.input-sm').attr('placeholder', 'Search ikwen')
+                    $('ul.navbar-nav li').removeClass('active')
+                    $('ul.nav.navbar-nav li.module_blog').addClass('active')
+            })()
+        </script>
     {% endblock %}

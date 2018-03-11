@@ -147,11 +147,7 @@ form em {color: #eb0f00; display: none}
   margin-bottom: 20px;
 }
 
-.single_comments img {
-  float: left;
-  margin-right: 10px;
-  margin-top: 5px;
-}
+.single_comments img {float: left; margin-right: 10px; margin-top: 5px; min-height: 65px;}
 
 .single_comments p {
   margin-bottom: 0;

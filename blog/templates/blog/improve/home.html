@@ -1,6 +1,6 @@
 {% extends 'blog/improve/base.html' %}
 {% load i18n humanize staticfiles %}
-{% block page_title %} <title>Improve blog  - Home</title> {% endblock %}
+{% block page_title %} <title>{{ service.project_name }} - blog  - Home</title> {% endblock %}
 {% block blog_content %}
     {% include 'snippets/fb_sdk.html' %}
     {% if entries %}

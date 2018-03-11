@@ -2522,7 +2522,7 @@ shortcodes page css
 .single_comments.item_details div.details {float: left; margin-left: 1%; width: 66%}
 .single_comments.item_details div.details h5 {float: left; margin: 5px 0 0 }
 .single_comments.item_details div.details p {clear: both; float: left}
-.single_comments.item_details img {width: 30%}
+.single_comments.item_details img {min-height: 55px; max-height: 60px; width: 30%}
 
 .navbar-inverse .navbar-toggle .icon-bar {
     background-color: #999;

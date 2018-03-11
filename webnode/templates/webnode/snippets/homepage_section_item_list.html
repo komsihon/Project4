@@ -7,11 +7,41 @@
 {#        <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut <br> et dolore magna aliqua. Ut enim ad minim veniam</p>#}
         <div class="row">
             {% for item in item_list %}
-                <div class="col-md-3 col-sm-4 col-xs-12 wow fadeInDown" data-wow-duration="1000ms" data-wow-delay="600ms">
+                {% if config.theme.display == 'Comfortable' %}
+                    <div class="col-sm-6 wow hidden-xs fadeInDown {{ config.theme.display }}" data-wow-duration="1000ms" data-wow-delay="600ms">
+                        <div class="feature-wrap subtle-shade item-list">
+                            <a href="{% url 'webnode:product_details' item.category.slug item.slug %}">
+                                <div class="item-list-img" style="background-image: url('{{ item.get_photos_url_list.0.small }}'); height: 380px"></div>
+                            </a>
+                            <a href="{% url 'webnode:product_details' item.category.slug  item.slug %}"><h2>{{ item.name }}</h2></a>
+                            <h3>{{ item.summary | safe }}</h3>
+                        </div>
+                    </div>
+                {% elif config.theme.display == 'Cozy'  %}
+                    <div class="col-sm-4 wow fadeInDown hidden-xs {{ config.theme.display }}" data-wow-duration="1000ms" data-wow-delay="600ms">
+                        <div class="feature-wrap subtle-shade item-list">
+                            <a href="{% url 'webnode:product_details' item.category.slug item.slug %}">
+                                <div class="item-list-img" style="background-image: url('{{ item.get_photos_url_list.0.small }}'); height: 240px"></div>
+                            </a>
+                            <a href="{% url 'webnode:product_details' item.category.slug  item.slug %}"><h2>{{ item.name }}</h2></a>
+                            <h3>{{ item.summary | safe }}</h3>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="col-sm-3 wow fadeInDown hidden-xs {{ config.theme.display }}" data-wow-duration="1000ms" data-wow-delay="600ms">
+                        <div class="feature-wrap subtle-shade item-list">
+                            <a href="{% url 'webnode:product_details' item.category.slug item.slug %}">
+                                <div class="item-list-img" style="background-image: url('{{ item.get_photos_url_list.0.small }}'); height: 200px"></div>
+                            </a>
+                            <a href="{% url 'webnode:product_details' item.category.slug  item.slug %}"><h2>{{ item.name }}</h2></a>
+                            <h3>{{ item.summary | safe }}</h3>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="wow fadeInDown visible-xs" data-wow-duration="1000ms" data-wow-delay="600ms">
                     <div class="feature-wrap subtle-shade item-list">
                         <a href="{% url 'webnode:product_details' item.category.slug item.slug %}">
-                            <div class="item-list-img" style="background-image: url('{{ item.get_photos_url_list.0.small }}')"></div>
-{#                            <img src="{{ item.get_photos_url_list.0.small }}" class="img-responsive">#}
+                            <div class="item-list-img" style="background-image: url('{{ item.get_photos_url_list.0.small }}'); height: 200px"></div>
                         </a>
                         <a href="{% url 'webnode:product_details' item.category.slug  item.slug %}"><h2>{{ item.name }}</h2></a>
                         <h3>{{ item.summary | safe }}</h3>

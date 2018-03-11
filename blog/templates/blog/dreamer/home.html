@@ -1,6 +1,6 @@
 {% extends 'blog/dreamer/base.html' %}
 {% load i18n humanize staticfiles %}
-{% block page_title %} <title>Improve blog  - Home</title> {% endblock %}
+{% block page_title %} <title>{{ service.project_name }} blog  - Home</title> {% endblock %}
 {% block blog_content %}
     {% include 'snippets/fb_sdk.html' %}
     {% if entries %}
@@ -45,14 +45,5 @@
         {% endif %}
     </div>
 
-{% endblock %}
-{% block js %}
-    {{ block.super }}
-    <script type="text/javascript">
-        (function() {
-            $('ul.navbar-nav li').removeClass('active')
-            $('ul.navbar-nav li.blog').addClass('active')
-        })()
-    </script>
 {% endblock %}
 

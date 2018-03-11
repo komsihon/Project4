@@ -22,6 +22,7 @@ from django.views.decorators.csrf import csrf_protect
 
 from ikwen_webnode.web.models import Banner, SmartCategory, SLIDE, HomepageSection
 from ikwen_webnode.items.models import ItemCategory, Item
+from ikwen.core.utils import as_matrix
 import random
 
 
@@ -30,6 +31,9 @@ from ikwen_webnode.blog.models import Post
 # from ikwen_webnode.conf import settings
 from ikwen_webnode.webnode.cloud_setup import deploy, DeploymentForm
 
+COZY = "Cozy"
+COMPACT = "Compact"
+COMFORTABLE = "Comfortable"
 HOME = 'home'
 POST_PER_PAGE = 5
 
@@ -53,7 +57,6 @@ class Home(TemplateSelector, TemplateView):
         context = super(Home, self).get_context_data(**kwargs)
         context['slideshow'] = Banner.objects.filter(display=SLIDE, is_active=True).order_by('order_of_appearance')
         context['homepage_section_list'] = HomepageSection.objects.filter(is_active=True).order_by('order_of_appearance')
-
         return context
 
 
@@ -93,6 +96,15 @@ class ItemDetails(TemplateSelector, TemplateView):
 class ItemList(TemplateSelector, TemplateView):
     template_name = 'webnode/item_list.html'
 
+    def _get_row_len(self):
+        config = get_service_instance().config
+        if config.theme and config.theme.display == COMFORTABLE:
+            return 2
+        elif config.theme and config.theme.display == COZY:
+            return 3
+        else:
+            return getattr(settings, 'PRODUCTS_PREVIEWS_PER_ROW', 4)
+
     def get_context_data(self, **kwargs):
         context = super(ItemList, self).get_context_data(**kwargs)
         slug = kwargs['slug']
@@ -102,11 +114,13 @@ class ItemList(TemplateSelector, TemplateView):
             category = get_object_or_404(ItemCategory, pk=category_id)
             item_qs = Item.objects.filter(category=category)
             if item_qs.count() > 0:
-                item = {'category': category, 'items':item_qs}
+                item = {'category': category, 'items':as_matrix(item_qs, self._get_row_len(), strict=True)}
                 item_list.append(item)
+
         activate_block_title = False
         if len(smart_category.items_fk_list) > 1:
             activate_block_title = True
+
         context['item_list'] = item_list
         context['smart_category'] = smart_category
         context['activate_block_title'] = activate_block_title

@@ -9,12 +9,17 @@ from django.template.loader import get_template
 from django.utils.module_loading import import_by_path
 from djangotoolbox.fields import ListField
 from ikwen.core.fields import MultiImageField
+from ikwen.core.utils import get_service_instance
 
 from ikwen.core.models import Model, Module
 from ikwen_webnode.items.models import Item
 from django.utils.translation import gettext_lazy as _
 
 from ikwen_webnode.items.models import ItemCategory
+
+COZY = "Cozy"
+COMPACT = "Compact"
+COMFORTABLE = "Comfortable"
 
 FLAT = "Flat"
 MENU = "Menu"
@@ -160,6 +165,15 @@ class HomepageSection(SmartObject):
     def __unicode__(self):
         return self.title
 
+    def _get_row_len(self):
+        config = get_service_instance().config
+        if config.theme and config.theme.display == COMFORTABLE:
+            return 2
+        elif config.theme and config.theme.display == COZY:
+            return 3
+        else:
+            return getattr(settings, 'PRODUCTS_PREVIEWS_PER_ROW', 4)
+
     def render(self, request=None):
         if self.content_type == FLAT:
             c = Context({'section': self})
@@ -170,9 +184,10 @@ class HomepageSection(SmartObject):
                 # The actual menu points to an Item List
                 smart_category = SmartCategory.objects.get(slug=self.description)
                 product_list = []
+                config = get_service_instance().config
                 for category in smart_category.get_category_queryset():
                     product_list.extend(list(Item.objects.filter(category=category)))
-                c = Context({'item_list': product_list[:4], 'title':smart_category.title})
+                c = Context({'item_list': product_list[:self._get_row_len()], 'title':smart_category.title, 'config': config})
                 html_template = get_template('webnode/snippets/homepage_section_item_list.html')
                 return html_template.render(c)
             except SmartCategory.DoesNotExist:

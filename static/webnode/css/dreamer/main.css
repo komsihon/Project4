@@ -13,14 +13,14 @@ hr {border-top: 1px solid #e5e5e5; border-bottom: 1px solid #fff;}
 
 #feature .feature-wrap, #services .feature-wrap  {background-color: #FFF;}
 #feature .feature-wrap img, #services .feature-wrap img  {margin: auto; width: 100%;}
-#feature .feature-wrap h3, #services .feature-wrap h3   {height: 150px; overflow: hidden}
+#feature .feature-wrap h3, #services .feature-wrap h3   {min-height: 150px; max-height: 350px; overflow: hidden}
 .single_comments:first-child {margin-bottom: 30px}
 .single_comments:first-child {margin-bottom: 0}
 .single_comments a:first-child {margin-top: 0}
 .single_comments a:last-child {margin-top: 25px}
 .blog-item {text-align: justify}
-#feature .feature-wrap, #services .feature-wrap {height: 440px}
-.features .feature-wrap {height: 400px}
+/*#feature .feature-wrap, #services .feature-wrap {height: 440px}*/
+/*.features .feature-wrap {height: 400px}*/
 #blog .features .feature-wrap {height: 150px}
 #blog .features .feature-wrap a {height: 130px; padding-left: 0}
 #blog .features .feature-wrap a img  {max-height: 100%; height: inherit;}
@@ -35,11 +35,11 @@ hr {border-top: 1px solid #e5e5e5; border-bottom: 1px solid #fff;}
 .post_reply {clear: both}
 
 .feature-wrap {background: #fff; margin-bottom: 35px; overflow: hidden; padding: 10px}
-div.item-list-img {background-size: cover; background-position: center; height: 200px; width: 100%}
+div.item-list-img {background-size: cover; background-position: center; width: 100%}
 
-.feature-wrap img {height: 38%}
-.feature-wrap h2 {height: 10%}
-.feature-wrap h3 {height: 44%; overflow: hidden}
+/*.feature-wrap img {height: 38%}*/
+/*.feature-wrap h2 {height: 10%}*/
+/*.feature-wrap h3 {height: 44%; overflow: hidden}*/
 .recent-work-wrap img {height: 232px;width: 600px;}
 
 .close {cursor: pointer; padding: 5px 5px 0 0; text-align: right}

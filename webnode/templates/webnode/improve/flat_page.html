@@ -16,7 +16,7 @@
 			<div class="center wow fadeInDown">
 				<h2>{{ page.title }}</h2>
 			</div>
-            <div style="font-size: 20px; line-height: 35px; min-height: 600px">
+            <div class="col-xs-12" style="font-size: 20px; line-height: 35px; overflow: hidden;max-width: 100%">
                 {{ page.content|safe }}
             </div>
 		</div><!--/.container-->
@@ -28,6 +28,7 @@
         (function() {
             $('ul.navbar-nav li').removeClass('active');
             $('ul.navbar-nav li.about').addClass('active')
+            $('#bottom .container.fadeInDown').css('visibility', 'visible')
         })()
     </script>
 {% endblock %}
