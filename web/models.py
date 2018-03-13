@@ -183,11 +183,11 @@ class HomepageSection(SmartObject):
             try:
                 # The actual menu points to an Item List
                 smart_category = SmartCategory.objects.get(slug=self.description)
-                product_list = []
+                item_list = []
                 config = get_service_instance().config
                 for category in smart_category.get_category_queryset():
-                    product_list.extend(list(Item.objects.filter(category=category)))
-                c = Context({'item_list': product_list[:self._get_row_len()], 'title':smart_category.title, 'config': config})
+                    item_list.extend(list(Item.objects.filter(category=category, visible=True, in_trash=False)))
+                c = Context({'item_list': item_list[:self._get_row_len()], 'title':smart_category.title, 'config': config})
                 html_template = get_template('webnode/snippets/homepage_section_item_list.html')
                 return html_template.render(c)
             except SmartCategory.DoesNotExist:
