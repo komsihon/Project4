@@ -4,7 +4,15 @@
     {{ block.super }}
     {% include 'webnode/snippets/item_list_seo.html' %}
 {% endblock %}
-{% block page_title %}<title>{{ smart_category.title }} - {{ service.project_name }}</title>{% endblock %}
+{% block page_title %}
+    <title>
+        {% if smart_category.title %}
+            {{ smart_category.title }} - {{ service.project_name }}
+        {% else %}
+            {{ category.name }} - {{ service.project_name }}
+        {% endif %}
+    </title>
+{% endblock %}
 
 {% block seo %}
     <div class="hidden seo">
@@ -15,15 +23,22 @@
 {% block head_style %}
     {{ block.super }}
     <style>
-    .navbar-nav>li>a { color: #555; text-shadow: 1px 2px 2px rgba(0, 0, 0, 0.05);}
-    .center{padding-top: 150px}
+        .header-top {position: absolute; top:0; width: 100%}
+        .header-bottom {background: #ffffff;height: 75px; margin-top: 40px}
+        .navbar-nav>li>a {color: #747474;}
+        .page-banner {float: left; margin-top: 40px}
+        .center {text-align: center;padding-bottom: 0;margin-top: 105px;}
     </style>
 {% endblock %}
 {% block content %}
 <section id="feature" class="transparent-bg">
     <div class="container">
         <div class="center wow fadeInDown">
-            <h2>{{ smart_category.title }}</h2>
+            {% if smart_category.title %}
+                <h2>{{ smart_category.title }}</h2>
+            {% else %}
+                <h2>{{ category.name }}</h2>
+            {% endif %}
             <p class="lead"></p>
         </div>
         <div class="row">

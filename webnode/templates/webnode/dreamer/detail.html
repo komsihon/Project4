@@ -9,6 +9,17 @@
 {% endblock %}
 {% block page_title %} <title>{{ service.project_name }} - {{ item.name }}</title> {% endblock %}
 
+{% block head_style %}
+    {{ block.super }}
+    <style>
+     .header-top {position: absolute; top:0; width: 100%}
+     .header-bottom {background: #ffffff;height: 75px; margin-top: 40px}
+     .navbar-nav>li>a {color: #747474;}
+     .page-banner {float: left; margin-top: 110px}
+        .center {text-align: center;padding-bottom: 0;margin-top: 105px;}
+    </style>
+{% endblock %}
+
 {% block banner %}
     {% if  item.image %}
         <div class="page-banner" style="background-image: url({{ item.get_photos_url_list.0.original }})"></div>

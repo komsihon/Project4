@@ -123,11 +123,19 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                                                     <span class="caret"></span></a>
                                                     <ul class="dropdown-menu subtle-shade">
                                                         {% for sub_menu in menu.get_category_queryset  %}
-                                                            {% if sub_menu.slug != menu.slug %}
-                                                                <li class="{{ sub_menu.slug }}">
-                                                                    <a href="#">{{ sub_menu.name }}</a>
-                                                                </li>
-                                                            {% endif %}
+                                                            <li class="{{ sub_menu.slug }}">
+                                                                {% if sub_menu.content_type == 'FlatPage'  %}
+                                                                    {% if sub_menu.description %}
+                                                                        <a href="{% url 'flatpage' sub_menu.description %}">{% trans sub_menu.name %}</a>
+                                                                    {% endif %}
+                                                                {% elif sub_menu.content_type == 'ItemList' %}
+                                                                    <a href="{% url 'webnode:item_list' sub_menu.slug %}">{% trans sub_menu.name %}</a>
+                                                                {% elif sub_menu.content_type == 'Link' %}
+                                                                    <a href="{{ sub_menu.target_url }}">{% trans sub_menu.name %}</a>
+                                                                {% elif sub_menu.content_type == 'Module' %}
+                                                                    <a href="{% url sub_menu.module.url_name %}">{% trans sub_menu.name %}</a>
+                                                                {% endif %}
+                                                            </li>
                                                         {% endfor %}
                                                     </ul>
                                                 </li>

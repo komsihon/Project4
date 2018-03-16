@@ -72,7 +72,7 @@ class ItemDetails(TemplateSelector, TemplateView):
         slug = kwargs['slug']
         category_slug = kwargs['category_slug']
         category = ItemCategory.objects.get(slug=category_slug)
-        page_item = Item.objects.get(slug=slug, category=category, visible=True)
+        page_item = Item.objects.get(slug=slug, category=category, in_trash=False, visible=True)
         tags = page_item.tags
         tag_list = tags.split(' ')
         blog_suggestions = []
@@ -108,22 +108,30 @@ class ItemList(TemplateSelector, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ItemList, self).get_context_data(**kwargs)
         slug = kwargs['slug']
-        smart_category = SmartCategory.objects.get(slug=slug)
-        item_list = []
-        for category_id in smart_category.items_fk_list:
-            category = get_object_or_404(ItemCategory, pk=category_id)
-            item_qs = Item.objects.filter(category=category)
+        try:
+            smart_category = SmartCategory.objects.get(slug=slug)
+        except SmartCategory.DoesNotExist:
+            category = ItemCategory.objects.get(slug=slug)
+            item_list = []
+            item_qs = Item.objects.filter(category=category, in_trash=False, visible=True)
             if item_qs.count() > 0:
-                item = {'category': category, 'items':as_matrix(item_qs, self._get_row_len(), strict=True)}
+                item = {'category': category, 'items': as_matrix(item_qs, self._get_row_len(), strict=True)}
                 item_list.append(item)
-
-        activate_block_title = False
-        if len(smart_category.items_fk_list) > 1:
-            activate_block_title = True
-
+            context['category'] = category
+        else:
+            item_list = []
+            for category_id in smart_category.items_fk_list:
+                category = get_object_or_404(ItemCategory, pk=category_id)
+                item_qs = Item.objects.filter(category=category, in_trash=False, visible=True)
+                if item_qs.count() > 0:
+                    item = {'category': category, 'items':as_matrix(item_qs, self._get_row_len(), strict=True)}
+                    item_list.append(item)
+            activate_block_title = False
+            if len(smart_category.items_fk_list) > 1:
+                activate_block_title = True
+            context['activate_block_title'] = activate_block_title
+            context['smart_category'] = smart_category
         context['item_list'] = item_list
-        context['smart_category'] = smart_category
-        context['activate_block_title'] = activate_block_title
         return context
 
 
@@ -150,7 +158,7 @@ def grab_item_list_from_smart_category(smart_category, page):
     if page == HOME:
         for item_id in smart_category.items_fk_list:
             try:
-                item = Item.objects.get(pk=item_id)
+                item = Item.objects.get(pk=item_id, in_trash=False, visible=True)
             except Item.DoesNotExist:
                 pass
             else:
@@ -161,9 +169,13 @@ def grab_item_list_from_smart_category(smart_category, page):
             smart_category.item_list = item_list
     else:
         for item_id in smart_category.items_fk_list:
-            item = Item.objects.get(pk=item_id)
-            item_list.append(item)
-        smart_category.item_list = item_list
+            try:
+                item = Item.objects.get(pk=item_id, in_trash=False, visible=True)
+            except Item.DoesNotExist:
+                pass
+            else:
+                item_list.append(item)
+            smart_category.item_list = item_list
     return smart_category
 
 
@@ -177,7 +189,7 @@ def grab_items_list_from_smart_category(smart_category, page):
             except ItemCategory.DoesNotExist:
                 pass
             else:
-                item_qs = Item.objects.filter(category=category)
+                item_qs = Item.objects.filter(category=category, in_trash=False, visible=True)
                 if item_qs.count() > 0:
                     item = {'category': category, 'items': item_qs}
                     item_list.append(item)
@@ -199,7 +211,7 @@ def grab_item_list_from_porfolio(smart_category, page):
     if page == HOME:
         for category_id in smart_category.items_fk_list:
             category = ItemCategory.objects.get(pk=category_id)
-            items = Item.objects.filter(category=category)
+            items = Item.objects.filter(category=category, in_trash=False, visible=True)
             for item in items:
                 item_list.append(item)
         random.shuffle(item_list)
@@ -212,7 +224,7 @@ def grab_item_list_from_porfolio(smart_category, page):
     else:
         for category_id in smart_category.items_fk_list:
             category = ItemCategory.objects.get(pk=category_id)
-            item = Item.objects.filter(category=category)
+            item = Item.objects.filter(category=category, in_trash=False, visible=True)
             for item in item:
                 item_list.append(item)
         random.shuffle(item_list)

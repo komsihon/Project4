@@ -195,7 +195,7 @@ class ChangeCategory(TemplateView):
             category.items_count = category.item_set.all().count()
             category.save()
         category_admin = get_model_admin_instance(ItemCategory, ItemCategoryAdmin)
-        ModelForm = modelform_factory(ItemCategory, fields=('name', 'description', 'badge_text',
+        ModelForm = modelform_factory(ItemCategory, fields=('name', 'content_type', 'description', 'badge_text',
                                                                'appear_in_menu', 'is_active'))
         form = ModelForm(instance=category)
         category_form = helpers.AdminForm(form, list(category_admin.get_fieldsets(self.request)),
@@ -327,7 +327,7 @@ class MerchantListFilter(object):
 class ItemList(HybridListView):
     template_name = 'items/item_list.html'
     html_results_template_name = 'items/snippets/item_list_results.html'
-    queryset = Item.objects.filter(in_trash=False)
+    queryset = Item.objects.filter(in_trash=False, visible=True)
     ordering = ('-updated_on', '-total_units_sold')
     search_field = 'name'
     context_object_name = 'item_list'

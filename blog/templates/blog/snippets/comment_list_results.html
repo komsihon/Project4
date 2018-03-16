@@ -1,0 +1,32 @@
+{% load i18n staticfiles humanize auth_tokens %}
+
+<div id="results">
+    {% include 'core/snippets/spinner.html' %}
+    <ul class="object-list">
+        {% for product in objects_page.object_list %}
+        <li class="ik-li img-lg product" id="{{ product.id }}" data-id="{{ product.id }}">
+
+            <div class="info">
+                <span class="name" style="text-transform: uppercase">{{ product.post.title }}</span>
+                <span class="comment" style="float: left; clear: both; width: 100%">{{ product.entry }}</span>
+            </div>
+            <div class="actions">
+                {% if product.is_active %}
+                    <i class="action glyphicon glyphicon-ok toggle active off" title="{% trans "Deactivate" %}"></i>
+                {% else %}
+                    <i class="action glyphicon glyphicon-ok toggle active on" title="{% trans "Activate" %}"></i>
+                {% endif %}
+                <i class="glyphicon glyphicon-trash trash" title="{% trans "Delete item" %}"></i>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    <div id="page-navigation" class="text-muted">
+        {% if objects_page.paginator.num_pages > 1  %}
+            <p>{% blocktrans with count=objects_page.paginator.count start=objects_page.start_index end=objects_page.end_index %}
+                {{ start }} – {{ end }} of {{ count }} results{% endblocktrans %}</p>
+        {% else %}
+            <p>{% blocktrans with count=objects_page.paginator.count %}{{ count }} results{% endblocktrans %}</p>
+        {% endif %}
+    </div>
+</div>

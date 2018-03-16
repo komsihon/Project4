@@ -12,6 +12,19 @@ from ikwen.core.models import AbstractWatchModel, Service
 from ikwen.core.utils import to_dict, set_counters, increment_history_field
 from ikwen_kakocase.kakocase.models import IS_PROVIDER, IS_RETAILER, PRODUCTS_PREVIEWS_PER_ROW
 
+
+FLAT_PAGE = "FlatPage"
+ITEM_LIST = "ItemList"
+LINK = "Link"
+MODULE = "Module"
+SMART_CATEGORY_TYPE_CHOICES = (
+    (FLAT_PAGE, _("Flat Page")),
+    (ITEM_LIST, _("Item List")),
+    (LINK, _("Link"))
+)
+
+
+
 wholesale_price_help_text = _("Your wholesale price. Retailers may set their own price.") if IS_PROVIDER\
     else _("Wholesale price of the provider")
 retail_price_help_text = _("Price at which retailers must sell this item on their website. "
@@ -52,6 +65,9 @@ class ItemCategory(AbstractWatchModel):
     image = MultiImageField(upload_to=UPLOAD_TO, blank=True, null=True, max_size=500)
     # A list of 366 integer values, each of which representing the number of items of this category
     # that were traded (sold or delivered) on a day out of the 366 previous (current day being the last)
+
+    content_type = models.CharField(max_length=15, choices=SMART_CATEGORY_TYPE_CHOICES,blank=True, null=True,
+                                    help_text=_("Whether it is a flat content or a menu preview."))
     items_traded_history = ListField()
     turnover_history = ListField()
     earnings_history = ListField()
