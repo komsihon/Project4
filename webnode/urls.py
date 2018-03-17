@@ -7,10 +7,17 @@ from django.conf import settings
 
 admin.autodiscover()
 
-if getattr(settings, 'IS_IKWEN', False) or getattr(settings, 'IS_APP_RETAILER', False):
+if getattr(settings, 'IS_IKWEN', False):
     urlpatterns = patterns(
         '',
-        url(r'^deployCloud/$', DeployCloud.as_view(), name='deploy_cloud')
+        url(r'^deployCloud/$', DeployCloud.as_view(), name='deploy_cloud'),
+    )
+elif getattr(settings, 'IS_APP_RETAILER', False):
+    urlpatterns = patterns(
+        '',
+        url(r'^webnode/deployCloud/$', DeployCloud.as_view(), name='deploy_cloud'),
+        url(r'^(?P<category_slug>[-\w]+)/(?P<slug>[-\w]+)/$', ItemDetails.as_view(), name='product_details'),
+        url(r'^(?P<slug>[-\w]+)/$', ItemList.as_view(), name='item_list'),
     )
 else:
     urlpatterns = patterns(
