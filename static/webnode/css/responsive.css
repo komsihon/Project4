@@ -188,7 +188,10 @@
 /* xs */
 @media (max-width: 767px) {
   .container > .navbar-header, .container > .navbar-collapse{
-    margin-left: 0;
+    margin-left: -15px;
+  }
+  .navbar-nav>li {
+    margin-left: 0
   }
 
   .top-number{
