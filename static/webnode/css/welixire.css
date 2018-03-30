@@ -1,0 +1,23 @@
+/*
+    Created on : March 30, 2018, 16:37:26 PM
+    Author     : Kom Sihon
+*/
+
+.navbar.main {
+    background: #f5933b;
+}
+.navbar-inverse .navbar-nav > li > a {color: #fff}
+
+@media (max-width: 767px) {
+    .navbar-inverse .navbar-toggle .icon-bar {
+        background-color: #fff;
+    }
+    .navbar-collapse {
+        background: #f5933b;
+    }
+    .navbar-brand img {height: 45px; margin-left: 5px; width: auto}
+}
+
+@media (min-width: 768px) {
+    .navbar-brand img {height: 65px}
+}
