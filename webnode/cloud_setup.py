@@ -15,7 +15,7 @@ from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.utils.translation import gettext as _
 from ikwen.billing.mtnmomo.views import MTN_MOMO
-from ikwen_kakocase.kako.models import Product
+from ikwen.billing.orangemoney.views import ORANGE_MONEY
 from ikwen_webnode.webnode.models import OperatorProfile
 from permission_backend_nonrel.models import UserPermissionList, GroupPermissionList
 
@@ -24,7 +24,7 @@ from ikwen.accesscontrol.models import SUDO, Member
 from ikwen.billing.models import Invoice, PaymentMean, InvoicingConfig
 from ikwen.billing.utils import get_next_invoice_number
 from ikwen.conf.settings import STATIC_ROOT, STATIC_URL, MEDIA_ROOT, MEDIA_URL
-from ikwen.core.models import Service, SERVICE_DEPLOYED
+from ikwen.core.models import Service, SERVICE_DEPLOYED, OperatorWallet
 from ikwen.core.tools import generate_django_secret_key, generate_random_key, reload_server
 from ikwen.core.utils import add_database_to_settings, add_event, get_mail_content, \
     get_service_instance
@@ -205,17 +205,15 @@ def deploy(app, member, project_name, billing_plan, theme, monthly_cost,
 
     # Copy payment means to local database
     for mean in PaymentMean.objects.using(UMBRELLA).all():
-        if mean.slug == 'paypal':
-            mean.action_url_name = 'shopping:paypal_set_checkout'
         if mean.slug == MTN_MOMO:
             mean.is_main = True
             mean.is_active = True
+        elif mean.slug == ORANGE_MONEY:
+            mean.is_main = False
+            mean.is_active = True
         else:
             mean.is_main = False
-            if is_pro_version:
-                mean.is_active = True
-            else:
-                mean.is_active = False
+            mean.is_active = False
         mean.save(using=database)
         logger.debug("PaymentMean %s created in database: %s" % (mean.slug, database))
 
@@ -235,7 +233,9 @@ def deploy(app, member, project_name, billing_plan, theme, monthly_cost,
     obj_list.save(using=database)
     logger.debug("Member %s successfully added to sudo group for service: %s" % (member.username, pname))
 
-    # wallet = OperatorWallet.objects.using('wallets').create(nonrel_id=service.id)
+    # Create wallets
+    OperatorWallet.objects.using('wallets').create(nonrel_id=service.id, provider=MTN_MOMO)
+    OperatorWallet.objects.using('wallets').create(nonrel_id=service.id, provider=ORANGE_MONEY)
     mail_signature = "%s<br>" \
                      "<a href='%s'>%s</a>" % (project_name, 'http://' + domain, domain)
     config = OperatorProfile(service=service, theme=theme, currency_code='XAF', currency_symbol='XAF',
