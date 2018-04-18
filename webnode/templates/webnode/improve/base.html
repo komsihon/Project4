@@ -126,9 +126,53 @@
                     <div class="col-sm-4">
                         <div class="widget">
                             <h3>{% trans 'About' %}</h3>
+                            {% if config.short_description %}
+                                <p>{{ config.short_description|safe }}</p>
+                            {% endif %}
                             <ul>
-                                 {% if config.address %}<li><a href="#">{{ config.short_description }}</a></li>{% endif %}
-                            </ul>
+                                {% if config.facebook_link %}
+                                    <li style="display: inline-block">
+                                        <a href="{{ config.facebook_link }}">
+                                            <i class="fa fa-facebook-square" style="font-size: 36px"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% if config.twitter_link %}
+                                    <li style="display: inline-block; padding-left: 10px">
+                                        <a href="{{ config.twitter_link }}">
+                                            <i class="fa fa-twitter-square" style="font-size: 36px"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% if config.google_plus_link %}
+                                    <li style="display: inline-block; padding-left: 10px">
+                                        <a href="{{ config.google_plus_link }}">
+                                            <i class="fa fa-google-plus-square" style="font-size: 36px"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% if config.linkedin_link %}
+                                    <li style="display: inline-block; padding-left: 10px">
+                                        <a href="{{ config.linkedin_link }}">
+                                            <i class="fa fa-linkedin-square" style="font-size: 36px"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% if config.youtube_link %}
+                                    <li style="display: inline-block; padding-left: 10px">
+                                        <a href="{{ config.youtube_link }}">
+                                            <i class="fa fa-youtube" style="font-size: 36px"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% if config.instagram_link %}
+                                    <li style="display: inline-block; padding-left: 10px">
+                                        <a href="{{ config.instagram_link }}">
+                                            <i class="fa fa-instagram" style="font-size: 36px"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+{#                          </ul>
                         </div>
                     </div><!--/.col-md-3-->
                 </div>
