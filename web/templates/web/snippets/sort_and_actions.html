@@ -4,8 +4,8 @@
             placeholder: "sortable-placeholder",
             forcePlaceholderSize: true,
             update: function (event, ui) {
-                var sorted = [], model_name = $('.tiles li').parents('.tiles').data('model-name');
-                $('.tiles li').each(function (i) {
+                var sorted = [], model_name = ui.item.parents('.tiles').data('model-name');
+                ui.item.parents('.tiles').find('li').each(function (i) {
                     sorted.push($(this).attr('id') + ':' + i)
                 });
                 $.getJSON('', {model_name: model_name, sorted: sorted.join(',')})
