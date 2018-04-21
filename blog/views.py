@@ -24,7 +24,6 @@ from django.views.generic import TemplateView
 from ikwen.accesscontrol.templatetags.auth_tokens import append_auth_tokens
 
 from ikwen.core.utils import get_model_admin_instance, DefaultUploadBackend
-from ikwen_webnode.web.models import SmartCategory
 from ikwen_webnode.blog.admin import PostAdmin, PostCategoryAdmin
 from ikwen_webnode.blog.models import Post, Comments, PostCategory, PostLikes, Photo
 from django.http import HttpResponse
@@ -33,11 +32,11 @@ from django.template.defaultfilters import slugify
 from ikwen.core.views import HybridListView, ChangeObjectBase
 from ikwen_webnode.webnode.views import TemplateSelector
 
-from conf import settings
+from django.conf import settings
 
 POST_PER_PAGE = 5
-MEDIA_DIR = settings.MEDIA_ROOT + 'tiny_mce/'
-TINYMCE_MEDIA_URL = settings.MEDIA_URL + 'tiny_mce/'
+MEDIA_DIR = getattr(settings, 'MEDIA_ROOT') + 'tiny_mce/'
+TINYMCE_MEDIA_URL = getattr(settings, 'MEDIA_URL') + 'tiny_mce/'
 
 
 class PostsList(TemplateSelector, TemplateView):
