@@ -41,12 +41,15 @@ POST_PER_PAGE = 5
 class TemplateSelector(object):
     def get_template_names(self):
         config = get_service_instance().config
-        if config.theme and config.theme.template.slug != "":
-            if config.theme.template.slug == 'optimum':
-                config.theme.template.slug = "improve"
-            tokens = self.template_name.split('/')
-            tokens.insert(1, config.theme.template.slug)
-            return ['/'.join(tokens)]
+        try:
+            if config.theme and config.theme.template.slug != "":
+                if config.theme.template.slug == 'optimum':
+                    config.theme.template.slug = "improve"
+                tokens = self.template_name.split('/')
+                tokens.insert(1, config.theme.template.slug)
+                return ['/'.join(tokens)]
+        except:
+            pass
         return [self.template_name]
 
 
@@ -229,13 +232,6 @@ def grab_item_list_from_porfolio(smart_category, page):
                 item_list.append(item)
         random.shuffle(item_list)
     return item_list
-
-
-def get_menus_context():
-    categories = {
-        'smart_cat_list': SmartCategory.objects.all()
-    }
-    return categories
 
 
 class DeployCloud(TemplateView):
