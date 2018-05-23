@@ -984,6 +984,13 @@ def save_item_from_url(request, *args, **kwargs):
     return HttpResponseRedirect(reverse('items:item_list'))
 
 
+def get_menu_for_category(request, *args, **kwargs):
+    category_id = request.GET.get('category_id')
+    menus = SmartCategory.objects.all()
+    for menu in menus:
+        if category_id in menu.items_fk_list:
+            return HttpResponse(json.dumps({'menu_id': menu.id}), 'content-type: text/json')
+
 # def render_item_pushed_event(event):
 #     try:
 #         item = Items.objects.get(pk=event.object_id)

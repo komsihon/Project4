@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import permission_required
 
 from ikwen_webnode.items.provider.views import do_import_items_from_spreadsheet, item_batch_uploader, set_stock
 from ikwen_webnode.items.views import ProviderList, ProviderItemList, do_import_items, \
-    update_item_retail_price, \
+    update_item_retail_price, get_menu_for_category, \
     item_photo_uploader, ChangeItem, ItemList, put_item_in_trash, \
     ProviderItemDetail, update_item_stock, delete_photo, CategoryList, ChangeCategory, delete_category, \
     toggle_category_attribute, load_item_from_url, save_item_from_url
@@ -37,6 +37,7 @@ urlpatterns = patterns(
     url(r'^put_item_in_trash$', put_item_in_trash, name='put_item_in_trash'),
     url(r'^load_item_from_url$', load_item_from_url, name='load_item_from_url'),
     url(r'^save_item_from_url$', save_item_from_url, name='save_item_from_url'),
+    url(r'^get_menu_for_category$', get_menu_for_category, name='get_menu_for_category'),
 
     url(r'^api/set_stock/(?P<api_signature>[-\w]+)/(?P<ref>[-\w]+)/(?P<units>\d+(.\d)*)/$', set_stock, name='set_stock')
 )
