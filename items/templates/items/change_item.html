@@ -432,6 +432,29 @@
                 }
             })
 
+            function initMenuSelector(){
+                var menu = $("#id_smart_category").val()
+                var selectedCategory = $("#id_category").val()
+                if (selectedCategory){
+                    // get attrubute "Menu" and find the corresponding menu to make an auto select
+
+                    var endpoint = "{% url 'items:get_menu_for_category' %}";
+                    $.getJSON(endpoint, {category_id: selectedCategory}, function(data) {
+                        $('body, button.confirm').css('cursor','default');
+                        if (data.error) {
+
+                        } else {
+                            alert(data.menu_id)
+                            $("#id_smart_category").find('option:selected').removeAttr('selected')
+                            $("#id_smart_category option[value= " + data.menu_id + "]").prop('selected',true)
+                        }
+                        return false
+                    });
+
+                }
+            }
+
+            initMenuSelector()
             function initCategorySelector(){
                 $('select#id_category option').each(function () {
                     if ($(this).val() != 'new' && $(this).val() != '') $(this).remove()
@@ -461,7 +484,7 @@
                     $('#image-cntr').insertAfter('textarea#id_description')
                 }
                 return false
-                });
+            });
             function populateMedia(media) {
                 if (media.length <= 0) {
                     var $emptyRow = $('<div class="empty-grid" colspan="10">No data found</div>')

@@ -6,7 +6,19 @@
 .slide .cta:hover, a.cta:hover  {background-color: #800009; border: 2px solid #800009; color: #fff}
 .header-bottom {background: rgb(249, 248, 248);}
 .navbar-inverse .navbar-nav > li > a:hover {background-color: transparent; color: #a40009;}
+#main-slider .prev, #main-slider .next {background: #a40009; }
+#main-slider .prev:hover, #main-slider .next:hover {background: #8a0009;}
+#main-slider .carousel-indicators .active:after {background: #8a0009; border: 1px solid #c52d2f;}
+.home-section.bg-img-true .cta {border: 2px solid #a40009; background-color: #a40009}
+.home-section.bg-img-true .cta:hover {border-color: #7e0009;  background-color: #7e0009; color: #FFF;}
+.social-icon a {margin-left: 12px;}
+.social-icon i {color: #201338;font-size: 30px;}
+.social-icon i:hover {color: #a40009}
+.social-icon a:first-child {margin-left: 0}
 
+.nav-xs .swiper-slide{background: #a40009;}
+
+.product-tile {margin-left: 0;}
 /*BLOG STYLE*/
 
 
@@ -48,6 +60,9 @@ div.paginator > span .active, div.paginator > span :hover  {background-color: #a
 .left-tab > li > a {background: #cb0009}
 #reviews input[type="submit"] {background: #ef0009;}
 #reviews input[type="submit"]:hover {background: #a40009;}
-section.home-section .description {line-height: 35px;}
+section.home-section .description {line-height: 35px;font-size: 21px;}
 .header-xs {background: #5f0000;}
 .company-logo-container {max-height: 113px;}
+
+#bottom{border-bottom-color: #1F1137;}
+#footer{background: #1F1137;}

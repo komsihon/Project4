@@ -1,5 +1,6 @@
 import os
 import random
+from time import strftime
 
 from django.db import models
 from datetime import datetime
@@ -12,25 +13,6 @@ from ikwen.core.fields import MultiImageField
 from ikwen.core.models import Model
 from ikwen.core.utils import to_dict, add_database_to_settings
 from ikwen.accesscontrol.models import Member
-
-
-def to_display_date(a_datetime):
-    now = datetime.now()
-    if translation.get_language().lower().find('en') == 0:
-        now_date = '%02d/%02d, %d' % (now.month, now.day, now.year)
-        display_date = '%02d/%02d, %d %02d:%02d' % (
-            a_datetime.month, a_datetime.day, a_datetime.year,
-            a_datetime.hour, a_datetime.minute
-        )
-        display_date = display_date.replace(now_date, '').strip()
-    else:
-        now_date = '%02d/%02d/%d' % (now.day, now.month, now.year)
-        display_date = '%02d/%02d/%d %02d:%02d' % (
-            a_datetime.day, a_datetime.month, a_datetime.year,
-            a_datetime.hour, a_datetime.minute
-        )
-        display_date = display_date.replace(now_date, '').strip()
-    return display_date
 
 
 class PostCategory(Model):
@@ -74,19 +56,6 @@ class Post(Model):
         folders = '%s' % (self.slug)
         return '%s' % folders
 
-    # def get_photos_url_list(self):
-    #     photo_list = []
-    #     for photo in self.photos:
-    #         photo_list.append({
-    #             'original': photo.image.url,
-    #             'small': photo.image.small_url,
-    #             'thumb': photo.image.thumb_url
-    #         })
-    #     return photo_list
-
-    # def get_photos_ids_list(self):
-    #     return ','.join([photo.id for photo in self.photos])
-
     def get_uri(self):
         base_uri = getattr(settings, 'BASE_URI')
         return '%s%s' % (base_uri, self.get_path())
@@ -116,7 +85,7 @@ class Comments(models.Model):
     is_active = models.BooleanField(default=False)
 
     def get_display_date(self):
-        return to_display_date(self.created_on)
+        return strftime("%b.%d %Y", self.pub_date)
 
     def to_dict(self):
         display_date = self.get_display_date()
