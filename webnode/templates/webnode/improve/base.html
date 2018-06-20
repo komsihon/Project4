@@ -88,7 +88,7 @@
                                     {% elif menu.content_type == 'Module' %}
                                         <a href="{% url menu.module.url_name %}">{% trans menu.title %}</a>
                                     {% elif menu.content_type == 'Link' %}
-                                        <a href="{% url menu.target_url %}">{% trans menu.title %}</a>
+                                        <a href="{{ menu.target_url }}">{% trans menu.title %}</a>
                                     {% endif %}
                                 </li>
                                 {% endif %}
