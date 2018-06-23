@@ -444,7 +444,6 @@
                         if (data.error) {
 
                         } else {
-                            alert(data.menu_id)
                             $("#id_smart_category").find('option:selected').removeAttr('selected')
                             $("#id_smart_category option[value= " + data.menu_id + "]").prop('selected',true)
                         }

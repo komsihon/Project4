@@ -3,7 +3,6 @@ from ikwen_webnode.items.models import ItemCategory
 from ikwen_webnode.web.models import SmartCategory
 from ikwen_kakocase.kakocase.context_processors import project_settings as kakocase_settings
 
-
 def project_settings(request):
     """
     Adds utility project url and ikwen base url context variable to the context.
