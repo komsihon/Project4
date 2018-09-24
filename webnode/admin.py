@@ -18,7 +18,7 @@ if getattr(settings, 'IS_IKWEN', False):
                                    'description', 'is_pro_version')}),
         # (_('Business'), {'fields': ('ikwen_share', 'payment_delay', )}),
         # (_('Platform'), {'fields': ('can_manage_delivery_options', 'allow_paypal_direct')}),
-        (_('SMS'), {'fields': ('sms_api_script_url', 'sms_api_username', 'sms_api_password', )}),
+        # (_('SMS'), {'fields': ('sms_api_script_url', 'sms_api_username', 'sms_api_password', )}),
         (_('Mailing'), {'fields': ('welcome_message', 'signature',)})
     ]
     # _readonly_fields = ('api_signature', )
