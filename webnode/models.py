@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
 from ikwen.theming.models import Theme
 
 __author__ = 'Roddy Mbogning'
 
 from django.db import models
 from ikwen.core.models import AbstractConfig
-from ikwen.core.utils import to_dict
-
+from ikwen.core.utils import to_dict, add_database
 
 PROVIDER_ADDED_ITEMS_EVENT = 'ProviderAddedProductsEvent'
 PROVIDER_REMOVED_ITEM_EVENT = 'ProviderRemovedProductEvent'
@@ -22,6 +22,21 @@ class OperatorProfile(AbstractConfig):
     class Meta:
         verbose_name = "Operator"
         verbose_name_plural = "Operators"
+
+    def save(self, *args, **kwargs):
+        if getattr(settings, 'IS_IKWEN', False):
+            db = self.service.database
+            add_database(db)
+            try:
+                obj_mirror = OperatorProfile.objects.using(db).get(pk=self.id)
+                obj_mirror.currency_code = self.currency_code
+                obj_mirror.currency_symbol = self.currency_symbol
+                obj_mirror.cash_out_min = self.cash_out_min
+                obj_mirror.is_pro_version = self.is_pro_version
+                obj_mirror.can_manage_currencies = self.can_manage_currencies
+                super(OperatorProfile, obj_mirror).save(using=db)
+            except OperatorProfile.DoesNotExist:
+                pass
 
     def to_dict(self):
         var = to_dict(self)
