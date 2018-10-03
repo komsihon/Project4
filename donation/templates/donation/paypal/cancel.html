@@ -1,0 +1,41 @@
+{% extends 'webnode/institution/base.html' %}
+{% load i18n staticfiles humanize auth_tokens %}
+
+{% block page_title %}
+    <title>{% trans "Payment canceled" %} - {{ service.project_name }}</title>
+{% endblock %}
+{% block head_style %}
+    {{ block.super }}
+    <style>
+        #content {background: #fff; float: left; min-height: 800px; width: 100%}
+        .checkout-header {margin-top: 50px; text-align: center; font-size: 45px}
+        .donate-btn {display: none}
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div id="content" class="checkout-content">
+        <h2 class="checkout-header">{% trans "Checkout" %}</h2>
+        <div class="container" style="height: 450px">
+            {% if server_error %}
+                <p class="alert alert-danger" style="margin-top: 2em">
+                    {{ server_error }}
+                </p>
+            {% elif paypal_error %}
+                <p style="margin-top: 2em">{% trans "PayPal payment failed with the following error" %}</p>
+                <p class="alert alert-danger" style="margin-top: 1em">
+                    {{ paypal_error }}
+                </p>
+            {% else %}
+                <p class="alert alert-info" style="margin-top: 2em">
+                    {% trans "Ooops! Payment canceled" %}
+                </p>
+            {% endif %}
+            <p style="margin-top: 2em">
+            {% url 'donation:home' as donation_url %}
+                {% blocktrans with cart_url=donation_url|append_auth_tokens:request %}
+                You can <a href="{{ donation_url }}"><ins>go back to donation page</ins></a> and retry or try again later.
+            {% endblocktrans %}</p>
+        </div>
+    </div>
+{% endblock %}

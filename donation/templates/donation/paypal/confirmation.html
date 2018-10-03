@@ -1,0 +1,35 @@
+{% extends 'webnode/institution/base.html' %}
+{% load i18n staticfiles humanize auth_tokens currency %}
+
+{% block page_title %}
+    <title>{% trans "Confirm your donation" %} - {{ service.project_name }}</title>
+{% endblock %}
+{% block head_style %}
+    {{ block.super }}
+    <style>
+        .checkout-header {float: left; font-size: 45px; padding-top: 50px; text-align: center; width: 100%}
+        .alert-warning {background-color: #c5cce6; border-color: #757eec;clear: both;color: #3b408a;float: left; font-size: 20px; margin-top: 40px; text-align: center; width: 100%;}
+        .btn-warning {background-color: #002884;border-color: #060035;font-size: 20px}
+        .price {font-weight: 700}
+        .donate-btn {display: none}
+    </style>
+{% endblock %}
+{% block content %}
+    <div id="content" class="checkout-content">
+        <h2 class="checkout-header">{% trans "Confirm your donation" %}</h2>
+        <div class="container" style="height: 700px">
+            <form action="{% url 'donation:paypal_do_checkout' %}" method="POST" style="margin-top: 3em">
+                {% csrf_token %}
+                <input type="hidden" name="amount" value="{{ request.GET.amount }}">
+                <div class="alert alert-warning">
+                    {% trans "Do you confirm this Donation ?" %}
+                    <p class="price">
+                        {{ CURRENCY.symbol }}
+                        {{ amount|currency:CURRENCY.code|floatformat:CURRENCY.precision|intcomma }}
+                    </p>
+                </div>
+                <button type="submit" class="btn btn-warning" style="width: 220px">{% trans "I confirm" %}</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

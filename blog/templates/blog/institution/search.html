@@ -1,0 +1,66 @@
+{% extends "blog/institution/base.html" %}
+{% load i18n %}
+{% load staticfiles  auth_tokens %}
+{% block meta %}
+    <meta name="abstract" content="ikwen blog "/>
+    <meta property="og:image" content="{{ fb_share_item.media.url }}"/>
+{% endblock %}
+{% block page_title %} <title>{% trans "Search of " %} {{ radix }} - ikwen blog</title> {% endblock %}
+{% block head_style %}
+    {{ block.super }}
+    <style>
+        .alert {border: 1px solid transparent; border-radius: 4px; margin-bottom: 20px; padding: 15px; width: 760px;}
+        .paginator {float: left; margin-top: 20px;}
+        .paginator a {border: solid 1px #DDD; float: left; margin-left: 5px; text-decoration: none; padding: 7px 10px}
+        {#.paginator span {background-color: #f2dede; border: solid 1px #DDD; color: #b94a48; float: left;margin-left: 5px; padding: 7px 10px}#}
+        .post {padding-top: 10px}
+        .post .intro {padding-top: 0}
+        .row.blog-content {margin-top: 30px}
+    </style>
+{% endblock %}
+
+{#{% block page_header %}#}
+{#    <div class="center"><p class="lead">Results found for <b>"{{ radix }}"</b></p></div>#}
+{#{% endblock %}#}
+{% block page_content %}
+    {% include 'snippets/fb_sdk.html' %}
+    {% if entries %}
+        {% for entry in items_paginated %}
+
+            {% if entry.media.name %}
+                <div class="row" style="">
+                    <div class="col-lg-12 hidden-xs">
+                        <a  class="title" href="{% url 'blog:details' entry.slug %}"><img src="{{ entry.media.url }}" width="100%"></a>
+                    </div>
+                    <a  class="title" href="{% url 'blog:details' entry.slug %}"><div class="col-lg-12 visible-xs" style="background-image: url('{{ post.media.url }}'); background-size: 100% auto; background-position: center; height: 6em"></div></a>
+                </div>
+            {% endif %}
+            <div class="post">
+                <a  class="title" href="{% url 'blog:details' entry.slug %}"><span>{{ entry.title }}</span></a>
+                <p class="meta">{{ entry.pub_date }}.
+                    <a href="{% url 'blog:details' entry.slug %}" style="border-bottom: 1px dotted #686868; text-decoration: none">{{ entry.comment_count }} Comments</a> </p>
+                <div class="intro">
+                    <div class="text">{{ entry.summary }}</div>
+                </div>
+                <a href="{% url 'blog:details' entry.slug %}" class="more">Read more</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="post alert alert-danger" align="center" style="">
+			<h2 style="line-height: 35px;">
+				Sorry, there is no article corresponding to your criteria <br/> Try another one please.
+			</h2>
+		</div>
+    {% endif %}
+
+    {{ items_paginated.page_range }}
+    <div class="paginator">
+        {% if items_paginated.has_previous %}
+           <a href="{% url 'blog:home' %}?page={{ items_paginated.previous_page_number }}" >{{ items_paginated.previous_page_number }}</a>
+        {% endif %}
+            <span>{{ items_paginated.number }}</span>
+        {% if items_paginated.has_next %}
+           <a href="{% url 'blog:home' %}?page={{ items_paginated.next_page_number }}" >{{ items_paginated.next_page_number }}</a>
+        {% endif %}
+    </div>
+{% endblock %}

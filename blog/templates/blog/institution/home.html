@@ -1,0 +1,88 @@
+{% extends "blog/institution/base.html" %}
+{% load staticfiles i18n auth_tokens %}
+
+{% block page_title %} <title>ikwen blog - {% trans "Home" %}</title> {% endblock %}
+
+
+{% block meta %}
+    {{ block.super }}
+    <meta name="abstract" content="ikwen blog "/>
+    <meta property="og:type" content="Website" />
+    <meta property="og:title" content="IKWEN BLOG" />
+    <meta property="og:image" content="{{ IKWEN_MEDIA_URL }}{{ config.logo.name }}" />
+    <meta property="og:description" content="{% trans 'Blog of ikwen platforms and applications' %}" />
+    <meta property="description" content="{% trans 'Blog of ikwen platforms and applications' %}" />
+    <meta name="abstract" content="IKWEN provides you with very simple Cloud Apps to take your business to digital world hassle free."/>
+{% endblock %}
+
+{% block head_style %}
+    {{ block.super }}
+    <meta property="og:image" content="{{ fb_share_item.media.url }}"/>
+    <meta property="og:description" content="{% trans 'Blog of ikwen platforms and applications' %}"/>
+    <style>
+        .alert {border: 1px solid transparent; border-radius: 4px; margin-bottom: 20px; padding: 15px}
+        .paginator {float: left; margin-top: 20px;}
+        .paginator a {border: solid 1px #DDD; float: left; margin-left: 5px; text-decoration: none; padding: 7px 10px}
+        .paginator span {background-color: #f2dede; border: solid 1px #DDD; color: #b94a48; float: left;margin-left: 5px; padding: 7px 10px}
+        {#.profile img.poster {height: 40px; width: 40px}#}
+        a.image {float: left; margin-top: 15px}
+        .center {margin-top: 0; padding-bottom: 0;}
+
+        @media only screen
+        and (max-width : 425px) {
+            aside {clear: both}
+            .post {margin-top: 0}
+            .alert-danger {margin-top: 30px}
+            .post:first-of-type {margin-top: 55px}
+            div.socials {margin-top: 50px;}
+        }
+
+    </style>
+{% endblock %}
+
+{% block page_content %}
+    {% include 'snippets/fb_sdk.html' %}
+
+    {% if entries %}
+        {% for entry in items_paginated %}
+            <div class="post">
+                <h1><a class="title" href="{% url 'blog:details' entry.slug %}"><span>{{ entry.title }} </span></a></h1>
+                {% if entry.member.photo and entry.member.photo.name %}
+                    <div class="profile" style="">
+                        <img class="poster" src="{{ IKWEN_MEDIA_URL }}{{ entry.member.photo.small_name }}">
+                        <span class="name">{{ entry.member.full_name  }}</span> <br>
+                        <span style="float: left;font-size: 12px;margin-left: 10px;">
+                            {{ entry.pub_date }}.
+                            <a href="{% url 'blog:details' entry.slug %}" style="border-bottom: 1px dotted #686868; margin-left: 7px; text-decoration: none">{{ entry.comment_count }} {% trans "Comments" %}</a>
+                        </span>
+                    </div>
+                {% endif %}
+{#                    <p class="meta"></p>#}
+                {% if entry.image.name %}
+                    <a class="image" href="{% url 'blog:details' entry.slug %}"><img class="img-responsive img-blog" src="{{ entry.image.url }}" width="100%" alt="" /></a>
+                {% endif %}
+                <div class="intro" style="">
+                    <div class="text">{{ entry.summary }}</div>
+                </div>
+                <a href="{% url 'blog:details' entry.slug %}" class="more">{% trans "Read more" %}</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="post alert alert-danger col-xs-12" align="center" style="">
+			<h2 style="line-height: 35px;">
+				Sorry, there is no article corresponding to your criteria <br/> Try another one please.
+			</h2>
+		</div>
+    {% endif %}
+
+    {{ items_paginated.page_range }}
+    <div class="paginator">
+        {% if items_paginated.has_previous %}
+           <a href="{% url 'blog:home' %}?page={{ items_paginated.previous_page_number }}" >{{ items_paginated.previous_page_number }}</a>
+        {% endif %}
+            <span>{{ items_paginated.number }}</span>
+        {% if items_paginated.has_next %}
+           <a href="{% url 'blog:home' %}?page={{ items_paginated.next_page_number }}" >{{ items_paginated.next_page_number }}</a>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -177,7 +177,16 @@ class HomepageSection(SmartObject):
     def render(self, request=None):
         if self.content_type == FLAT:
             c = Context({'section': self})
-            html_template = get_template('webnode/snippets/homepage_section_flat.html')
+            config = get_service_instance().config
+            tpl = 'webnode/snippets/homepage_section_flat.html'
+            if config.theme and config.theme.template.slug != "":
+                if config.theme.template.slug == 'optimum' or config.theme.template.slug == 'improve':
+                    tpl = 'webnode/snippets/homepage_section_flat.html'
+                else:
+                    tokens = tpl.split('/')
+                    tokens.insert(1, config.theme.template.slug)
+                    tpl = '/'.join(tokens)
+            html_template = get_template(tpl)
             return html_template.render(c)
         else:  # The section points to a Menu
             try:
@@ -188,7 +197,16 @@ class HomepageSection(SmartObject):
                 for category in smart_category.get_category_queryset():
                     item_list.extend(list(Item.objects.filter(category=category, visible=True, in_trash=False)))
                 c = Context({'item_list': item_list[:self._get_row_len()], 'title':smart_category.title, 'config': config})
-                html_template = get_template('webnode/snippets/homepage_section_item_list.html')
+                tpl = 'webnode/snippets/homepage_section_item_list.html'
+                # refix template URI according to the theme used
+                if config.theme and config.theme.template.slug != "":
+                    if config.theme.template.slug == 'optimum' or config.theme.template.slug == 'improve':
+                        tpl = 'webnode/snippets/homepage_section_item_list.html'
+                    else:
+                        tokens = tpl.split('/')
+                        tokens.insert(1, config.theme.template.slug)
+                        tpl = '/'.join(tokens)
+                html_template = get_template(tpl)
                 return html_template.render(c)
             except SmartCategory.DoesNotExist:
                 # The actual menu points to a Module

@@ -1,0 +1,123 @@
+{% extends 'webnode/institution/base.html' %}
+{% load staticfiles auth_tokens %}{% block head_style %}
+    {{ block.super }}
+     {% if config.theme %}
+        {% with theme=config.theme %}
+            <link rel='stylesheet' href="{% static 'webnode/themes/' %}{{ theme.template.slug }}/blog.css" />
+        {% endwith %}
+     {% else %}
+        <link href="{% static 'webnode/css/institution/blog.css' %}?version=1.0" rel="stylesheet">
+    {% endif %}
+{% endblock %}
+{% block content %}
+    {% block page_header %}
+    {% endblock %}
+    <section id="blog" class="container blog">
+        <div class="row blog-content">
+            <div  class="col-sm-8" style="">
+                <div class="widget search mobile-search-widget visible-xs">
+                    <form role="form" action="{% url 'blog:search'   %}" method="get" autocomplete="off">
+                        <input type="text"  name="radix" class="form-control search_box" autocomplete="off" placeholder="Search blog">
+                    </form>
+                </div><!--/.search-->
+
+                {% if radix %}
+                    <div class="center"><p class="lead">Results found for <b>"{{ radix }}"</b></p></div>
+                {% endif %}
+                {% block page_content %}
+                {% endblock %}
+            </div>
+            <aside class="col-xs-12 col-md-4">
+                <div class="widget search hidden-xs">
+                    <form role="form" action="{% url 'blog:search'   %}" method="get" autocomplete="off">
+                        <input type="text"  name="radix" class="form-control search_box" autocomplete="off" placeholder="Search blog">
+                    </form>
+                </div><!--/.search-->
+                {% if suggestions %}
+                    <div class="widget categories">
+                        <h3>Post suggestions</h3>
+                        <div class="row" style="">
+                            <div class="col-sm-12">
+                                {% for suggestion in suggestions %}
+                                <div class="single_comments suggestions">
+                                    <a href="{% url 'blog:details' suggestion.slug %}">
+                                        {% if suggestion.image.name %}
+                                            <img src="{{ suggestion.image.url }}" width="100" alt=""  />
+                                        {% endif %}
+                                        <div>{{ suggestion.title }} </div>
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div><!--/.recent comments-->
+                {% endif %}
+
+
+                <div class="widget categories">
+                    <h3>Categories</h3>
+                    <div class="row hidden-xs">
+                        <div class="col-sm-6">
+                            <ul class="blog_category">
+                                {% for category in categories %}
+                                <li>
+                                <a href="{% url 'blog:post_per_category'  category.slug %}">
+                                    <button type="button" class="btn btn-outline-primary">
+                                        {{ category.name }}  <span class="badge badge-light">{{ category.post_count }}</span>
+                                    </button>
+                                </a>
+{#                                    <a href="{% url 'blog:post_per_category'  category.slug %}">{{ category.name }} <span class="badge">{{ category.post_count }}</span></a>#}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+
+                    <div class="row visible-xs">
+                        <div class="col-sm-6">
+                            <ul class="blog_category mob">
+                                {% for category in categories %}
+                                    <li><a href="{% url 'blog:post_per_category'  category.slug %}">{{ category.name }}</a></li>
+                                    <li role="separator" class="divider"></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div><!--/.categories-->
+                {% if recent_posts %}
+                <div class="widget categories">
+                    <h3>Most consulted</h3>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            {% for suggestion in recent_posts %}
+                            <div class="single_comments suggestions">
+                                <a href="{% url 'blog:details' suggestion.slug %}">
+                                    {% if suggestion.image.name %}
+                                        <img src="{{ suggestion.image.url }}"  width="100"  alt=""  />
+                                    {% endif %}
+                                    <div>{{ suggestion.title }} </div>
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </aside>
+        </div>
+    </section>
+        <!-- /#page-content-wrapper -->
+{% endblock %}
+
+
+    {% block js %}
+        {{ block.super }}
+        <script type="text/javascript">
+            (function() {
+                $('form#search input.input-sm').attr('placeholder', 'Search ikwen')
+                    $('ul.navbar-nav li').removeClass('active')
+                    $('ul.nav.navbar-nav li.module_blog').addClass('active')
+            })()
+        </script>
+    {% endblock %}

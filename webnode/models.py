@@ -18,6 +18,8 @@ class OperatorProfile(AbstractConfig):
                                       help_text="Max number of products this provider may have.")
     theme = models.ForeignKey(Theme, blank=True, null=True)
     max_products = models.IntegerField(default=100)
+    ikwen_share_rate = models.IntegerField(default=0)
+    ikwen_share_fixed = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = "Operator"
@@ -37,6 +39,7 @@ class OperatorProfile(AbstractConfig):
                 super(OperatorProfile, obj_mirror).save(using=db)
             except OperatorProfile.DoesNotExist:
                 pass
+        super(OperatorProfile, self).save(*args, **kwargs)
 
     def to_dict(self):
         var = to_dict(self)

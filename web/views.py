@@ -279,7 +279,7 @@ def toggle_smart_object_attribute(request, *args, **kwargs):
         try:
             obj = Banner.objects.get(pk=object_id)
         except Banner.DoesNotExist:
-            HomepageSection.objects.get(pk=object_id)
+            obj = HomepageSection.objects.get(pk=object_id)
     if val.lower() == 'true':
         obj.__dict__[attr] = True
     else:

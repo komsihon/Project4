@@ -31,6 +31,9 @@ from ikwen_webnode.blog.models import Post
 # from ikwen_webnode.conf import settings
 from ikwen_webnode.webnode.cloud_setup import deploy, DeploymentForm
 
+import logging
+logger = logging.getLogger('ikwen')
+
 COZY = "Cozy"
 COMPACT = "Compact"
 COMFORTABLE = "Comfortable"
@@ -41,12 +44,16 @@ POST_PER_PAGE = 5
 class TemplateSelector(object):
     def get_template_names(self):
         config = get_service_instance().config
+
         try:
             if config.theme and config.theme.template.slug != "":
+                logger.debug("theme / Template:  %s / %s" % (config.theme.name, config.theme.template.name))
                 if config.theme.template.slug == 'optimum':
-                    config.theme.template.slug = "improve"
+                    pass
                 tokens = self.template_name.split('/')
+                logger.debug("tokens:  %s " % (tokens))
                 tokens.insert(1, config.theme.template.slug)
+                logger.debug("templates:  %s " % ('/'.join(tokens)))
                 return ['/'.join(tokens)]
         except:
             pass

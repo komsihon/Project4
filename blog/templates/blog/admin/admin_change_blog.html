@@ -26,12 +26,12 @@
         .form-row.form-group {float: left; clear: both}
 
         .verify {border: 1px solid #e74c3c}  {# Highlights form errors (Check performed by javascript) #}
-        div#upload-container { float: left; margin-top: 3px; width: 74% }
-        div#upload-container .image {background: url('{% static 'ikwen/img/no_photo.png' %}') no-repeat center; background-size: 100%; border: solid 1px #DBE6FF; height: 225px; float: left; margin: 5px; overflow: hidden; width: 280px}
-        div#upload-container .image .progress {float: left; background: #3C63FF; height: 10px; margin-top: 228px}
-        div#upload-container .image .spinner {margin-top: 90px}
-        div#upload-container .uploader {display: none; height: 225px; position: absolute; text-align: center; width: 280px}
-        div#upload-container .image:hover .uploader {display: block}
+        div#upload-container, div#upload-doc-container { float: left; margin-top: 3px; width: 74% }
+        div#upload-container .image, div#upload-doc-container .image {background: url('{% static 'ikwen/img/no_photo.png' %}') no-repeat center; background-size: 100%; border: solid 1px #DBE6FF; height: 225px; float: left; margin: 5px; overflow: hidden; width: 280px}
+        div#upload-container .image .progress, div#upload-doc-container .image .progress {float: left; background: #3C63FF; height: 10px; margin-top: 228px}
+        div#upload-container .image .spinner, div#upload-doc-container .image .spinner {margin-top: 90px}
+        div#upload-container .uploader, div#upload-doc-container .uploader {display: none; height: 225px; position: absolute; text-align: center; width: 280px}
+        div#upload-container .image:hover .uploader, div#upload-doc-container .image:hover .uploader {display: block}
         .qq-uploader {background: rgba(0, 0, 0, .7); height: 40px; padding-top: 8px}
         .qq-upload-button {background: none; border: none; box-shadow: none; color: #fff; text-shadow: none; height: 100px; width: 100%}
         .qq-upload-button-hover {box-shadow: none; color: #fff}
@@ -97,7 +97,9 @@
                 <input type="hidden" name="slug" id="slug" value="{{ post.slug }}" />
                 <input type="hidden" name="post_id" value="{{ post.id }}" />
                 <input type="hidden" name="photos_ids" id="photos_ids" value="" />
+                <input type="hidden" name="docs_ids" id="docs_ids" value="" />
                 <input type="hidden" name="image_url" id="image_url" value="" />
+                <input type="hidden" name="doc_url" id="doc_url" value="" />
                 {% include 'core/snippets/model_admin_form.html' %}
                 <section class="photos" style="width: 100%">
                     <label class="required" style="float: left; width: 100%">{% trans "Cover image" %}</label>
@@ -113,6 +115,28 @@
                         </div>
                     </div>
                     <p class="help clear">{% trans "Nice cover photo to help customer have an idea" %} (640px &times; 426px Recommended)</p>
+                </section>
+
+                <section class="photos" style="width: 100%">
+                    <label class="required" style="float: left; width: 100%">{% trans "Linked document" %}</label>
+                    <div id="upload-doc-container">
+                        {% if post.linked_document and post.linked_document.name %}
+                            <ul>
+                                <li>
+                                    <a href="{{ post.linked_document.url }}">{{ post.linked_document.url }}</a>
+                                </li>
+                            </ul>
+{#                        <div class="image" style="background-image: url('{{ post.get_document_url }}')">#}
+{#                        {% else %}#}
+
+                        {% endif %}
+                        <div class="image">
+                            <span class="progress"></span>
+                            <div class="uploader"></div>
+                            {% include 'core/snippets/spinner.html' %}
+                        </div>
+                    </div>
+                    <p class="help clear">{% trans "File type" %} (less then 2Mo Recommended)</p>
                 </section>
                 <div class="form-group col-xs-12 col-sm-4 col-md-3" style="clear: both; padding-top: 15px">
                     <button class="btn btn-sm btn-primary btn-block">{% trans "Save" %}</button>
@@ -211,6 +235,56 @@
                 }
             });
 
+            var uploader2 = new qq.FileUploader({
+                action: "{% url 'blog:post_document_uploader' %}",
+                element: $('div#upload-doc-container .uploader')[0],
+                buttonText: "{% trans "Upload a document" %}",
+                multiple: false,
+                onProgress: function(id, fileName, loaded, total) {
+                    var ratio = loaded / total,
+                        percent = ratio * 100;
+                    $('div#upload-doc-container .image .progress').animate({width: percent + '%'});
+                    if (ratio == 1) $('div#upload-doc-container .image .spinner').show()
+                },
+                onComplete: function(id, fileName, responseJSON) {
+                    if(responseJSON.success) {
+                        var ext = getExt(fileName)
+
+                        var imageUrl = getFileTypeIcon(ext),
+                            docUrl = responseJSON.url,
+
+                            post = getLocalPost();
+
+                            $('div#upload-doc-container .image').css('background-color', "#fff")  // Causes the placeholder image to disappear
+                                    .css('background-image', "url('" + imageUrl +"')")
+                                    .find('.progress, .spinner').hide();
+
+                        post.documentUrl = docUrl;
+                        $('#doc_url').val(docUrl);
+                        localStorage.setItem('post', JSON.stringify(post));
+                    } else {
+                        alert("upload failed!");
+                    }
+                },
+                params: {
+                    'csrf_token': '{{ csrf_token }}',
+                    'csrf_name': 'csrfmiddlewaretoken',
+                    'csrf_xname': 'X-CSRFToken'
+                }
+            });
+
+            function getExt(filename){
+                var idx = filename.lastIndexOf('.');
+                // handle cases like, .htaccess, filename
+                return (idx < 1) ? "" : filename.substr(idx + 1);
+            }
+            function getFileTypeIcon(ext) {
+                var iconUrl = ''
+                if (ext == 'pdf') iconUrl = "{% static 'webnode/img/pdf-icon.jpg' %}"
+                else if (ext == 'doc' || ext == 'docx') iconUrl = "{% static 'webnode/img/word-icon.jpg' %}"
+                else iconUrl = "{% static 'webnode/img/unknow-icon.png' %}"
+                return iconUrl
+            }
 
             {% if post %}
                 $('#image_url').val("{{ post.get_image_url }}");

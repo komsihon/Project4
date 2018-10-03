@@ -1,11 +1,10 @@
 from django.conf.urls import patterns, include, url
-
 from django.contrib import admin
 from django.contrib.auth.decorators import permission_required
 
 from ikwen_webnode.blog.views import PostDetails, Search, PostPerCategory, PostsList, save_comment, AdminPostHome, \
-    save_post_likes, post_photo_uploader, delete_photo, ListCategory, ChangeCategory, load_posts_for_homepage, \
-    ChangePost, CommentList, delete_comment_object, toggle_object_attribute, get_media, delete_tinyMCE_photo
+    save_post_likes, post_photo_uploader,Post_document_uploader, delete_photo, ListCategory, ChangeCategory, load_posts_for_homepage, \
+    ChangePost, CommentList, delete_comment_object, toggle_object_attribute, get_media, delete_tinyMCE_photo,delete_doc
 from ikwen_webnode.webnode.views import AdminHome
 
 
@@ -27,7 +26,9 @@ urlpatterns = patterns(
         name='list_comment'),
 
     url(r'^post_photo_uploader$', post_photo_uploader, name='post_photo_uploader'),
+    url(r'^post_doc_uploader$', Post_document_uploader, name='post_document_uploader'),
     url(r'^delete_photo$', delete_photo, name='delete_photo'),
+    url(r'^delete_document$', delete_doc, name='delete_doc'),
 
     url(r'^(?P<post_slug>[-\w]+)/$', PostDetails.as_view(), name='details'),
     url(r'^search$', Search.as_view(), name='search'),

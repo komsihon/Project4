@@ -46,6 +46,7 @@ class Post(Model):
     member = models.ForeignKey(Member, editable=False)
     tags = models.CharField(max_length=255, blank=True)
     likes = models.SmallIntegerField(default=0, editable=False)
+    linked_document = models.FileField(blank=True, upload_to=UPLOAD_TO)
     rand = models.FloatField(default=random.random, db_index=True, editable=False)
     consult_count = models.IntegerField(default=10)
 
@@ -110,4 +111,24 @@ class Photo(models.Model):
 
     def __unicode__(self):
         return self.image.url
+
+
+class LinkedDoc(models.Model):
+    UPLOAD_TO = 'blog/blog_img'
+    PLACE_HOLDER = 'no_photo.png'
+    document = models.FileField(upload_to=UPLOAD_TO)
+
+    def delete(self, *args, **kwargs):
+        try:
+            os.unlink(self.document.path)
+        except:
+            pass
+        super(LinkedDoc, self).delete(*args, **kwargs)
+
+    def __unicode__(self):
+        return self.document.url
+
+    def extension(self):
+        name, extension = os.path.splitext(self.document.name)
+        return extension
 

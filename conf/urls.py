@@ -11,6 +11,7 @@ urlpatterns = patterns(
     url(r'^blog/', include('ikwen_webnode.blog.urls', namespace='blog')),
     url(r'^ikwen/theming/', include('ikwen.theming.urls', namespace='theming')),
     url(r'^web/', include('ikwen_webnode.web.urls', namespace='web')),
+    url(r'^donation/', include('ikwen_webnode.donation.urls', namespace='donation')),
 
     url(r'^$', Home.as_view(), name='home'),
     url(r'^dashboard/$', AdminHome.as_view(), name='admin_home'),

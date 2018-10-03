@@ -25,7 +25,7 @@ from ikwen.accesscontrol.templatetags.auth_tokens import append_auth_tokens
 
 from ikwen.core.utils import get_model_admin_instance, DefaultUploadBackend
 from ikwen_webnode.blog.admin import PostAdmin, PostCategoryAdmin
-from ikwen_webnode.blog.models import Post, Comments, PostCategory, PostLikes, Photo
+from ikwen_webnode.blog.models import Post, Comments, PostCategory, PostLikes, LinkedDoc, Photo
 from django.http import HttpResponse
 import json
 from django.template.defaultfilters import slugify
@@ -274,6 +274,7 @@ class ChangePost(TemplateView):
             entry = request.POST.get('entry')
             is_active = request.POST.get('is_active')
             image_url = request.POST.get('image_url')
+            document_url = request.POST.get('doc_url')
             post_category = PostCategory.objects.get(pk=category_id)
             # media_link = request.POST.get('media_link')
             if not post:
@@ -299,6 +300,22 @@ class ChangePost(TemplateView):
                             destination = media_root + Post.UPLOAD_TO + "/" + filename
                             post.image.save(destination, content)
                         os.unlink(media_root + image_url)
+                    except IOError as e:
+                        if getattr(settings, 'DEBUG', False):
+                            raise e
+                        return {'error': 'File failed to upload. May be invalid or corrupted image file'}
+            if document_url:
+                if not post.linked_document.name or document_url != post.linked_document.url:
+                    document = document_url.split('/')[-1]
+                    media_root = getattr(settings, 'MEDIA_ROOT')
+                    media_url = getattr(settings, 'MEDIA_URL')
+                    document_url = document_url.replace(media_url, '')
+                    try:
+                        with open(media_root + document_url, 'r') as f:
+                            content = File(f)
+                            destination = media_root + Post.UPLOAD_TO + "/" + document
+                            post.linked_document.save(destination, content)
+                        os.unlink(media_root + document_url)
                     except IOError as e:
                         if getattr(settings, 'DEBUG', False):
                             raise e
@@ -352,7 +369,43 @@ class PostPhotoUploadBackend(DefaultUploadBackend):
             return {'error': 'File failed to upload. May be invalid or corrupted image file'}
 
 
+class PostDocumentUploadBackend(DefaultUploadBackend):
+    """
+    Ajax upload handler for :class:`items.models.Product` photos
+    """
+
+    def upload_complete(self, request, filename, *args, **kwargs):
+        path = self.UPLOAD_DIR + "/" + filename
+        self._dest.close()
+        media_root = getattr(settings, 'MEDIA_ROOT')
+        try:
+            with open(media_root + path, 'r') as f:
+                content = File(f)
+                destination = media_root + Photo.UPLOAD_TO + "/" + filename
+                linked_document = LinkedDoc()
+                linked_document.document.save(destination, content)
+                post_id = request.GET.get('post_id')
+                if post_id:
+                    try:
+                        post = Post.objects.get(pk=post_id)
+                        post.image.append(linked_document)
+                        post.save()
+                    except:
+                        pass
+
+            os.unlink(media_root + path)
+            return {
+                'id': linked_document.id,
+                'url': linked_document.document.url
+            }
+        except IOError as e:
+            if getattr(settings, 'DEBUG', False):
+                raise e
+            return {'error': 'File failed to upload. May be invalid or corrupted image file'}
+
+
 post_photo_uploader = AjaxFileUploader(PostPhotoUploadBackend)
+Post_document_uploader = AjaxFileUploader(PostDocumentUploadBackend)
 
 
 def delete_photo(request, *args, **kwargs):
@@ -366,6 +419,24 @@ def delete_photo(request, *args, **kwargs):
             post.save()
     try:
         Photo.objects.get(pk=photo_id).delete()
+    except:
+        pass
+    return HttpResponse(
+        json.dumps({'success': True}),
+        content_type='application/json')
+
+
+def delete_doc(request, *args, **kwargs):
+    post_id = request.GET.get('post_id')
+    document_id = request.GET['document_id']
+    doc = LinkedDoc(id=document_id)
+    if post_id:
+        post = Post.objects.get(pk=post_id)
+        if doc in post.linked_document:
+            post.linked_document.remove(doc)
+            post.save()
+    try:
+        Photo.objects.get(pk=document_id).delete()
     except:
         pass
     return HttpResponse(
