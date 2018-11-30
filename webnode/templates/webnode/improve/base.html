@@ -195,7 +195,7 @@
                             {% if user.is_authenticated %}
                                 <li><a href="{% url "ikwen:logout" %}">{% trans "Logout" %}</a></li>
                                 {% if user.is_staff %}
-                                    <li><a href="{% url "items:item_list" %}">{% trans "Admin Panel" %}</a></li>
+                                    <li><a href="{% url "ikwen:staff_router" %}">{% trans "Admin Panel" %}</a></li>
                                 {% endif %}
                             {% else %}
                                 <li><a href="{% url 'ikwen:sign_in' %}">{% trans 'Login' %}</a></li>

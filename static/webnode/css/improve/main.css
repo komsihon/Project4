@@ -2511,7 +2511,7 @@ shortcodes page css
   margin-left: 15px;
 }
 
-.alert {border: 1px solid transparent; border-radius: 4px; margin-bottom: 20px; padding: 15px; width: 760px;}
+.alert {border: 1px solid transparent;border-radius: 4px;margin-bottom: 20px;padding: 15px;width: 760px;}
 .alert-danger {color: #b94a48; background-color: #f2dede; border-color: #ebccd1}
 .paginator {float: left; margin-top: 20px;}
 .paginator a {border: solid 1px #DDD; float: left; margin-left: 5px; text-decoration: none; padding: 7px 10px}

@@ -1,15 +1,12 @@
-from django.contrib.admin.sites import AlreadyRegistered
 from django.template.defaultfilters import slugify
 from ikwen.core.admin import CustomBaseAdmin
 from import_export import resources
-
-from ikwen.core.utils import get_service_instance
-from ikwen_webnode.items.models import Item, RecurringPaymentService, ItemCategory
+from ikwen_webnode.items.models import Item, ItemCategory
 from django.contrib import admin
 
 from ikwen_kakocase.kakocase.models import IS_PROVIDER, IS_RETAILER
 
-from conf import settings
+from django.conf import settings
 
 
 class ItemResource(resources.ModelResource):

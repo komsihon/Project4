@@ -250,7 +250,7 @@ class DeployCloud(TemplateView):
         app = Application.objects.using(UMBRELLA).get(slug='webnode')
         context['app'] = app
         template_list = list(Template.objects.using(UMBRELLA).filter(app=app))
-        context['theme_list'] = Theme.objects.using(UMBRELLA).filter(template__in=template_list)
+        context['theme_list'] = Theme.objects.using(UMBRELLA).filter(template__in=template_list, is_active=True)
         context['can_choose_themes'] = True
         if getattr(settings, 'IS_IKWEN', False):
             billing_plan_list = CloudBillingPlan.objects.using(UMBRELLA).filter(app=app, partner__isnull=True, is_active=True)
