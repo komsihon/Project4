@@ -49,11 +49,15 @@ class TemplateSelector(object):
             if config.theme and config.theme.template.slug != "":
                 logger.debug("theme / Template:  %s / %s" % (config.theme.name, config.theme.template.name))
                 if config.theme.template.slug == 'optimum':
-                    pass
-                tokens = self.template_name.split('/')
-                logger.debug("tokens:  %s " % (tokens))
-                tokens.insert(1, config.theme.template.slug)
-                logger.debug("templates:  %s " % ('/'.join(tokens)))
+                    tokens = self.template_name.split('/')
+                    logger.debug("tokens:  %s " % (tokens))
+                    tokens.insert(1, 'improve')
+                    logger.debug("templates:  %s " % ('/'.join(tokens)))
+                else:
+                    tokens = self.template_name.split('/')
+                    logger.debug("tokens:  %s " % (tokens))
+                    tokens.insert(1, config.theme.template.slug)
+                    logger.debug("templates:  %s " % ('/'.join(tokens)))
                 return ['/'.join(tokens)]
         except:
             pass

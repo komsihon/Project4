@@ -285,6 +285,9 @@ class Item(AbstractItem):
                                            help_text=_("Unit of measurement for this item."))
     min_order = models.IntegerField(default=1,
                                     help_text=_("Minimum number of units one can order. Excellent for wholesale."))
+
+    video_url = models.URLField(blank=True, null=True,
+                                    help_text=_("Link of the video talking about the item."))
     batch_upload = models.ForeignKey('BatchUpload', blank=True, null=True, editable=False)
 
     # Django ORM does not support .distinct() with MongoDB Backend.

@@ -1,7 +1,10 @@
+from django.contrib.admin.sites import AlreadyRegistered
 from django.template.defaultfilters import slugify
 from ikwen.core.admin import CustomBaseAdmin
 from import_export import resources
-from ikwen_webnode.items.models import Item, ItemCategory
+
+from ikwen.core.utils import get_service_instance
+from ikwen_webnode.items.models import Item, RecurringPaymentService, ItemCategory
 from django.contrib import admin
 
 from ikwen_kakocase.kakocase.models import IS_PROVIDER, IS_RETAILER
@@ -49,8 +52,8 @@ class ItemResource(resources.ModelResource):
 
 class ItemAdmin(admin.ModelAdmin):
     fieldsets = (
-        (None, {'fields': ('provider', 'category', 'name', 'brand', 'wholesale_price', 'retail_price', 'max_price', 'size', 'color', 'weight', 'badge_text', 'stock', 'visible', 'summary', 'description', ) if IS_RETAILER
-        else ('category', 'name', 'brand', 'wholesale_price', 'retail_price', 'max_price', 'retail_price_is_modifiable',
+        (None, {'fields': ('provider', 'category', 'name', 'brand', 'wholesale_price', 'video_url', 'retail_price', 'max_price', 'size', 'color', 'weight', 'badge_text', 'stock', 'visible', 'summary', 'description', ) if IS_RETAILER
+        else ('category', 'name', 'brand', 'wholesale_price', 'video_url', 'retail_price', 'max_price', 'retail_price_is_modifiable',
               'reference', 'original_id', 'size', 'color', 'weight', 'stock', 'unit_of_measurement', 'min_order', 'badge_text', 'summary', 'description',
               'visible',)}),
     )
