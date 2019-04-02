@@ -77,7 +77,7 @@ class PostLikes(Model):
     post = models.ForeignKey(Post)
 
 
-class Comments(models.Model):
+class Comment(models.Model):
     email = models.EmailField()
     name = models.CharField(max_length=45, blank=True)
     post = models.ForeignKey(Post)
@@ -86,7 +86,7 @@ class Comments(models.Model):
     is_active = models.BooleanField(default=False)
 
     def get_display_date(self):
-        return strftime("%b.%d %Y", self.pub_date)
+        return strftime("%b.%d %Y", self.created_on)
 
     def to_dict(self):
         display_date = self.get_display_date()

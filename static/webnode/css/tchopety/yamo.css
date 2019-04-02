@@ -1,4 +1,5 @@
-
+/*h1, h2, h3, h4, h5, h6 {color: #a40009;}*/
+.slide h1 {color: #a40009;}
 .veil{display: none}
 .cta, a.cta {background-color: #a40009; border: 2px solid #a40009; color: #fff; font-size: 24px; padding: 8px 30px}
 .slide-title {color: #a40009; font-size: 3.5em; margin-top: 120px; text-align: center; line-height: 50px }
@@ -9,18 +10,20 @@
 #main-slider .prev, #main-slider .next {background: #a40009; }
 #main-slider .prev:hover, #main-slider .next:hover {background: #8a0009;}
 #main-slider .carousel-indicators .active:after {background: #8a0009; border: 1px solid #c52d2f;}
-.home-section.bg-img-true .cta {border: 2px solid #a40009; background-color: #a40009}
+.home-section.bg-img-true .cta {border: 2px solid #a40009; background-color: #a40009; margin-top: 200px;}
 .home-section.bg-img-true .cta:hover {border-color: #7e0009;  background-color: #7e0009; color: #FFF;}
 .social-icon a {margin-left: 12px;}
 .social-icon i {color: #201338;font-size: 30px;}
 .social-icon i:hover {color: #a40009}
 .social-icon a:first-child {margin-left: 0}
 
+/*.navbar {background: #fff;}*/
+
 .nav-xs .swiper-slide{background: #a40009;}
 
 .product-tile {margin-left: 0;}
 /*BLOG STYLE*/
-
+.social-icon a i {color: #720000;}
 
 .caution {color: #D62626}
 #navbar {background-color: #a40009; color: #fff}
@@ -45,7 +48,7 @@ div.paginator > span .active, div.paginator > span :hover  {background-color: #a
 .post_reply_comments a:before {border-color: #a40009 transparent transparent; border-style: solid; border-width: 16px; bottom: -11px; content: ""; height: 0; left: -12px;  position: absolute; z-index: 99999;}
 #bottom {background: #f5f5f5; border-bottom: 5px solid #a40009; font-size: 14px;}
 #bottom ul li a:hover {color: #a40009;}
-#footer a:hover {color: #a40009;}
+#footer a:hover {color: #310000}
 .single_comments.suggestions {width: 100%}
 .dropdown-menu-xs {background: #a40009}
 .post .intro {padding: 15px 0 25px 0;width: 100%}
@@ -64,5 +67,21 @@ section.home-section .description {line-height: 35px;font-size: 21px;}
 .header-xs {background: #5f0000;}
 .company-logo-container {max-height: 113px;}
 
-#bottom{border-bottom-color: #1F1137;}
-#footer{background: #1F1137;}
+#bottom{border-bottom-color: #371111;}
+#footer{background: #350000;}
+.slide .details .cta {margin-top: 75px; border: none;background-color: transparent}
+.slide .details .button1 {background-color: #a40009; border: 2px solid #a40009; color: #fff; font-size: 24px; padding: 8px 30px}
+
+
+@media (max-width: 767px) {
+    .cta, a.cta {background-color: transparent; border: none; position: absolute; text-align: center; width: 100%}
+    div.slide.mobile .cta, .home-section.bg-img-true .cta {margin-top: 200px}
+    .slide h1 {margin-top: 120px; position: absolute; text-align: center; width: 100%}
+    .slide .details .cta {margin-top: 10px;}
+    .slide .button1 {background-color: #a40009; border: 2px solid #a40009; color: #fff; font-size: 24px; padding: 8px 30px;}
+    .slide .details {margin-top: 150px;}
+    .swiper-slide .slide {background-size: 200% auto; background-position: center;}
+    .center {padding-top: 25px}
+    .home-section.bg-img-true .cta {width: 91%;}
+    .home-section-cta {float: left}
+}

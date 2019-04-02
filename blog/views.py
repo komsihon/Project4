@@ -25,7 +25,7 @@ from ikwen.accesscontrol.templatetags.auth_tokens import append_auth_tokens
 
 from ikwen.core.utils import get_model_admin_instance, DefaultUploadBackend
 from ikwen_webnode.blog.admin import PostAdmin, PostCategoryAdmin
-from ikwen_webnode.blog.models import Post, Comments, PostCategory, PostLikes, LinkedDoc, Photo
+from ikwen_webnode.blog.models import Post, Comment, PostCategory, PostLikes, LinkedDoc, Photo
 from django.http import HttpResponse
 import json
 from django.template.defaultfilters import slugify
@@ -48,7 +48,7 @@ class PostsList(TemplateSelector, TemplateView):
         entries = posts.order_by('-pub_date')
         page_count = entries.count() / POST_PER_PAGE
         for entry in entries:
-            comment_count = Comments.objects.filter(post=entry).count()
+            comment_count = Comment.objects.filter(post=entry).count()
             entry.comment_count = comment_count
         context['items_paginated'] = get_paginated_view(self.request, entries, POST_PER_PAGE)
         context['entries'] = entries
@@ -97,7 +97,7 @@ class PostDetails(TemplateSelector, TemplateView):
         context = super(PostDetails, self).get_context_data(**kwargs)
         slug = kwargs['post_slug']
         entry = get_object_or_404(Post, slug=slug)
-        context['comments'] = Comments.objects.filter(post=entry, is_active=True).order_by('id')
+        context['comments'] = Comment.objects.filter(post=entry, is_active=True).order_by('id')
         context['blog'] = entry
         try:
             self.request.META['HTTP_REFERER']
@@ -128,7 +128,7 @@ def save_comment(request, *args, **kwargs):
     name = request.GET.get('name')
     entry = request.GET.get('comment')
     post = get_object_or_404(Post, pk=post_id)
-    comment = Comments(post=post, name=name, email=email, entry=entry)
+    comment = Comment(post=post, name=name, email=email, entry=entry)
     comment.save()
     response = {
         'email': comment.email,
@@ -212,7 +212,7 @@ class ChangeCategory(ChangeObjectBase):
 
 
 class AdminPostHome(HybridListView):
-    template_name = 'blog/admin/admin_blog_list.html'
+    template_name = 'blog/admin/blog_list.html'
 
     model = Post
     search_field = 'title'
@@ -232,7 +232,7 @@ class AdminPostHome(HybridListView):
 
 
 class ChangePost(TemplateView):
-    template_name = 'blog/admin/admin_change_blog.html'
+    template_name = 'blog/admin/change_blog.html'
 
     def get_post_admin(self):
         default_site = AdminSite()
@@ -449,27 +449,16 @@ def load_posts_for_homepage(request, *args, **kwargs):
     module = Module.objects.get(slug="module_blog")
     # entries = posts.order_by('-pub_date')
     for entry in entries:
-        comment_count = Comments.objects.filter(post=entry).count()
+        comment_count = Comment.objects.filter(post=entry).count()
         entry.comment_count = comment_count
     context = {'entries': entries, 'module': module}
     return render(request, 'webnode/snippets/homepage_section_blog.html', context)
 
 
 class CommentList(HybridListView):
-    template_name = 'blog/admin/admin_blog_comments_list.html'
-    html_results_template_name = 'blog/snippets/comment_list_results.html'
-    queryset = Comments.objects.all()
-    ordering = ('-pub_date', )
-    context_object_name = 'Comments_list'
-
-    def get_context_data(self, **kwargs):
-        queryset = self.get_queryset()
-        context = super(CommentList, self).get_context_data(**kwargs)
-        paginator = Paginator(queryset, self.page_size)
-        objects_page = paginator.page(1)
-        context['q'] = self.request.GET.get('q')
-        context['objects_page'] = objects_page
-        return context
+    model = Comment
+    template_name = "blog/admin/comment_list.html"
+    ordering = ("-id",)
 
 
 def toggle_object_attribute(request, *args, **kwargs):
@@ -477,9 +466,9 @@ def toggle_object_attribute(request, *args, **kwargs):
     attr = request.GET['attr']
     val = request.GET['val']
     try:
-        obj = Comments.objects.get(pk=object_id)
-    except Comments.DoesNotExist:
-        obj = Comments.objects.get(pk=object_id)
+        obj = Comment.objects.get(pk=object_id)
+    except Comment.DoesNotExist:
+        obj = Comment.objects.get(pk=object_id)
     if val.lower() == 'true':
         obj.__dict__[attr] = True
     else:
@@ -492,13 +481,13 @@ def toggle_object_attribute(request, *args, **kwargs):
 def delete_comment_object(request, *args, **kwargs):
     pk = request.GET.get('selection')
     try:
-        Comments.objects.get(pk=pk).delete()
+        Comment.objects.get(pk=pk).delete()
         message = "Item successfully deleted."
-    except Comments.DoesNotExist:
+    except Comment.DoesNotExist:
         try:
-            Comments.objects.get(pk=pk).delete()
+            Comment.objects.get(pk=pk).delete()
             message = "Item successfully deleted."
-        except Comments.DoesNotExist:
+        except Comment.DoesNotExist:
             message = "Object was not found."
 
     response = {'message': message}
