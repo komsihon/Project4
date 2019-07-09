@@ -22,7 +22,13 @@
 
 {% block banner %}
     {% if  item.image %}
-        <div class="page-banner" style="background-image: url({{ item.get_photos_url_list.0.original }})"></div>
+        {% if item.has_background_image %}
+            <div class="page-banner" style="background-image: url({{ item.get_photos_url_list.0.original }})"></div>
+        {% else %}
+            <div class="page-banner">
+                <img src="{{ item.get_photos_url_list.0.original }}" class="img-responsive img-rounded">
+            </div>
+        {% endif %}
     {% endif %}
 {% endblock %}
 {% block content %}
@@ -30,10 +36,20 @@
     <div class="container item-detail">
         <div class="blog-item">
             <div class="row">
+                {% if item.has_background_image %}
                 <div class="col-xs-12 col-sm-12 page-content">
                     <h1>{{ item.name  }}</h1>
                     <div>{{ item.description | safe }}</div>
                 </div>
+                {% else %}
+                    <h1>{{ item.name  }}</h1>
+                    <div class="col-xs-12 col-sm-4 col-md-4">
+                        <img src="{{ item.get_photos_url_list.0.original }}" class="img-responsive img-rounded">
+                    </div>
+                    <div class="col-xs-12 col-sm-8 col-md-8 page-content">
+                        <div>{{ item.description | safe }}</div>
+                    </div>
+                {% endif %}
             </div>
         </div><!--/.blog-item-->
         {% if blog_suggestions %}

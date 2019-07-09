@@ -38,6 +38,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
               <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
             <![endif]-->
         {% endblock %}
+        <link rel="stylesheet" href="{% static 'webnode/css/dreamer/hpn.css' %}">
         <script src="{% static 'ikwen/js/jquery-1.12.4.min.js' %}"></script>
     </head>
     <body>
@@ -289,6 +290,15 @@ License URL: http://creativecommons.org/licenses/by/3.0/
         <script src="{% static 'ikwen/js/ikwen-util.js' %}"></script>
         <script type="text/javascript">
             (function () {
+                var headerTopH = $('.header').height()
+                $(window).scroll(function () {
+                    var scrollTop = $(this).scrollTop();
+                    if (scrollTop > headerTopH) {
+                        $('.header:not(.fixed)').addClass('fixed');
+                    } else {
+                        $('.header.fixed').removeClass('fixed');
+                    }
+                });
             })()
 		</script>
         {% block js %}{% endblock %}

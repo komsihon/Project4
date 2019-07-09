@@ -55,7 +55,7 @@ class ItemAdmin(admin.ModelAdmin):
         (None, {'fields': ('provider', 'category', 'name', 'brand', 'wholesale_price', 'video_url', 'retail_price', 'max_price', 'size', 'color', 'weight', 'badge_text', 'stock', 'visible', 'summary', 'description', ) if IS_RETAILER
         else ('category', 'name', 'brand', 'wholesale_price', 'video_url', 'retail_price', 'max_price', 'retail_price_is_modifiable',
               'reference', 'original_id', 'size', 'color', 'weight', 'stock', 'unit_of_measurement', 'min_order', 'badge_text', 'summary', 'description',
-              'visible',)}),
+              'visible', 'has_background_image')}),
     )
 
     def get_readonly_fields(self, request, obj=None):
@@ -78,5 +78,3 @@ class ItemCategoryAdmin(admin.ModelAdmin):
         readonly_fields = ('total_items_traded', 'total_orders_count',)
     else:
         fields = ('name','content_type', 'description', 'badge_text', 'is_active',)
-        if getattr(settings, 'IS_RETAILER', False):
-            readonly_fields = ('name', 'description',)

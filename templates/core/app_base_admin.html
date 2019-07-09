@@ -32,16 +32,7 @@
                     </li>
                 </ul>
             </li>
-{#        <li role="presentation" class="blog">#}
-{#            <a href="{% url 'blog:list_blog' %}">{% trans "Blog" %}</a>#}
-{#        </li>#}
         {% endif %}
-{#        {% if module_donation.is_active %}#}
-{#            <li class="donations">{% url 'donate:donation_list' as donation_list_url %}#}
-{#                <a href="{{ donation_list_url }}">{% trans "Donations" %}</a>#}
-{##}
-{#            </li>#}
-{#        {% endif %}#}
         {% if module_donation.is_active %}
             <li role="presentation" class="bounty">
                 <a href="javascript:;" data-toggle="collapse" data-target="#bounty"

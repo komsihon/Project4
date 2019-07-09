@@ -6,12 +6,10 @@ from django.db.models.signals import post_save, post_delete
 from django.utils.translation import gettext_lazy as _
 from djangotoolbox.fields import ListField, EmbeddedModelField
 from ikwen.accesscontrol.backends import UMBRELLA
-
 from ikwen.core.fields import MultiImageField
 from ikwen.core.models import AbstractWatchModel, Service
 from ikwen.core.utils import to_dict, set_counters, increment_history_field
 from ikwen_kakocase.kakocase.models import IS_PROVIDER, IS_RETAILER, PRODUCTS_PREVIEWS_PER_ROW
-
 
 FLAT_PAGE = "FlatPage"
 ITEM_LIST = "ItemList"
@@ -295,6 +293,8 @@ class Item(AbstractItem):
     # The field is set upon the saving and deleting an object using
     # :func:`items.utils.mark_duplicates`
     is_duplicate = models.BooleanField(default=False, editable=False)
+    has_background_image = models.BooleanField(default=False,
+                                    help_text=_("Specify if you want the item to be presented as background banner or just as an image"))
 
     class Meta:
         permissions = (

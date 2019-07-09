@@ -83,8 +83,12 @@ class ItemDetails(TemplateSelector, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ItemDetails, self).get_context_data(**kwargs)
+        menu_slug = kwargs['menu_slug']
         slug = kwargs['slug']
         category_slug = kwargs['category_slug']
+        # try:
+        #     menu = SmartCategory.objects.get(slug=category_slug)
+        #
         category = ItemCategory.objects.get(slug=category_slug)
         page_item = Item.objects.get(slug=slug, category=category, in_trash=False, visible=True)
         tags = page_item.tags

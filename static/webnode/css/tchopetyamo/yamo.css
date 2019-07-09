@@ -71,3 +71,6 @@ section.home-section .description {line-height: 35px;font-size: 21px;}
 #footer{background: #350000;}
 .slide .details .cta {margin-top: 75px; border: none;background-color: transparent}
 .slide .details .button1 {background-color: #a40009; border: 2px solid #a40009; color: #fff; font-size: 24px; padding: 8px 30px}
+
+.checkout-header {padding: 20px 0;}
+h2.title {font-size: 1.8em}

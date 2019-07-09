@@ -24,24 +24,21 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import TemplateView
+from ikwen_kakocase.kakocase.models import OperatorProfile, BusinessCategory, PROVIDER_REMOVED_PRODUCT_EVENT, \
+    PRODUCTS_LIMIT_ALMOST_REACHED_EVENT, PRODUCTS_LIMIT_REACHED_EVENT
 from ikwen_kakocase.kakocase.templatetags.media_from_provider import from_provider
-
-from ikwen.core.models import Service
-
-from ikwen.accesscontrol.utils import get_members_having_permission
-
-from ikwen_webnode.web.models import SmartCategory, Banner
-from ikwen.accesscontrol.templatetags.auth_tokens import append_auth_tokens
-
-from ikwen.accesscontrol.backends import UMBRELLA
-from ikwen.core.utils import add_database_to_settings, DefaultUploadBackend, get_service_instance, add_event, \
-    get_mail_content, get_model_admin_instance
-from ikwen.core.views import HybridListView
 from ikwen_webnode.items.admin import ItemAdmin, RecurringPaymentServiceAdmin, ItemCategoryAdmin
 from ikwen_webnode.items.models import Item, RecurringPaymentService, Photo, ItemCategory
 from ikwen_webnode.items.utils import create_category, mark_duplicates, get_item_from_url
-from ikwen_kakocase.kakocase.models import OperatorProfile, BusinessCategory, PROVIDER_REMOVED_PRODUCT_EVENT, \
-    PRODUCTS_LIMIT_ALMOST_REACHED_EVENT, PRODUCTS_LIMIT_REACHED_EVENT
+from ikwen_webnode.web.models import SmartCategory, Banner
+
+from ikwen.accesscontrol.backends import UMBRELLA
+from ikwen.accesscontrol.templatetags.auth_tokens import append_auth_tokens
+from ikwen.accesscontrol.utils import get_members_having_permission
+from ikwen.core.models import Service
+from ikwen.core.utils import add_database_to_settings, DefaultUploadBackend, get_service_instance, add_event, \
+    get_mail_content, get_model_admin_instance
+from ikwen.core.views import HybridListView
 
 
 class ProviderList(HybridListView):
@@ -221,6 +218,9 @@ class ChangeCategory(TemplateView):
             description = form.cleaned_data['description']
             badge_text = form.cleaned_data['badge_text']
             image_url = request.POST.get('image_url')
+            content_type = request.POST.get('content_type')
+
+            category.content_type = content_type
             if not category:
                 category = create_category(name)
             else:
@@ -621,6 +621,7 @@ class ChangeItem(TemplateView):
             category_id = request.POST.get('category')
             brand = request.POST.get('brand')
             reference = request.POST.get('reference')
+            has_background_image = request.POST.get('has_background_image') if request.POST.get('has_background_image') else False
             original_id = request.POST.get('original_id')
             wholesale_price = float(request.POST.get('wholesale_price'))
             try:
@@ -685,6 +686,7 @@ class ChangeItem(TemplateView):
             item.original_id = original_id
             item.size = size
             item.weight = weight
+            item.has_background_image = has_background_image
             item.min_order = min_order
             item.unit_of_measurement = unit_of_measurement
             item.tags = item.slug.replace('-', ' ')

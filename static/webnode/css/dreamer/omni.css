@@ -1,0 +1,21 @@
+.header-top {background: #005b82; height: 100px}
+.footer-w3l {margin-top: 210px;}
+.btn-primary {background: #2dc597;}
+#payment-start-flow li {list-style-type: none;}
+#content.form > div {margin-top: 50px}
+
+#left {background-color: transparent; left: 120px; top: 180px; position: absolute; z-index: 3;}
+#left header h1 {color: #4e4e4e}
+#use-omni {background-color: rgba(255, 255, 255, 0.8); border-radius: 7px; padding: 12px;}
+#download-android {background-color:  rgba(255, 255, 255, 0.8);  border-radius: 12px; padding: 12px;}
+.go {padding: 29px 0}
+.btn-primary:hover, .btn-primary:focus {background: #40b97e;}
+.btn-success {border-color: #005b82; background-color: #005b82; font-weight: 700}
+.btn {padding: 5px 12px}
+.input-sm {padding: 16px 10px;}
+.btn-success:hover, .btn-success:focus, .btn-success:active, .btn-success.active, .open .dropdown-toggle.btn-success {border-color: #004f72; background-color: #004866;}
+
+
+@media (max-width: 768px) {
+	#left {position: relative; margin: 0;  left: inherit; top: inherit;     height: 700px;}
+}

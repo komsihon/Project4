@@ -68,7 +68,7 @@ class ChangeSmartObject(TemplateView):
         else:
             model = SmartCategory
             model_admin = SmartCategoryAdmin
-            fields = ("title", "content_type", "target_url",'description',)
+            fields = ("title", "content_type", 'density', "target_url",'description',)
         if smart_object_id:
             smart_object = get_object_or_404(model, pk=smart_object_id)
             smart_object.content = [ItemCategory.objects.get(pk=pk) for pk in smart_object.items_fk_list]
@@ -193,11 +193,13 @@ class ChangeHomepageSection(ChangeObjectBase):
             title = form.cleaned_data['title']
             slug = slugify(title)
             content_type = form.cleaned_data['content_type']
+            density = request.POST.get('density')
             image_url = request.POST.get('image_url')
             if not smart_object:
                 smart_object = HomepageSection()
             smart_object.title = title
             smart_object.slug = slug
+            smart_object.density = density
             smart_object.content_type = content_type
             if content_type == FLAT:
                 smart_object.description = form.cleaned_data['description']

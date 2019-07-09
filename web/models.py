@@ -39,6 +39,12 @@ SMART_CATEGORY_TYPE_CHOICES = (
     (LINK, _("Link"))
 )
 
+DENSITY_CHOICE = (
+    (COZY, _("Cozy")),
+    (COMPACT, _("Compact")),
+    (COMFORTABLE, _("Comfortable"))
+)
+
 SLIDE = 'Slide'
 TILES = 'Tiles'
 POPUP = 'Popup'
@@ -80,6 +86,9 @@ class SmartObject(Model):
     class Meta:
         abstract = True
         ordering = ('-id', 'slug', )
+
+    def get_sub_menu_queryset(self):
+        return ItemCategory.objects.filter(pk__in=self.items_fk_list).exclude(slug=self.slug)
 
     def get_category_queryset(self):
         return ItemCategory.objects.filter(pk__in=self.items_fk_list)
@@ -155,6 +164,7 @@ class HomepageSection(SmartObject):
                            help_text=_('Action you want your visitors to undertake. '
                                        '<em><strong>E.g:</strong> "Join Us Now"</em>'))
     target_url = models.URLField(blank=True)
+    density = models.CharField(max_length=15, default=COZY, choices=DENSITY_CHOICE)
 
     class Meta:
         ordering = ('order_of_appearance', '-id', )
@@ -196,7 +206,7 @@ class HomepageSection(SmartObject):
                 config = get_service_instance().config
                 for category in smart_category.get_category_queryset():
                     item_list.extend(list(Item.objects.filter(category=category, visible=True, in_trash=False)))
-                c = Context({'item_list': item_list[:self._get_row_len()], 'title':smart_category.title, 'config': config})
+                c = Context({'item_list': item_list[:self._get_row_len()], 'density':self.density , 'title':smart_category.title, 'config': config})
                 tpl = 'webnode/snippets/homepage_section_item_list.html'
                 # refix template URI according to the theme used
                 if config.theme and config.theme.template.slug != "":

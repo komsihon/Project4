@@ -12,7 +12,7 @@ class SmartCategoryAdmin(admin.ModelAdmin):
 
 class HomepageSectionAdmin(admin.ModelAdmin):
     fieldsets = (
-        (None, {'fields': ('title', 'content_type')}),
+        (None, {'fields': ('title', 'content_type', 'density')}),
         (_("Details"), {'fields': ('description', 'cta', 'target_url', 'text_position', 'background_image')}),
     )
-    fields = ('title', 'content_type', 'description', 'cta', 'target_url', 'text_position', 'background_image',)
+    fields = ('title', 'content_type', 'density', 'description', 'cta', 'target_url', 'text_position', 'background_image',)

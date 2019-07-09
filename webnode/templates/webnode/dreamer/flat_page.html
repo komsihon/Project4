@@ -7,6 +7,8 @@
     {{ block.super }}
     <style>
         .navbar-inverse .navbar-nav > li > a {color: #2e2e2e;}
+        .flat-page-content {font-size: 20px; line-height: 35px; min-height: 600px; margin-top: 50px;}
+        .page-title {margin-top: 5em;}
     </style>
 {% endblock %}
 
@@ -14,9 +16,9 @@
     <section id="about-us">
         <div class="container">
 			<div class="center wow fadeInDown">
-				<h2>{{ page.title }}</h2>
+				<h2 class="page-title">{{ page.title }}</h2>
 			</div>
-            <div style="font-size: 20px; line-height: 35px; min-height: 600px">
+            <div class="flat-page-content">
                 {{ page.content|safe }}
             </div>
 		</div><!--/.container-->
