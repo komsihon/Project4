@@ -17,5 +17,10 @@
 
 
 @media (max-width: 768px) {
-	#left {position: relative; margin: 0;  left: inherit; top: inherit;     height: 700px;}
+	#left {position: relative; margin: 0;  left: inherit; top: inherit; height: 679px;}
+	.header-xs .fa {font-size: 30px;margin-left: 11px; margin-top: -3px;}
+	.header-xs h3 {margin-top: 9px;}
+	.edge-panel-left .wrapper {padding-top: 0}
+	#side-nav .divider {float: left}
 }
+

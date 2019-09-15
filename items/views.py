@@ -623,18 +623,15 @@ class ChangeItem(TemplateView):
             reference = request.POST.get('reference')
             has_background_image = request.POST.get('has_background_image') if request.POST.get('has_background_image') else False
             original_id = request.POST.get('original_id')
-            wholesale_price = float(request.POST.get('wholesale_price'))
             try:
                 retail_price = float(request.POST.get('retail_price'))
             except:
                 retail_price = 0
-            max_price = request.POST.get('max_price')
             summary = request.POST.get('summary')
             description = request.POST.get('description')
             badge_text = request.POST.get('badge_text')
             size = request.POST.get('size')
             weight = request.POST.get('weight')
-            stock = request.POST.get('stock')
             unit_of_measurement = request.POST.get('unit_of_measurement')
             min_order = request.POST.get('min_order')
             if not min_order:
@@ -643,11 +640,6 @@ class ChangeItem(TemplateView):
             photos_ids = request.POST.get('photos_ids')
             photos_ids_list = photos_ids.strip(',').split(',') if photos_ids else []
             category = ItemCategory.objects.get(pk=category_id)
-            if retail_price and retail_price < wholesale_price:
-                error = _("Retail price cannot be smaller than wholesale price.")
-                context = self.get_context_data(**kwargs)
-                context['error'] = error
-                return render(request, self.template_name, context)
             if item_id:
                 item = get_object_or_404(Item, pk=item_id)
                 if getattr(settings, 'IS_PROVIDER', False):
@@ -657,11 +649,7 @@ class ChangeItem(TemplateView):
                         context['error'] = error
                         return render(request, self.template_name, context)
 
-                if item.retail_price_is_modifiable and retail_price < item.retail_price:
-                    item.previous_price = item.retail_price
-                    item.on_sale = True
-                else:
-                    item.on_sale = False
+                item.on_sale = False
                 if item.category != category:
                     item.category.items_count -= 1
                     item.category.save()
@@ -690,17 +678,6 @@ class ChangeItem(TemplateView):
             item.min_order = min_order
             item.unit_of_measurement = unit_of_measurement
             item.tags = item.slug.replace('-', ' ')
-            try:
-                item.stock = int(stock.strip())
-            except:
-                item.stock = 0
-            if getattr(settings, 'IS_PROVIDER', False):
-                item.wholesale_price = wholesale_price
-                if max_price:
-                    item.max_price = float(max_price.strip())
-                item.retail_price_is_modifiable = True if request.POST.get('retail_price_is_modifiable') else False
-            else:
-                item.retail_price_is_modifiable = True
             item.photos = []
             if len(photos_ids_list) == 0:
                 item.visible = False  # Items without photo are hidden
@@ -718,16 +695,6 @@ class ChangeItem(TemplateView):
             item.provider = service
             item.save()
             category.save()
-            if not config.is_pro_version:
-                total_items_count = Item.objects.filter(in_trash=False).count()
-                if config.max_products == (total_items_count - 10):
-                    item_manager_list = get_members_having_permission(Item, 'ik_manage_item')
-                    for m in item_manager_list:
-                        add_event(service, PRODUCTS_LIMIT_ALMOST_REACHED_EVENT, m)
-                if config.max_products == total_items_count - 10:
-                    item_manager_list = get_members_having_permission(Item, 'ik_manage_item')
-                    for m in item_manager_list:
-                        add_event(service, PRODUCTS_LIMIT_REACHED_EVENT, m)
             if item_id:
                 next_url = reverse('items:change_item', args=(item_id, ))
                 messages.success(request, _("Items %s successfully updated." % item.name))
@@ -750,7 +717,8 @@ class ChangeItem(TemplateView):
 class ChangeRecurringPaymentServiceView(TemplateView):
     template_name = 'items/change_item.html'
 
-    def get_recurring_payment_service_admin(self):
+    @staticmethod
+    def get_recurring_payment_service_admin():
         default_site = AdminSite()
         service_admin = RecurringPaymentServiceAdmin(RecurringPaymentService, default_site)
         return service_admin
@@ -831,14 +799,6 @@ class ChangeRecurringPaymentServiceView(TemplateView):
         # item.stock = stock
         if retail_price:
             item.retail_price = retail_price
-        if getattr(settings, 'IS_PROVIDER', False):
-            item.wholesale_price = wholesale_price
-            if max_price:
-                item.max_price = float(max_price)
-            item.retail_price_is_modifiable = True if request.POST.get('retail_price_is_modifiable') else False
-        else:
-            # item.wholesale_price = 0
-            item.retail_price_is_modifiable = True
         item.photos = []
         if len(photos_ids_list) == 0:
             item.visible = False  # Items without photo are hidden

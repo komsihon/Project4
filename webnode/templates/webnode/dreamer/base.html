@@ -45,6 +45,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
         {% block seo %}{% endblock %}
         {% block header %}
             <div class="header hidden-xs hidden-sm">
+                {% if config.show_contact_bar %}
                 <div class="header-top">
                     <div class="container">
                         <div class="top-left">
@@ -71,6 +72,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                         <div class="clearfix"></div>
                     </div>
                 </div>
+                {% endif %}
                 <div class="header-bottom">
                     <div class="container">
                         <div class="logo-nav">

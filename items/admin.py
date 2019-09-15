@@ -7,7 +7,7 @@ from ikwen.core.utils import get_service_instance
 from ikwen_webnode.items.models import Item, RecurringPaymentService, ItemCategory
 from django.contrib import admin
 
-from ikwen_kakocase.kakocase.models import IS_PROVIDER, IS_RETAILER
+from ikwen_kakocase.kakocase.models import IS_RETAILER
 
 from django.conf import settings
 
@@ -31,8 +31,6 @@ class ItemResource(resources.ModelResource):
         instance.slug = slug
         instance.tags = slug.replace('-', ' ')
         instance.visible = False
-        instance.provider = self.provider
-        instance.retail_price_is_modifiable = self.retail_price_is_modifiable
         instance.batch_upload = self.batch_upload
 
     def skip_row(self, instance, original):
@@ -52,18 +50,16 @@ class ItemResource(resources.ModelResource):
 
 class ItemAdmin(admin.ModelAdmin):
     fieldsets = (
-        (None, {'fields': ('provider', 'category', 'name', 'brand', 'wholesale_price', 'video_url', 'retail_price', 'max_price', 'size', 'color', 'weight', 'badge_text', 'stock', 'visible', 'summary', 'description', ) if IS_RETAILER
-        else ('category', 'name', 'brand', 'wholesale_price', 'video_url', 'retail_price', 'max_price', 'retail_price_is_modifiable',
-              'reference', 'original_id', 'size', 'color', 'weight', 'stock', 'unit_of_measurement', 'min_order', 'badge_text', 'summary', 'description',
-              'visible', 'has_background_image')}),
+        (None, {'fields': ('provider', 'category', 'name', 'brand', 'wholesale_price', 'video_url', 'retail_price',
+                           'max_price', 'size', 'color', 'weight', 'badge_text', 'stock', 'visible', 'summary',
+                           'description', ) if IS_RETAILER
+        else ('category', 'name', 'brand', 'wholesale_price', 'video_url', 'retail_price', 'max_price',
+              'size', 'color', 'weight', 'stock', 'unit_of_measurement', 'min_order', 'badge_text', 'summary',
+              'description', 'visible', 'has_background_image')}),
     )
 
     def get_readonly_fields(self, request, obj=None):
-        if IS_PROVIDER:
-            return ()
-        ro = ['provider', 'category', 'name', 'brand', 'wholesale_price', 'summary', 'description', 'max_price', 'size', 'color', 'weight', 'stock', 'visible']
-        if not obj.retail_price_is_modifiable:
-            ro.append('retail_price')
+        ro = ['provider', 'brand', 'wholesale_price', 'max_price', 'size', 'color', 'weight', 'stock', 'visible']
         return ro
 
 

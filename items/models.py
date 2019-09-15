@@ -157,19 +157,12 @@ class AbstractItem(AbstractWatchModel):
     badge_text = models.CharField(max_length=25, blank=True, null=True,
                                   help_text=_("Text in the badge that appears on the item. "
                                               "<strong>E.g.:</strong> -20%, -30%, New, etc."))
-    reference = models.CharField(max_length=60, db_index=True, blank=True, null=True, editable=IS_PROVIDER,
-                                 help_text=_("Reference number of the item as in your current IS."))
-    original_id = models.CharField(max_length=30, db_index=True, blank=True, null=True, editable=IS_PROVIDER,
-                                   help_text=_("ID of the item in your current database."))
+
     photos = ListField(EmbeddedModelField('Photo'), editable=False)
     # PRICES
     wholesale_price = models.FloatField(blank=IS_RETAILER, null=IS_RETAILER, help_text=wholesale_price_help_text)
     retail_price = models.FloatField(blank=True, null=True, help_text=retail_price_help_text)
     max_price = models.FloatField(blank=True, null=True, help_text=max_price_help_text)
-    retail_price_is_modifiable = models.BooleanField(_("modifiable price ?"), editable=IS_PROVIDER, default=True,
-                                                     help_text="If True, retailer can set his own retail price. "
-                                                               "Otherwise, retailer will be forced to set the retail "
-                                                               "price you have set.")
 
     # SALE INFORMATION: They are automatically set whenever retail_price is updated
     on_sale = models.BooleanField(default=False, editable=False,

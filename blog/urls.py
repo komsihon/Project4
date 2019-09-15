@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import permission_required
 
 from ikwen_webnode.blog.views import PostDetails, Search, PostPerCategory, PostsList, save_comment, AdminPostHome, \
     save_post_likes, post_photo_uploader,Post_document_uploader, delete_photo, ListCategory, ChangeCategory, load_posts_for_homepage, \
-    ChangePost, CommentList, delete_comment_object, toggle_object_attribute, get_media, delete_tinyMCE_photo,delete_doc
+    ChangePost, CommentList, delete_comment_object, toggle_object_attribute, get_media, delete_tinyMCE_photo,delete_doc, put_post_in_trash
 from ikwen_webnode.webnode.views import AdminHome
 
 
@@ -41,4 +41,5 @@ urlpatterns = patterns(
     url(r'^toggle_object_attribute$', toggle_object_attribute, name='toggle_object_attribute'),
     url(r'^get_media$', get_media, name='get_media'),
     url(r'^delete_tinymce_photo', delete_tinyMCE_photo, name='delete_tinymce_photo'),
+    url(r'^put_post_in_trash$', put_post_in_trash, name='put_post_in_trash'),
 )

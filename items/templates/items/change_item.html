@@ -166,9 +166,9 @@
                     <div id="upload-container" class="images-uploader">
                         {% for photo in item.photos %}
                             <div class="frame image" id="{{ photo.id }}" style="background-image: url('{{ photo.image.small_url }}')">
-                                {% if settings.IS_PROVIDER %}
+{#                                {% if settings.IS_PROVIDER %}#}
                                     <div class="delete has-shade" title="{% trans 'Delete image ?' %}">&times;</div>
-                                {% endif %}
+{#                                {% endif %}#}
                             </div>
                         {% endfor %}
                         <div class="frame image tpl">
@@ -176,9 +176,9 @@
                             {% include 'core/snippets/spinner.html' %}
                             <div class="delete has-shade" title="{% trans 'Delete image' %}">&times;</div>
                         </div>
-                        {% if settings.IS_PROVIDER %}
+{#                        {% if settings.IS_PROVIDER %}#}
                             <div class="frame uploader"></div>
-                        {% endif %}
+{#                        {% endif %}#}
                     </div><div class="clearfix"></div>
                 </div>
                 <div class="form-row field-menu form-group">
@@ -221,11 +221,11 @@
                     <div class="clearfix"></div>
 
                 {% endif %}
-                {% if settings.IS_PROVIDER %}
+{#                {% if settings.IS_PROVIDER %}#}
                     <div class="form-group submit col-xs-12 col-sm-4 col-md-3" style="clear: both; margin-left: -15px; padding-top: 15px">
                         <button class="btn btn-sm btn-primary btn-block">{% trans "Save" %}</button>
                     </div>
-                {% endif %}
+{#                {% endif %}#}
                 <div class="clearfix"></div>
             </form>
         </div>
@@ -242,7 +242,7 @@
             $('.form-row').addClass('form-group');
             $('.form-row input, .form-row select, .form-row textarea').addClass('form-control input-sm');
             $('.form-row textarea').addClass('form-control input-sm');
-            {% if settings.IS_PROVIDER %}
+{#            {% if settings.IS_PROVIDER %}#}
                 {% if request.GET.name %}
                     $('#id_name').val("{{ request.GET.name }}");
                 {% endif %}
@@ -400,7 +400,7 @@
                         window.location = "{% url 'items:change_category' %}?smart_category_id=" + smartCatId
                     }
                 });
-            {% endif %}
+{#            {% endif %}#}
             $('form#submit-item .field-wholesale_price').find('input').val(0)
 
 

@@ -1,38 +1,38 @@
+import json
 import os
 
 from ajaxuploader.views import AjaxFileUploader
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.admin import helpers
 from django.contrib.admin.sites import AdminSite
+from django.contrib.auth.decorators import permission_required, login_required
+from django.core.files import File
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.core.urlresolvers import reverse
 from django.forms.models import modelform_factory
+from django.http import HttpResponse
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
-from django.contrib.admin import helpers
-from django.contrib import messages
-from django.utils.translation import gettext as _
-from ikwen.core.models import Module, Model
-from ikwen.flatpages.models import FlatPage
-
-# Create your views here.
-import random
-
-from django.core.files import File
+from django.template.defaultfilters import slugify
 from django.utils.decorators import method_decorator
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import TemplateView
-from ikwen.accesscontrol.templatetags.auth_tokens import append_auth_tokens
-
-from ikwen.core.utils import get_model_admin_instance, DefaultUploadBackend
 from ikwen_webnode.blog.admin import PostAdmin, PostCategoryAdmin
 from ikwen_webnode.blog.models import Post, Comment, PostCategory, PostLikes, LinkedDoc, Photo
-from django.http import HttpResponse
-import json
-from django.template.defaultfilters import slugify
-from ikwen.core.views import HybridListView, ChangeObjectBase
 from ikwen_webnode.webnode.views import TemplateSelector
+from ikwen.core.models import Service
 
-from django.conf import settings
+from ikwen.accesscontrol.templatetags.auth_tokens import append_auth_tokens
+from ikwen.core.models import Module
+from ikwen.core.utils import get_model_admin_instance, DefaultUploadBackend, add_database_to_settings,\
+    DefaultUploadBackend, get_service_instance, add_event, get_mail_content, get_model_admin_instance
+
+from ikwen.core.views import HybridListView, ChangeObjectBase
+
+# Create your views here.
 
 POST_PER_PAGE = 5
 MEDIA_DIR = getattr(settings, 'MEDIA_ROOT') + 'tiny_mce/'
@@ -216,7 +216,7 @@ class AdminPostHome(HybridListView):
 
     model = Post
     search_field = 'title'
-    ordering = ('-updated_on',)
+    ordering = ('-id',)
     context_object_name = 'entries'
 
     def get(self, request, *args, **kwargs):
@@ -332,6 +332,28 @@ class ChangePost(TemplateView):
             context = self.get_context_data(**kwargs)
             context['errors'] = form.errors
             return render(request, self.template_name, context)
+
+
+@permission_required('items.ik_manage_item')
+def put_post_in_trash(request, *args, **kwargs):
+    # TODO: Implement Trash view itself so that people can view and restore the content of the trash
+    config = get_service_instance().config
+    selection = request.GET['selection'].split(',')
+    deleted = []
+    for post_id in selection:
+        try:
+            post = Post.objects.get(pk=post_id)
+            post.is_active = False
+            post.save()
+            deleted.append(post_id)
+
+        except Post.DoesNotExist:
+            message = "Items %s was not found."
+            break
+    else:
+        message = "%d item(s) moved to trash." % len(selection)
+    response = {'message': message, 'deleted': deleted}
+    return HttpResponse(json.dumps(response), 'content-type: text/json')
 
 
 class PostPhotoUploadBackend(DefaultUploadBackend):

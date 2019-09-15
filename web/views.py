@@ -68,7 +68,7 @@ class ChangeSmartObject(TemplateView):
         else:
             model = SmartCategory
             model_admin = SmartCategoryAdmin
-            fields = ("title", "content_type", 'density', "target_url",'description',)
+            fields = ("title", "content_type", "target_url",'description',)
         if smart_object_id:
             smart_object = get_object_or_404(model, pk=smart_object_id)
             smart_object.content = [ItemCategory.objects.get(pk=pk) for pk in smart_object.items_fk_list]

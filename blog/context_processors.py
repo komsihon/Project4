@@ -14,4 +14,5 @@ def blog_base_data(request):
                 'suggestions': suggestions[:4],
                 'most_consulted': recent_posts[:4],
                 'archives': recent_posts,
+                'footer_posts': suggestions[:3],
             }
