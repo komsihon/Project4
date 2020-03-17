@@ -219,6 +219,7 @@
                     $('#id_description').val(smartObject.description);
                     $('#id_cta').val(smartObject.cta);
                     $('#image_url').val(smartObject.image_url);
+                    $('#density').val(smartObject.density);
                     $('div#upload-container .image').css('background-image', "url('" + smartObject.image_url +"')");
                 }
             {% endif %}
@@ -226,11 +227,11 @@
                 var val = $(this).val();
                 if (val === 'Flat') {
                     $('.details, .photos').show();
-                    $('.field-menu').hide();
+                    $('.field-menu, .field-density').hide();
                     $('.field-cta').insertAfter('.field-description').show();
                 } else if (val === 'Menu') {
                     $('.details, .photos').hide();
-                    $('.field-menu').show();
+                    $('.field-menu, .field-density').show();
                     $('.field-cta').insertAfter('.field-menu').show();
                 } else $('.details, .photos, .field-menu, .field-cta').hide();
             });

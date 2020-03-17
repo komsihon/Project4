@@ -37,7 +37,7 @@ logger = logging.getLogger('ikwen')
 
 
 if getattr(settings, 'LOCAL_DEV', False):
-    CLOUD_HOME = '/home/roddy/PycharmProjects/CloudTest/'
+    CLOUD_HOME = '/home/w177/MEGAsync/PycharmProjects/CloudTest/'
 else:
     CLOUD_HOME = '/home/ikwen/Cloud/'
 
@@ -122,7 +122,7 @@ def deploy(app, member, project_name, billing_plan, theme, monthly_cost,
     elif not os.path.exists(media_root):
         os.makedirs(media_root)
         logger.debug("Media folder '%s' successfully created empty" % media_root)
-    favicons_folder = media_root + 'favicons'
+    favicons_folder = media_root + 'icons'
     if not os.path.exists(favicons_folder):
         os.makedirs(favicons_folder)
     if os.path.exists(website_home_folder):

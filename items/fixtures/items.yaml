@@ -2,7 +2,7 @@
   pk: 55d1fa8feb60008099bd4151
   fields:
     provider: 56eb6d04b37b3379b531b101
-    category: 55d1fa8feb60008099bd4154
+    category: 569228a9b37b3301e0706b51
     name: Samsung Galaxy S7
     slug: samsung-galaxy-s7
     tags: samsung galaxy s7
@@ -23,7 +23,7 @@
   pk: 55d1fa8feb60008099bd4152
   fields:
     provider: 56eb6d04b37b3379b531b102
-    category: 55d1fa8feb6aaa8099bd4154
+    category: 569228a9b37b3301e0706b52
     name: Coca-Cola
     slug: coca-cola
     tags: coca cola
@@ -45,7 +45,7 @@
   pk: 55d1fa8feb60008099bd4153
   fields:
     provider: 56eb6d04b37b3379b531b102
-    category: 55d1fa8feb6aaa8099bd4154
+    category: 569228a9b37b3301e0706b52
     name: Mutzig
     slug: mutzig
     tags: mutzig
@@ -60,47 +60,28 @@
     units_sold_history: [74, 51, 35, 89]
     stock: 65
 
-- model: items.item
-  pk: 55d1fa8feb60008099beaa53
-  fields:
-    provider: 56eb6d04b37b3379b531b102
-    category: 56eb6d04b3779b33b531a521
-    name: Salade
-    slug: salade
-    tags: salade
-    photos:
-      - id: 56eb6d04b3779b33b531e093
-        image: items/photos/mutzig.jpg
-    wholesale_price: 460
-    retail_price: 550
-    max_price: 800
-    retail_price_is_modifiable: No
-    total_units_sold: 249
-    units_sold_history: [74, 51, 35, 89]
-    stock: 65
-
-- model: items.itemcategory
-  pk: 55d1fa8feb6aaa8099bd4154
-  fields:
-  fields:
-    name: Drinks
-    slug: drinks
-    is_active: yes
-
-- model: items.itemcategory
-  pk: 56eb6d04b3779b33b531a521
-  fields:
-  fields:
-    name: Food
-    slug: food
-    is_active: yes
-
-- model: items.itemcategory
+- model: items.recurringpaymentservice
   pk: 55d1fa8feb60008099bd4154
   fields:
-    name: Electronics
-    slug: electronics
-    is_active: yes
+    provider: 56eb6d04b37b3379b531b101
+    category: 569228a9b37b3301e0706b52
+    name: Theft insurance
+    slug: theft-insurance
+    tags: theft insurance
+    photos:
+      - id: 56eb6d04b3779b33b531e094
+        image: items/photos/theft-insurance.jpg
+    wholesale_price: 4500
+    retail_price: 5500
+    max_price: 7000
+    duration: 91
+    duration_text: 3 Mois
+    retail_price_is_modifiable: Yes
+    total_units_sold: 101
+    units_sold_history: [30, 14, 48, 9]
+#    sale_price: 480
+#    measurement: Crate
+#    min_quantity: 10
 
 - model: items.photo
   pk: 56eb6d04b3779b33b531e091

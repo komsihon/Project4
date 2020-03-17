@@ -94,7 +94,7 @@ div.top-right{float: right}
 .banner .cta a {background: #e74c3c; border-radius: 50px;color: #fff;float: left; font-size: 22px; font-weight: 300; margin-top: 150px; padding: 25px; text-align: center; width: 100%}
 .home-section-cta .cta {background: #e74c3c; border-radius: 50px;color: #fff; font-size: 22px; font-weight: 300; margin-top: 50px; padding: 25px 50px; text-align: center}
 .item-list {height: 440px; padding: 5px}
-.item-list .item-list-img {background-size: cover; background-position: center; height: 200px; width: 100%}
+.item-list .item-list-img {margin:auto; width: 75%}
 .item-list h2 {text-align: center}
 .item-list h3 {text-align: justify}
 .home-section-text-right .description {float: right;text-align: right;}

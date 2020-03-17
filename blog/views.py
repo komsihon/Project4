@@ -214,10 +214,14 @@ class ChangeCategory(ChangeObjectBase):
 class AdminPostHome(HybridListView):
     template_name = 'blog/admin/blog_list.html'
 
-    model = Post
+    queryset = Post.objects.filter(is_active=True)
     search_field = 'title'
     ordering = ('-id',)
     context_object_name = 'entries'
+
+    def get_queryset(self):
+        queryset = super(AdminPostHome, self).get_queryset()
+        return queryset
 
     def get(self, request, *args, **kwargs):
         sorted_keys = request.GET.get('sorted')
@@ -348,7 +352,7 @@ def put_post_in_trash(request, *args, **kwargs):
             deleted.append(post_id)
 
         except Post.DoesNotExist:
-            message = "Items %s was not found."
+            message = "Posts %s was not found."
             break
     else:
         message = "%d item(s) moved to trash." % len(selection)

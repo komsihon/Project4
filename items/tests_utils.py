@@ -44,6 +44,43 @@ class KakoUtilsTestCase(unittest.TestCase):
 
 
     @override_settings(IKWEN_SERVICE_ID='56eb6d04b37b3379b531b103')
+    def test_Product_get_size_list(self):
+        """
+        Product.get_size_list returns a list of all sizes of Products with same slug, category and brand.
+        """
+        brand = 'Same Brand'
+        c = ItemCategory.objects.all()[0]
+        slug = 'same-slug'
+        Item.objects.filter(pk='55d1fa8feb60008099bd4151').update(category=c, slug=slug, brand=brand, size="S")
+        Item.objects.filter(pk='55d1fa8feb60008099bd4152').update(category=c, slug=slug, brand=brand, size="M")
+        Item.objects.filter(pk='55d1fa8feb60008099bd4153').update(category=c, slug=slug, brand=brand, size="L")
+        p1 = Item.objects.get(pk='55d1fa8feb60008099bd4151')
+        self.assertEqual(p1.get_size_list_label(), 'S / M / L')
+
+
+    @override_settings(IKWEN_SERVICE_ID='56eb6d04b37b3379b531b103')
+    def test_mark_duplicates(self):
+        """
+        Product.get_size_list returns a list of all sizes of Products with same slug, category and brand.
+        """
+        brand = 'Same Brand'
+        c = ItemCategory.objects.all()[0]
+        slug = 'same-slug'
+        Item.objects.filter(pk='55d1fa8feb60008099bd4151').update(category=c, slug=slug, brand=brand, size="S", stock=10)
+        Item.objects.filter(pk='55d1fa8feb60008099bd4152').update(category=c, slug=slug, brand=brand, size="M", stock=5)
+        Item.objects.filter(pk='55d1fa8feb60008099bd4153').update(category=c, slug=slug, brand=brand, size="L", stock=7)
+        p1 = Item.objects.get(pk='55d1fa8feb60008099bd4151')
+        mark_duplicates(p1)
+        p2 = Item.objects.get(pk='55d1fa8feb60008099bd4152')
+        p3 = Item.objects.get(pk='55d1fa8feb60008099bd4153')
+        self.assertTrue(p2.is_duplicate)
+        self.assertTrue(p3.is_duplicate)
+        self.assertFalse(p1.is_duplicate)
+        p1.delete()
+        p2 = Item.objects.get(pk='55d1fa8feb60008099bd4152')
+        self.assertTrue(p2.is_duplicate)
+
+    @override_settings(IKWEN_SERVICE_ID='56eb6d04b37b3379b531b103')
     def test_Item_delete(self):
         """
         Product.get_size_list returns a list of all sizes of Products with same slug, category and brand.

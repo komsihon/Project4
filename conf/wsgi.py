@@ -7,7 +7,7 @@ For more information on this file, see
 https://docs.djangoproject.com/en/1.6/howto/deployment/wsgi/
 """
 import os, sys
-sys.path.append('/home/roddy/PycharmProjects/Webnode/conf')
+sys.path.append('/home/wi77/MEGAsync/PycharmProjects/Webnode/conf')
 from conf import monitor
 
 monitor.start(interval=1.0)

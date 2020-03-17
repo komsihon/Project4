@@ -2,6 +2,7 @@
 <!--
 Au<!--
 Author: Roddy Mbogning
+Contributor: W1773ND (wilfriedwillend@gmail.com)
 Author URL: http://w3layouts.com
 License: Creative Commons Attribution 3.0 Unported
 License URL: http://creativecommons.org/licenses/by/3.0/
@@ -21,6 +22,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
             <link rel="stylesheet" href="{% static 'ikwen/swiper/css/swiper.min.css' %}">
             <link rel="stylesheet" href="{% static 'webnode/css/dreamer/main.css' %}?version=1.0">
             <link rel="stylesheet" href="{% static 'webnode/css/dreamer/base.css' %}">
+            <link rel="stylesheet" href="{% static 'webnode/css/dreamer/hpn.css' %}">
             {% if config.theme %}
                 {% with theme=config.theme %}
                     <link rel='stylesheet' href="{% static 'webnode/themes/' %}{{ theme.template.slug }}/{{ theme.slug }}.css" />
@@ -38,7 +40,6 @@ License URL: http://creativecommons.org/licenses/by/3.0/
               <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
             <![endif]-->
         {% endblock %}
-        <link rel="stylesheet" href="{% static 'webnode/css/dreamer/hpn.css' %}">
         <script src="{% static 'ikwen/js/jquery-1.12.4.min.js' %}"></script>
     </head>
     <body>
@@ -87,7 +88,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                                         {% else %}
                                            <span>{{ service.project_name }}</span>
                                         {% endif %}
-                                    {% if config.slogan %}<span class="slogan" title="{{ config.slogan }}"><div style="float: left; width: 500%">{{ config.slogan }}</div></span>{% endif %}
+                                    {% if config.slogan %}<span class="slogan" title="{{ config.slogan }}"><div style="font-size: 13px; float: left; width: 500%">{{ config.slogan }}</div></span>{% endif %}
                                     </a>
                                     <a class="visible-xs">
                                         {% if config.theme.logo.name %}
@@ -95,7 +96,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                                         {% else %}
                                             <span>{{ service.project_name }}</span>
                                         {% endif %}
-                                    {% if config.slogan %}<span class="slogan" title="{{ config.slogan }}"><div style="float: left; width: 500%">{{ config.slogan }}</div></span>{% endif %}
+                                    {% if config.slogan %}<span class="slogan" title="{{ config.slogan }}"><div style="font-size: 13px; float: left; margin-top: 10px; width: 500%">{{ config.slogan }}</div></span>{% endif %}
                                     </a>
                                 </h1>
                             </div>
@@ -241,7 +242,11 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                                 {% if about_page %}
                                     <li><a href="{% url 'flatpage' about_page.url %}">{{ about_page.title }}</a></li>
                                 {% endif %}
-                                <li><a href="{% url 'ikwen:sign_in' %}">{% trans "Login" %}</a></li>
+                                {% if user.is_authenticated %}
+                                <li><a href="{% url "ikwen:logout" %}">{% trans "Logout" %}</a></li>
+                                {% else %}
+                                    <li><a href="{% url 'ikwen:sign_in' %}">{% trans 'Login' %}</a></li>
+                                {% endif %}
                             </ul>
                         </div>
                         <div class="col-sm-6 col-md-4 footer-grid foot">

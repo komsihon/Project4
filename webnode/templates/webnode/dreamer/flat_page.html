@@ -1,36 +1,28 @@
 {% extends 'webnode/dreamer/base.html' %}
-{% load static auth_tokens %}
+{% load i18n staticfiles humanize auth_tokens cache %}
 
-{% block page_title %}<title>{{ service.project_name }} - {{ page.title }}</title>{% endblock %}
+{% block page_title %}
+    <title>{% trans page.title %} - {{ service.project_name }}</title>
+{% endblock %}
 
 {% block head_style %}
     {{ block.super }}
     <style>
+	.navbar-nav>li>a, .logo-nav-left a {color: #AAA}
         .navbar-inverse .navbar-nav > li > a {color: #2e2e2e;}
         .flat-page-content {font-size: 20px; line-height: 35px; min-height: 600px; margin-top: 50px;}
         .page-title {margin-top: 5em;}
+        .page-content {margin-top: 4em; min-height: 450px; text-align: justify}
     </style>
 {% endblock %}
 
-{% block page_content %}
-    <section id="about-us">
+{% block content %}
+    <div id="content" class="content">
         <div class="container">
-			<div class="center wow fadeInDown">
-				<h2 class="page-title">{{ page.title }}</h2>
-			</div>
-            <div class="flat-page-content">
-                {{ page.content|safe }}
+            <h2 class="page-title">{% trans page.title %}</h2>
+            <div class="page-content" style="">
+                {% trans page.content|safe %}
             </div>
-		</div><!--/.container-->
-    </section><!--/about-us-->
-{% endblock %}
-{% block js %}
-    {{ block.super }}
-    <script type="text/javascript">
-        (function() {
-            $('ul.navbar-nav li').removeClass('active');
-            $('ul.navbar-nav li.about').addClass('active')
-            $('#bottom .container.fadeInDown').css('visibility', 'visible')
-        })()
-    </script>
+        </div>
+    </div>
 {% endblock %}

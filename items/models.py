@@ -160,7 +160,7 @@ class AbstractItem(AbstractWatchModel):
 
     photos = ListField(EmbeddedModelField('Photo'), editable=False)
     # PRICES
-    wholesale_price = models.FloatField(blank=IS_RETAILER, null=IS_RETAILER, help_text=wholesale_price_help_text)
+    wholesale_price = models.FloatField(blank=IS_RETAILER, null=IS_RETAILER, help_text=wholesale_price_help_text, default=0)
     retail_price = models.FloatField(blank=True, null=True, help_text=retail_price_help_text)
     max_price = models.FloatField(blank=True, null=True, help_text=max_price_help_text)
 

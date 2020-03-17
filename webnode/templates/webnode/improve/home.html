@@ -1,5 +1,5 @@
 {% extends 'webnode/improve/base.html' %}
-{% load i18n static auth_tokens %}
+{% load i18n static user_agents auth_tokens %}
 {% block meta %}
     {{ block.super }}
     {% include 'webnode/snippets/home_seo.html' %}
@@ -14,49 +14,56 @@
 
 {% block page_content %}
     {% if slideshow %}
-    <section id="main-slider" class="no-margin">
-        <div class="carousel slide">
-            {% if slideshow|length > 1 %}
-                <ol class="carousel-indicators">
+    <section class="no-margin">
+
+{#        <div class="slideshows">#}
+            <div class="swiper-container">
+                <!-- Additional required wrapper -->
+                <div class="swiper-wrapper">
+                    <!-- Slides -->
                     {% for slide in slideshow %}
-                    <li data-target="#main-slider" data-slide-to="{{ forloop.counter0 }}"></li>
-                    {% endfor %}
-                </ol>
-            {% endif %}
-            <div class="carousel-inner">
-                <div class="stage">
-                {% for slide in slideshow %}
-                    {% if slide.image.name %}
-                        <div class="item" style="background-image: url({{ slide.image.url }}">
-                            <div class="veil"></div>
-                            <div class="container">
-                                <div class="row slide-margin">
-                                    <div class="animation animated-item-4 slide-title">
-                                        {{ slide.title }}
+                        <div class="swiper-slide">
+                        {% if slide.image.name %}
+                            <div class="">
+                                {% if request|is_mobile %}
+                                    <div class="slide mobile" style="background-image: url({% get_media_prefix %}{{ slide.image.name }})">
+                                        {% if slide.title %}
+                                            <h1 class="text-has-shade">{{ slide.title }}</h1>
+                                        {% endif %}
+                                        {% if slide.cta %}
+                                            <div class="cta">
+                                                <a href="{{ slide.target_url }}" class="button1 has-shade">{{ slide.cta }}</a>
+                                            </div>
+                                        {% endif %}
                                     </div>
-                                    {% if slide.cta %}
-                                        <div class="animation animated-item-4 slide-cta">
-                                            <a href="{{ slide.target_url }}" class="cta">
-                                                {{ slide.cta }}
-                                            </a>
+                                {% else %}
+                                    <div class="slide" style="background-image: url({% get_media_prefix %}{{ slide.image.name }})">
+                                        <div class="details">
+                                            {% if slide.title %}
+                                                <h1 class="">{{ slide.title }}</h1>
+                                            {% endif %}
+                                            {% if slide.cta %}
+                                                <div class="cta">
+                                                    <a href="{{ slide.target_url }}" class="button1 has-shade">{{ slide.cta }}</a>
+                                                </div>
+                                            {% endif %}
                                         </div>
-                                    {% endif %}
-                                </div>
+                                    </div>
+                                {% endif %}
                             </div>
-                        </div><!--/.item-->
-                    {% endif %}
-                {% endfor %}
+                        {% endif %}
+                        </div>
+                    {% endfor %}
                 </div>
-            </div><!--/.carousel-inner-->
-        </div><!--/.carousel-->
-        {% if slideshow|length > 1 %}
-            <a class="prev hidden-xs" href="#main-slider" data-slide="prev">
-                <i class="fa fa-chevron-left"></i>
-            </a>
-            <a class="next hidden-xs" href="#main-slider" data-slide="next">
-                <i class="fa fa-chevron-right"></i>
-            </a>
-        {% endif %}
+                <!-- If we need pagination -->
+                <div class="swiper-pagination"></div>
+
+                <!-- If we need navigation buttons -->
+                <div  id="js-prev1" class="swiper-button-prev hidden-xs"></div>
+                <div  id="js-next1" class="swiper-button-next hidden-xs"></div>
+
+            </div>
+{#        </div>#}
     </section><!--/#main-slider-->
     {% endif %}
 
@@ -70,10 +77,33 @@
     {{ block.super }}
     <script type="text/javascript">
         (function() {
-            $('ul.navbar-nav li').removeClass('active');
-            $('ul.navbar-nav li.home').addClass('active');
-            $('.carousel.slide .carousel-inner').find('div.item:first-child').addClass('active');
-            $('.carousel.slide .carousel-indicators').find('li:first-child').addClass('active')
+            var mySwiper = new Swiper ('.swiper-container', {
+                // Optional parameters
+                direction: 'horizontal',
+                loop: false,
+
+                // If we need pagination
+                pagination: {
+                    el: '.swiper-pagination',
+                    type: 'bullets',
+                },
+
+                // Navigation arrows
+                navigation: {
+                    prevEl:  '#js-prev1',
+                    nextEl:  '#js-next1',
+                },
+                autoplay: 5000
+            })
+
+            $('.swiper-container').on('mouseenter', function(e){
+                console.log('stop autoplay');
+                mySwiper.stopAutoplay();
+            })
+             $('.swiper-container').on('mouseleave', function(e){
+                console.log('start autoplay');
+                mySwiper.startAutoplay();
+            })
         })()
     </script>
 {% endblock %}

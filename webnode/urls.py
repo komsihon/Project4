@@ -16,6 +16,7 @@ elif getattr(settings, 'IS_APP_RETAILER', False):
     urlpatterns = patterns(
         '',
         url(r'^webnode/deployCloud/$', DeployCloud.as_view(), name='deploy_cloud'),
+        url(r'^(?P<menu_slug>[-\w]+)/(?P<category_slug>[-\w]+)/(?P<slug>[-\w]+)/$', ItemDetails.as_view(), name='product_details'),
         url(r'^(?P<category_slug>[-\w]+)/(?P<slug>[-\w]+)/$', ItemDetails.as_view(), name='product_details'),
         url(r'^(?P<slug>[-\w]+)/$', ItemList.as_view(), name='item_list'),
     )
@@ -26,5 +27,6 @@ else:
         url(r'^appRegister/$', Registration.as_view(), name='app_register'),
         url(r'^appSignIn/$', appSignIn.as_view(), name='app_login'),
         url(r'^(?P<category_slug>[-\w]+)/(?P<slug>[-\w]+)/$', ItemDetails.as_view(), name='product_details'),
+        url(r'^(?P<menu_slug>[-\w]+)/(?P<category_slug>[-\w]+)/(?P<slug>[-\w]+)/$', ItemDetails.as_view(), name='product_details'),
         url(r'^(?P<slug>[-\w]+)/$', ItemList.as_view(), name='item_list'),
     )

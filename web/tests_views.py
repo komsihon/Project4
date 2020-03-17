@@ -17,7 +17,7 @@ class MarketingViewsTestCase(unittest.TestCase):
     will be achieved manually by a custom implementation of setUp()
     """
     fixtures = ['wn_members.yaml', 'wn_setup_data.yaml', 'wn_operators_configs.yaml',
-                 'wn_operators_configs.yaml', 'categories.yaml', 'items.yaml', 'wn_smart_objects.yaml']
+                 'wn_operators_configs.yaml', 'categories.yaml', 'items.yaml', 'smart_objects.yaml']
 
     def setUp(self):
         self.client = Client()
@@ -69,9 +69,13 @@ class MarketingViewsTestCase(unittest.TestCase):
         response = self.client.get(reverse('web:banner_list'))
         self.assertEqual(response.status_code, 200)
         slides = response.context['slide_list']
+        popups = response.context['popup_list']
         fw_sections = response.context['fw_section_list']
+        fs_popups = response.context['fs_popup_list']
         self.assertEqual(slides.count(), 3)
+        self.assertEqual(popups.count(), 0)
         self.assertEqual(fw_sections.count(), 0)
+        self.assertEqual(fs_popups.count(), 0)
 
     @override_settings(IKWEN_SERVICE_ID='56eb6d04b37b3379b531b103',
                        IS_RETAILER=True, IS_PROVIDER=False)

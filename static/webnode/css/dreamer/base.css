@@ -1,0 +1,6 @@
+/* Vertical alignment via flex : BEGIN */
+
+.v-align { display: flex; align-items: center; justify-content: flex-start }
+.v-align-center { align-self: center; }
+
+/* Vertical alignment via flex : END */

@@ -21,4 +21,7 @@ urlpatterns = patterns(
     url(r'^page/(?P<url>[-\w]+)/$', FlatPageView.as_view(), name='flatpage'),
     url(r'^items/', include('ikwen_webnode.items.urls', namespace='items')),
     url(r'^', include('ikwen_webnode.webnode.urls', namespace='webnode')),
+    # url(r'^', include('ikwen_webnode.items.urls', namespace='items')),
+
+    url(r'^echo/', include('echo.urls', namespace='echo')),
 )

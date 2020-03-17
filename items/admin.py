@@ -59,7 +59,7 @@ class ItemAdmin(admin.ModelAdmin):
     )
 
     def get_readonly_fields(self, request, obj=None):
-        ro = ['provider', 'brand', 'wholesale_price', 'max_price', 'size', 'color', 'weight', 'stock', 'visible']
+        ro = ['provider', 'brand', 'wholesale_price', 'max_price', 'size', 'color', 'weight', 'stock']
         return ro
 
 

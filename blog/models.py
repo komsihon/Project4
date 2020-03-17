@@ -38,7 +38,7 @@ class Post(Model):
     title = models.CharField(max_length=240, blank=False, unique=True)
     summary = models.CharField(max_length=240, blank=True)
     slug = models.SlugField(max_length=240, blank=False, unique=True, editable=False)
-    image = models.ImageField(upload_to=UPLOAD_TO, blank=True, null=True)
+    image = MultiImageField(upload_to=UPLOAD_TO, blank=True, null=True, max_size=800)
     entry = models.TextField()
     pub_date = models.DateField(default=datetime.now, editable=False)
     appear_on_home_page = models.BooleanField(default=False)
@@ -66,6 +66,10 @@ class Post(Model):
             return self.image.url
         else:
             return None
+
+    def delete(self, *args, **kwargs):
+        for photo in self.image:
+            photo.delete(*args, **kwargs)
 
 
 class PostLikes(Model):

@@ -8,6 +8,8 @@
 <VirtualHost *:80>
 	ServerName {% if is_naked_domain %}www.{% endif %}{{ domain }}
 
+    Alias /robots.txt /home/ikwen/Apps/WebNode/robots.txt
+
 	DocumentRoot /home/ikwen/Cloud/WebNode/{{ ikwen_name }}
 	<Directory /home/ikwen/Cloud/WebNode/{{ ikwen_name }}/conf/>
 		<Files wsgi.py>

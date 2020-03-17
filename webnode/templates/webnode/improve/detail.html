@@ -24,7 +24,7 @@
         {% endif %}
         <div class="row">
             <div class="col-xs-12 col-sm-12 blog-content">
-                <h2>{{ item.name  }}</h2>
+{#                <h2>{{ item.name  }}</h2>#}
                 <div>{{ item.description | safe }}</div>
             </div>
         </div>
@@ -44,7 +44,9 @@
                 {% for post in blog_suggestions %}
                     <div class="col-sm-4 suggess">
                         <div class="suggestion" >
+                            {% if post.image.name %}
                             <a href="{% url 'blog:details'  post.slug %}" style="background-image:url({{ post.image.url }})"></a>
+                            {% endif %}
                             <a href="{% url 'blog:details'  post.slug %}" >{{ post.title }}</a>
                         </div>
                     </div>

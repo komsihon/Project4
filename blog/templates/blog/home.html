@@ -22,7 +22,7 @@
                         {% endif %}
                         <h2><a href="{% url 'blog:details' entry.slug %}">{{ entry.title }}</a></h2>
                         <h3>{{ entry.summary }}</h3>
-                        <a class="btn btn-primary readmore" href="{% url 'blog:details' entry.slug %}">Read More</a>
+                        <a class="btn btn-primary readmore" href="{% url 'blog:details' entry.slug %}">Read More <i class="fa fa-angle-right"></i></a>
                     </div>
                 </div>
             </div>

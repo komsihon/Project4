@@ -220,13 +220,13 @@ class ChangeCategory(TemplateView):
             image_url = request.POST.get('image_url')
             content_type = request.POST.get('content_type')
 
-            category.content_type = content_type
             if not category:
                 category = create_category(name)
             else:
                 category.name = name
                 category.slug = slugify(name)
                 category.items_count = category.item_set.all().count()
+            category.content_type = content_type
             category.description = description
             category.badge_text = badge_text
             if image_url:
@@ -623,15 +623,18 @@ class ChangeItem(TemplateView):
             reference = request.POST.get('reference')
             has_background_image = request.POST.get('has_background_image') if request.POST.get('has_background_image') else False
             original_id = request.POST.get('original_id')
+            wholesale_price = request.POST.get('wholesale_price')
             try:
-                retail_price = float(request.POST.get('retail_price'))
+                retail_price = request.POST.get('retail_price')
             except:
                 retail_price = 0
+            max_price = request.POST.get('max_price')
             summary = request.POST.get('summary')
             description = request.POST.get('description')
             badge_text = request.POST.get('badge_text')
             size = request.POST.get('size')
             weight = request.POST.get('weight')
+            stock = request.POST.get('stock')
             unit_of_measurement = request.POST.get('unit_of_measurement')
             min_order = request.POST.get('min_order')
             if not min_order:
@@ -640,6 +643,11 @@ class ChangeItem(TemplateView):
             photos_ids = request.POST.get('photos_ids')
             photos_ids_list = photos_ids.strip(',').split(',') if photos_ids else []
             category = ItemCategory.objects.get(pk=category_id)
+            if retail_price and retail_price < wholesale_price:
+                error = _("Retail price cannot be smaller than wholesale price.")
+                context = self.get_context_data(**kwargs)
+                context['error'] = error
+                return render(request, self.template_name, context)
             if item_id:
                 item = get_object_or_404(Item, pk=item_id)
                 if getattr(settings, 'IS_PROVIDER', False):
@@ -665,7 +673,7 @@ class ChangeItem(TemplateView):
             #     return HttpResponseForbidden("You don't have permission to access this resource.")
             item.name = name
             item.slug = slugify(name)
-            item.brand = brand.strip()
+            item.brand = brand
             item.summary = summary
             item.description = description
             item.badge_text = badge_text
@@ -678,6 +686,14 @@ class ChangeItem(TemplateView):
             item.min_order = min_order
             item.unit_of_measurement = unit_of_measurement
             item.tags = item.slug.replace('-', ' ')
+            try:
+                item.stock = int(stock.strip())
+            except:
+                item.stock = 0
+            if getattr(settings, 'IS_PROVIDER', False):
+                item.wholesale_price = wholesale_price
+                if max_price:
+                    item.max_price = float(max_price.strip())
             item.photos = []
             if len(photos_ids_list) == 0:
                 item.visible = False  # Items without photo are hidden
@@ -717,8 +733,7 @@ class ChangeItem(TemplateView):
 class ChangeRecurringPaymentServiceView(TemplateView):
     template_name = 'items/change_item.html'
 
-    @staticmethod
-    def get_recurring_payment_service_admin():
+    def get_recurring_payment_service_admin(self):
         default_site = AdminSite()
         service_admin = RecurringPaymentServiceAdmin(RecurringPaymentService, default_site)
         return service_admin
@@ -799,6 +814,10 @@ class ChangeRecurringPaymentServiceView(TemplateView):
         # item.stock = stock
         if retail_price:
             item.retail_price = retail_price
+        if getattr(settings, 'IS_PROVIDER', False):
+            item.wholesale_price = wholesale_price
+            if max_price:
+                item.max_price = float(max_price)
         item.photos = []
         if len(photos_ids_list) == 0:
             item.visible = False  # Items without photo are hidden

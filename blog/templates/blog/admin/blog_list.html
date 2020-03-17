@@ -2,7 +2,7 @@
 {% load i18n humanize static auth_tokens %}
 
 {% block page_title %}
-<title> {% trans "Post" %} - {{ service.project_name }} </title>
+<title> {% trans "Post categories" %} - {{ service.project_name }} </title>
 {% endblock %}
 
 {% block head_style %}
@@ -42,6 +42,7 @@
                         {% endif %}
                         <div class="info">
                             <a href="{{ change_post_url|append_auth_tokens:request }}" class="full_name">{{ post.title }}</a>
+{#                                <p class="about">{{ post.items_count }} {% trans "items" %}</p>#}
                         </div>
                         <div class="actions">
                             <i class="action glyphicon glyphicon-trash trash" title="{% trans "Delete this post" %}"></i>

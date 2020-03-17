@@ -1,0 +1,26 @@
+{% extends 'webnode/improve/base.html' %}
+{% load static auth_tokens %}
+
+{% block page_title %}<title>{{ service.project_name }} - {{ page.title }}</title>{% endblock %}
+
+{% block page_content %}
+    <section id="about-us">
+        <div class="container">
+			<div class="center wow fadeInDown">
+				<h2>{{ page.title }}</h2>
+			</div>
+            <div style="font-size: 20px; line-height: 35px; min-height: 600px">
+                {{ page.content|safe }}
+            </div>
+		</div><!--/.container-->
+    </section><!--/about-us-->
+{% endblock %}
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function() {
+            $('ul.navbar-nav li').removeClass('active');
+            $('ul.navbar-nav li.about').addClass('active')
+        })()
+    </script>
+{% endblock %}

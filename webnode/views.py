@@ -1,17 +1,8 @@
 import json
 import datetime
-from django.http import HttpResponse
-from django.views.generic import TemplateView
-from ikwen.accesscontrol.models import Member
-from ikwen.billing.models import CloudBillingPlan, IkwenInvoiceItem, InvoiceEntry
-from ikwen.core.utils import get_service_instance
-from ikwen.flatpages.models import FlatPage
-from ikwen.partnership.models import ApplicationRetailConfig
-from ikwen.theming.models import Theme, Template
-from django.conf import settings
-from ikwen.accesscontrol.backends import UMBRELLA
-from ikwen.core.models import Service, Application
+import random
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -19,13 +10,21 @@ from django.utils.decorators import method_decorator
 from django.utils.http import urlquote
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
+from django.http import HttpResponse
+from django.views.generic import TemplateView
+
+from ikwen.accesscontrol.models import Member
+from ikwen.billing.models import CloudBillingPlan, IkwenInvoiceItem, InvoiceEntry
+from ikwen.core.utils import get_service_instance
+from ikwen.flatpages.models import FlatPage
+from ikwen.partnership.models import ApplicationRetailConfig
+from ikwen.theming.models import Theme, Template
+from ikwen.accesscontrol.backends import UMBRELLA
+from ikwen.core.models import Service, Application
+from ikwen.core.utils import as_matrix
 
 from ikwen_webnode.web.models import Banner, SmartCategory, SLIDE, HomepageSection
 from ikwen_webnode.items.models import ItemCategory, Item
-from ikwen.core.utils import as_matrix
-import random
-
-
 from ikwen_webnode.blog.models import Post
 
 # from ikwen_webnode.conf import settings
@@ -48,15 +47,16 @@ class TemplateSelector(object):
         try:
             if config.theme and config.theme.template.slug != "":
                 logger.debug("theme / Template:  %s / %s" % (config.theme.name, config.theme.template.name))
-                if config.theme.template.slug == 'optimum':
-                    tokens = self.template_name.split('/')
-                    logger.debug("tokens:  %s " % (tokens))
+                # if config.theme.template.slug == 'improve':
+                tokens = self.template_name.split('/')
+                if config.theme.template.slug == 'optimum' or config.theme.template.slug == 'improve':
                     tokens.insert(1, 'improve')
-                    logger.debug("templates:  %s " % ('/'.join(tokens)))
                 else:
-                    tokens = self.template_name.split('/')
+
+
                     logger.debug("tokens:  %s " % (tokens))
                     tokens.insert(1, config.theme.template.slug)
+                    # tokens.insert(1, 'graphic')
                     logger.debug("templates:  %s " % ('/'.join(tokens)))
                 return ['/'.join(tokens)]
         except:
@@ -83,12 +83,8 @@ class ItemDetails(TemplateSelector, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ItemDetails, self).get_context_data(**kwargs)
-        menu_slug = kwargs['menu_slug']
         slug = kwargs['slug']
         category_slug = kwargs['category_slug']
-        # try:
-        #     menu = SmartCategory.objects.get(slug=category_slug)
-        #
         category = ItemCategory.objects.get(slug=category_slug)
         page_item = Item.objects.get(slug=slug, category=category, in_trash=False, visible=True)
         tags = page_item.tags
@@ -149,6 +145,8 @@ class ItemList(TemplateSelector, TemplateView):
                 activate_block_title = True
             context['activate_block_title'] = activate_block_title
             context['smart_category'] = smart_category
+
+            context['category'] = ItemCategory.objects.get(slug=smart_category.slug)
         context['item_list'] = item_list
         return context
 
@@ -258,7 +256,7 @@ class DeployCloud(TemplateView):
         app = Application.objects.using(UMBRELLA).get(slug='webnode')
         context['app'] = app
         template_list = list(Template.objects.using(UMBRELLA).filter(app=app))
-        context['theme_list'] = Theme.objects.using(UMBRELLA).filter(template__in=template_list, is_active=True)
+        context['theme_list'] = Theme.objects.using(UMBRELLA).filter(template__in=template_list)
         context['can_choose_themes'] = True
         if getattr(settings, 'IS_IKWEN', False):
             billing_plan_list = CloudBillingPlan.objects.using(UMBRELLA).filter(app=app, partner__isnull=True, is_active=True)
